@@ -1,0 +1,49 @@
+export type Location = {
+  id: string
+  name: string
+  colorToken: string // key into tailwind `loc` palette, e.g. "bathroom"
+}
+
+export type MasterItem = {
+  id: string
+  name: string
+}
+
+export type Category = {
+  id: string
+  locationId: string
+  name: string
+  masterItems: MasterItem[]
+}
+
+export type Item = {
+  id: string
+  name: string
+  locationId: string
+  categoryId: string
+  masterItemId?: string
+  note?: string
+  rating?: number // 1-5, mutually exclusive with daysUntilEmpty
+  daysUntilEmpty?: number
+  place?: string
+  restockCycle?: string | null
+  affiliateUrl?: string | null
+  createdAt: string
+}
+
+export type FeedPost = {
+  id: string
+  nickname: string
+  itemName: string
+  rating: number
+  comment: string
+  locationId: string
+  categoryId: string
+}
+
+export type FamilyMember = {
+  id: string
+  name: string
+  relation: string
+  items: Array<{ itemName: string; daysUntilEmpty: number }>
+}
