@@ -89,7 +89,7 @@ remembuy/
 - Create: `.gitignore`
 
 **Interfaces:**
-- Produces: Tailwind theme tokens usable as `bg-paper`, `bg-card`, `text-ink`, `text-stamp`, `bg-stamp`, `text-accent`, `bg-accent`, `text-warn`, `bg-warn`, and `bg-loc-<name>`/`text-loc-<name>` for each of the 9 locations. Also produces `font-heading` (Gowun Batang) and `font-body` (IBM Plex Sans KR).
+- Produces: Tailwind theme tokens usable as `bg-paper`, `bg-card`, `text-ink`, `text-stamp`, `bg-stamp`, `text-accent`, `bg-accent`, `text-warn`, `bg-warn`, and `bg-loc-<name>`/`text-loc-<name>` for each of the 10 locations. Also produces `font-heading` (Gowun Batang) and `font-body` (IBM Plex Sans KR).
 - Produces: dev server fixed at `http://localhost:7777`.
 - Consumes: nothing (first task).
 
@@ -419,7 +419,7 @@ git commit -m "feat: add core domain types"
 
 **Interfaces:**
 - Consumes: `Location`, `Category`, `MasterItem` from `src/types.ts` (Task 2).
-- Produces: `LOCATIONS: Location[]`, `CATEGORIES: Category[]` (the fixed 9-location/23-category seed data), and helper `getCategoriesForLocation(locationId: string): Category[]`. These are consumed **only** as the initial/seed values inside `LockerContext` (Task 7) — every page reads the live, user-editable locations/categories from `useLocker()` instead.
+- Produces: `LOCATIONS: Location[]`, `CATEGORIES: Category[]` (the fixed 10-location/23-category seed data), and helper `getCategoriesForLocation(locationId: string): Category[]`. These are consumed **only** as the initial/seed values inside `LockerContext` (Task 7) — every page reads the live, user-editable locations/categories from `useLocker()` instead.
 
 - [ ] **Step 1: Write the failing test `src/data/locations.test.ts`**
 
@@ -428,10 +428,10 @@ import { describe, it, expect } from 'vitest'
 import { LOCATIONS, CATEGORIES, getCategoriesForLocation } from './locations'
 
 describe('locations seed data', () => {
-  it('has exactly 9 locations with unique ids', () => {
-    expect(LOCATIONS).toHaveLength(9)
+  it('has exactly 10 locations with unique ids', () => {
+    expect(LOCATIONS).toHaveLength(10)
     const ids = new Set(LOCATIONS.map((l) => l.id))
-    expect(ids.size).toBe(9)
+    expect(ids.size).toBe(10)
   })
 
   it('every category belongs to a real location', () => {
@@ -752,7 +752,7 @@ Expected: PASS (5 tests)
 
 ```bash
 git add src/data/locations.ts src/data/locations.test.ts
-git commit -m "feat: add 9-location/23-category master-item seed data"
+git commit -m "feat: add 10-location/23-category master-item seed data"
 ```
 
 ---
@@ -1335,7 +1335,7 @@ describe('LockerContext', () => {
   it('starts with the seed items, locations, and categories', () => {
     const { result } = renderHook(() => useLocker(), { wrapper })
     expect(result.current.items.length).toBeGreaterThan(0)
-    expect(result.current.locations.length).toBe(9)
+    expect(result.current.locations.length).toBe(10)
     expect(result.current.categories.length).toBeGreaterThan(0)
   })
 
@@ -2342,7 +2342,7 @@ export default function HomePage() {
 
 Run: `npm run dev`, open `http://localhost:7777`
 Expected:
-- 9 location rings render with distinct colors and non-zero percentages (seed data has partial completion).
+- 10 location rings render with distinct colors and non-zero percentages (seed data has partial completion).
 - Typing in search filters the list live.
 - Clicking a location ring filters to that location only; clicking it again does not toggle off (clicking "전체" resets).
 - "임박만" tab shows only items with `daysUntilEmpty <= 7` (seed items `seed-2` and `seed-5`).
@@ -3236,7 +3236,7 @@ export default function CollectionPage() {
 
 Run: `npm run dev`, open `http://localhost:7777/collection`
 Expected:
-- 9 location rings show varying percentages matching the seed data (locations with more matched `masterItemId`s show higher %).
+- 10 location rings show varying percentages matching the seed data (locations with more matched `masterItemId`s show higher %).
 - Clicking a different location ring switches the category list below to that location's categories.
 - Each category shows a progress bar, a checklist of owned items (✅) and missing items (⬜) with a "기록하기" shortcut that navigates to `/new`.
 - Adding a new item from `/new` with a matched `masterItemId`, then returning to `/collection`, shows the percentage and checklist updated immediately.
