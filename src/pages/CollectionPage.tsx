@@ -7,19 +7,7 @@ import {
   getMissingMasterItems,
 } from '../state/selectors'
 import { ProgressRing } from '../components/ProgressRing'
-
-const LOCATION_COLOR_HEX: Record<string, string> = {
-  bathroom: '#6E8F87',
-  kitchen: '#C98F2B',
-  laundry: '#7D93A6',
-  closet: '#B0472E',
-  vanity: '#A9789A',
-  bedroom: '#8A8F6E',
-  livingroom: '#9C8B5E',
-  entrance: '#6F7D5C',
-  medicine: '#B0763F',
-  car: '#5C7A8B',
-}
+import { LOCATION_COLOR_HEX } from '../data/locationColors'
 
 export default function CollectionPage() {
   const { items, locations, categories, renameLocation, removeLocation, renameCategory, removeCategory } =
@@ -35,6 +23,10 @@ export default function CollectionPage() {
   }
 
   function handleRemoveLocation(id: string, name: string) {
+    if (locations.length <= 1) {
+      window.alert('마지막 남은 장소는 삭제할 수 없습니다.')
+      return
+    }
     if (window.confirm(`"${name}" 장소를 삭제하면 그 안의 카테고리와 상품도 함께 삭제됩니다. 계속할까요?`)) {
       removeLocation(id)
       if (activeLocationId === id) {
@@ -50,6 +42,10 @@ export default function CollectionPage() {
   }
 
   function handleRemoveCategory(id: string, name: string) {
+    if (categories.length <= 1) {
+      window.alert('마지막 남은 카테고리는 삭제할 수 없습니다.')
+      return
+    }
     if (window.confirm(`"${name}" 카테고리를 삭제하면 그 안의 상품도 함께 삭제됩니다. 계속할까요?`)) {
       removeCategory(id)
     }
