@@ -1,12 +1,21 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { getUpcomingNotifications } from '../state/selectors'
+import { useSeenNotifications } from '../hooks/useSeenNotifications'
 
 export default function NotificationsPage() {
   const { items } = useLocker()
   const navigate = useNavigate()
   const upcoming = useMemo(() => getUpcomingNotifications(items, 7), [items])
+  const { markSeen } = useSeenNotifications()
+
+  useEffect(() => {
+    if (upcoming.length > 0) {
+      markSeen(upcoming.map((item) => item.id))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [upcoming])
 
   return (
     <div className="space-y-4 p-4">
@@ -34,7 +43,7 @@ export default function NotificationsPage() {
                   href={item.affiliateUrl ?? '#'}
                   className="ml-auto rounded-full bg-stamp px-3 py-1 text-sm text-white"
                 >
-                  다시 담기
+                  구매하기
                 </a>
               </div>
             </li>
