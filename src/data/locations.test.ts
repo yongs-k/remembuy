@@ -2,10 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { LOCATIONS, CATEGORIES, getCategoriesForLocation } from './locations'
 
 describe('locations seed data', () => {
-  it('has exactly 9 locations with unique ids', () => {
-    expect(LOCATIONS).toHaveLength(9)
+  it('has exactly 10 locations with unique ids', () => {
+    expect(LOCATIONS).toHaveLength(10)
     const ids = new Set(LOCATIONS.map((l) => l.id))
-    expect(ids.size).toBe(9)
+    expect(ids.size).toBe(10)
   })
 
   it('every category belongs to a real location', () => {

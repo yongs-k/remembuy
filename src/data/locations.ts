@@ -14,6 +14,7 @@ export const LOCATIONS: Location[] = [
   { id: 'livingroom', name: '거실', colorToken: 'livingroom' },
   { id: 'entrance', name: '현관/신발장', colorToken: 'entrance' },
   { id: 'medicine', name: '상비약함', colorToken: 'medicine' },
+  { id: 'car', name: '차량', colorToken: 'car' },
 ]
 
 export const CATEGORIES: Category[] = [
@@ -253,6 +254,16 @@ export const CATEGORIES: Category[] = [
       mi('medicine-firstaid-bandage', '밴드'),
       mi('medicine-firstaid-ointment', '연고'),
       mi('medicine-firstaid-thermometer', '체온계'),
+    ],
+  },
+  {
+    id: 'car-supplies',
+    locationId: 'car',
+    name: '차량용품',
+    masterItems: [
+      mi('car-supplies-washerfluid', '워셔액'),
+      mi('car-supplies-freshener', '방향제'),
+      mi('car-supplies-wetwipe', '실내용 물티슈'),
     ],
   },
 ]
