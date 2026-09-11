@@ -5,8 +5,10 @@ import {
   getMissingMasterItems,
   getRankingForCategory,
   getUpcomingNotifications,
+  getLocationsRankedByItemCount,
+  getCategoriesRankedByItemCount,
 } from './selectors'
-import type { Category, Item } from '../types'
+import type { Category, Item, Location } from '../types'
 
 const category: Category = {
   id: 'cat-1',
@@ -71,13 +73,11 @@ describe('getCategoryCompletion', () => {
 describe('getLocationCompletion', () => {
   it('averages completion across the location categories', () => {
     const items = [
-      makeItem({ id: 'i1', categoryId: 'cat-1', masterItemId: 'm1' }), // cat-1: 1/4 = 25%
-      makeItem({ id: 'i2', categoryId: 'cat-2', masterItemId: 'm5' }), // cat-2: 1/2 = 50%
+      makeItem({ id: 'i1', categoryId: 'cat-1', masterItemId: 'm1' }),
+      makeItem({ id: 'i2', categoryId: 'cat-2', masterItemId: 'm5' }),
     ]
-    // NOTE: getLocationCompletion needs the full category list to know which
-    // categories belong to a location; tested via a small local categories array.
     const completion = getLocationCompletion(items, 'loc-1', [category, category2])
-    expect(completion).toBe(38) // (25 + 50) / 2 = 37.5 rounded to 38
+    expect(completion).toBe(38)
   })
 })
 
@@ -90,12 +90,12 @@ describe('getMissingMasterItems', () => {
 })
 
 describe('getRankingForCategory', () => {
-  it('sorts rated items by rating descending, unrated last', () => {
+  it('sorts recommend first, then notRecommend, then unrated', () => {
     const items = [
-      makeItem({ id: 'i1', categoryId: 'cat-1', rating: 3 }),
-      makeItem({ id: 'i2', categoryId: 'cat-1', rating: 5 }),
+      makeItem({ id: 'i1', categoryId: 'cat-1', recommendation: 'notRecommend' }),
+      makeItem({ id: 'i2', categoryId: 'cat-1', recommendation: 'recommend' }),
       makeItem({ id: 'i3', categoryId: 'cat-1' }),
-      makeItem({ id: 'i4', categoryId: 'other-cat', rating: 4 }),
+      makeItem({ id: 'i4', categoryId: 'other-cat', recommendation: 'recommend' }),
     ]
     const ranked = getRankingForCategory(items, 'cat-1')
     expect(ranked.map((i) => i.id)).toEqual(['i2', 'i1', 'i3'])
@@ -108,9 +108,62 @@ describe('getUpcomingNotifications', () => {
       makeItem({ id: 'i1', daysUntilEmpty: 10 }),
       makeItem({ id: 'i2', daysUntilEmpty: 2 }),
       makeItem({ id: 'i3', daysUntilEmpty: 5 }),
-      makeItem({ id: 'i4', rating: 5 }),
+      makeItem({ id: 'i4', recommendation: 'recommend' }),
     ]
     const result = getUpcomingNotifications(items, 7)
     expect(result.map((i) => i.id)).toEqual(['i2', 'i3'])
+  })
+})
+
+describe('getLocationsRankedByItemCount', () => {
+  it('sorts locations by item count descending', () => {
+    const locA: Location = { id: 'loc-a', name: 'A', colorToken: 'a' }
+    const locB: Location = { id: 'loc-b', name: 'B', colorToken: 'b' }
+    const items = [
+      makeItem({ id: 'i1', locationId: 'loc-a' }),
+      makeItem({ id: 'i2', locationId: 'loc-b' }),
+      makeItem({ id: 'i3', locationId: 'loc-b' }),
+    ]
+    const ranked = getLocationsRankedByItemCount(items, [locA, locB])
+    expect(ranked.map((r) => r.location.id)).toEqual(['loc-b', 'loc-a'])
+    expect(ranked.map((r) => r.itemCount)).toEqual([2, 1])
+  })
+
+  it('includes locations with zero items at the end', () => {
+    const locA: Location = { id: 'loc-a', name: 'A', colorToken: 'a' }
+    const locB: Location = { id: 'loc-b', name: 'B', colorToken: 'b' }
+    const items = [makeItem({ id: 'i1', locationId: 'loc-a' })]
+    const ranked = getLocationsRankedByItemCount(items, [locA, locB])
+    expect(ranked.map((r) => r.location.id)).toEqual(['loc-a', 'loc-b'])
+    expect(ranked.map((r) => r.itemCount)).toEqual([1, 0])
+  })
+})
+
+describe('getCategoriesRankedByItemCount', () => {
+  it('sorts a location categories by item count descending', () => {
+    const items = [
+      makeItem({ id: 'i1', categoryId: 'cat-1' }),
+      makeItem({ id: 'i2', categoryId: 'cat-2' }),
+      makeItem({ id: 'i3', categoryId: 'cat-2' }),
+    ]
+    const ranked = getCategoriesRankedByItemCount(items, [category, category2], 'loc-1')
+    expect(ranked.map((r) => r.category.id)).toEqual(['cat-2', 'cat-1'])
+    expect(ranked.map((r) => r.itemCount)).toEqual([2, 1])
+  })
+
+  it('excludes categories belonging to a different location', () => {
+    const otherCategory: Category = {
+      id: 'cat-3',
+      locationId: 'loc-2',
+      name: '다른 장소 카테고리',
+      masterItems: [],
+    }
+    const items = [makeItem({ id: 'i1', categoryId: 'cat-3' })]
+    const ranked = getCategoriesRankedByItemCount(
+      items,
+      [category, category2, otherCategory],
+      'loc-1'
+    )
+    expect(ranked.map((r) => r.category.id)).toEqual(['cat-1', 'cat-2'])
   })
 })

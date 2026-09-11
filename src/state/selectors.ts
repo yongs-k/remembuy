@@ -1,4 +1,4 @@
-import type { Category, Item, MasterItem } from '../types'
+import type { Category, Item, Location, MasterItem } from '../types'
 
 export function getCategoryCompletion(items: Item[], category: Category): number {
   if (category.masterItems.length === 0) return 0
@@ -34,11 +34,17 @@ export function getMissingMasterItems(items: Item[], category: Category): Master
   return category.masterItems.filter((m) => !owned.has(m.id))
 }
 
+function recommendationRank(item: Item): number {
+  if (item.recommendation === 'recommend') return 0
+  if (item.recommendation === 'notRecommend') return 1
+  return 2
+}
+
 export function getRankingForCategory(items: Item[], categoryId: string): Item[] {
   return items
     .filter((i) => i.categoryId === categoryId)
     .slice()
-    .sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1))
+    .sort((a, b) => recommendationRank(a) - recommendationRank(b))
 }
 
 export function getUpcomingNotifications(items: Item[], thresholdDays = 7): Item[] {
@@ -46,4 +52,30 @@ export function getUpcomingNotifications(items: Item[], thresholdDays = 7): Item
     .filter((i) => i.daysUntilEmpty !== undefined && i.daysUntilEmpty <= thresholdDays)
     .slice()
     .sort((a, b) => (a.daysUntilEmpty as number) - (b.daysUntilEmpty as number))
+}
+
+export function getLocationsRankedByItemCount(
+  items: Item[],
+  locations: Location[]
+): Array<{ location: Location; itemCount: number }> {
+  return locations
+    .map((location) => ({
+      location,
+      itemCount: items.filter((i) => i.locationId === location.id).length,
+    }))
+    .sort((a, b) => b.itemCount - a.itemCount)
+}
+
+export function getCategoriesRankedByItemCount(
+  items: Item[],
+  categories: Category[],
+  locationId: string
+): Array<{ category: Category; itemCount: number }> {
+  return categories
+    .filter((c) => c.locationId === locationId)
+    .map((category) => ({
+      category,
+      itemCount: items.filter((i) => i.categoryId === category.id).length,
+    }))
+    .sort((a, b) => b.itemCount - a.itemCount)
 }
