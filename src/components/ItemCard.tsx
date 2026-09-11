@@ -1,5 +1,5 @@
 import type { Item } from '../types'
-import { RatingStars } from './RatingStars'
+import { RecommendationBadge } from './RecommendationBadge'
 
 export function ItemCard({ item, onClick }: { item: Item; onClick: () => void }) {
   return (
@@ -13,8 +13,8 @@ export function ItemCard({ item, onClick }: { item: Item; onClick: () => void })
       </div>
       <div className="flex-1">
         <p className="font-medium">{item.name}</p>
-        {item.rating !== undefined ? (
-          <RatingStars rating={item.rating} />
+        {item.recommendation !== undefined ? (
+          <RecommendationBadge recommendation={item.recommendation} />
         ) : item.daysUntilEmpty !== undefined ? (
           <span className="text-sm text-warn">D-{item.daysUntilEmpty}</span>
         ) : null}
