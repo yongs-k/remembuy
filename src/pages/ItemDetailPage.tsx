@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { RatingStars } from '../components/RatingStars'
+import { RecommendationToggle } from '../components/RecommendationToggle'
+import { ItemCard } from '../components/ItemCard'
 
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { items, locations, categories } = useLocker()
+  const { items, locations, categories, updateItem } = useLocker()
   const item = items.find((i) => i.id === id)
 
   if (!item) {
@@ -21,6 +22,9 @@ export default function ItemDetailPage() {
 
   const location = locations.find((l) => l.id === item.locationId)
   const category = categories.find((c) => c.id === item.categoryId)
+  const relatedItems = items
+    .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
+    .slice(0, 4)
 
   return (
     <div className="space-y-4 p-4">
@@ -37,13 +41,19 @@ export default function ItemDetailPage() {
           {location?.name} &gt; {category?.name}
         </p>
         <h1 className="text-xl font-bold">{item.name}</h1>
+        {item.price !== undefined && (
+          <p className="mt-1 text-lg font-semibold text-ink">{item.price.toLocaleString()}원</p>
+        )}
       </div>
 
-      {item.rating !== undefined ? (
-        <RatingStars rating={item.rating} />
-      ) : item.daysUntilEmpty !== undefined ? (
+      {item.daysUntilEmpty !== undefined ? (
         <p className="text-warn">D-{item.daysUntilEmpty}</p>
-      ) : null}
+      ) : (
+        <RecommendationToggle
+          value={item.recommendation}
+          onChange={(value) => updateItem(item.id, { recommendation: value })}
+        />
+      )}
 
       {item.note && <p className="rounded-lg bg-card p-3 text-sm">{item.note}</p>}
 
@@ -63,12 +73,22 @@ export default function ItemDetailPage() {
       </dl>
 
       <div className="flex gap-2">
-        <a
-          href={item.affiliateUrl ?? '#'}
-          className="flex-1 rounded-lg bg-stamp py-2 text-center text-white"
-        >
-          다시 담기
-        </a>
+        {item.affiliateUrl ? (
+          <a
+            href={item.affiliateUrl}
+            className="flex-1 rounded-lg bg-stamp py-2 text-center text-white"
+          >
+            구매하기
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="flex-1 rounded-lg bg-ink/10 py-2 text-center text-ink/40"
+          >
+            구매 링크 없음
+          </button>
+        )}
         <button
           type="button"
           onClick={() => navigate(`/new?editId=${item.id}`)}
@@ -77,6 +97,21 @@ export default function ItemDetailPage() {
           메모 수정하기
         </button>
       </div>
+
+      {relatedItems.length > 0 && (
+        <section className="space-y-2">
+          <h2 className="text-sm font-semibold text-ink/70">이런 상품은 어때요?</h2>
+          <div className="space-y-2">
+            {relatedItems.map((related) => (
+              <ItemCard
+                key={related.id}
+                item={related}
+                onClick={() => navigate(`/item/${related.id}`)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }
