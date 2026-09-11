@@ -207,7 +207,7 @@ Expected: PASS (7 tests)
 - [ ] **Step 6: Verify the whole project still compiles**
 
 Run: `npx tsc --noEmit`
-Expected: FAILS at this point — `src/components/ItemCard.tsx`, `src/pages/ItemDetailPage.tsx`, `src/pages/RankingPage.tsx`, and `src/pages/NewItemPage.tsx` all reference `item.rating` (or `existing?.rating`), which no longer exists on `Item`. (`src/components/RatingStars.tsx` itself does NOT error — it only takes a plain `{ rating: number }` prop and never references the `Item` type.) This is expected and will be fixed by later tasks in this plan — do not fix those files in this task.
+Expected: FAILS at this point — `src/components/ItemCard.tsx`, `src/pages/ItemDetailPage.tsx`, `src/pages/RankingPage.tsx`, `src/pages/NewItemPage.tsx`, and `src/pages/FeedPage.tsx` (its `handleSave` passes `rating: post.rating` into an `Item`-shaped object) all reference `item.rating`/a `rating` field on an `Item`, which no longer exists on `Item`. (`src/components/RatingStars.tsx` itself does NOT error — it only takes a plain `{ rating: number }` prop and never references the `Item` type.) This is expected and will be fixed by later tasks in this plan — do not fix those files in this task.
 
 - [ ] **Step 7: Commit**
 
@@ -1410,14 +1410,17 @@ git commit -m "feat: new/edit item form uses recommendation toggle, adds price/�
 
 ---
 
-### Task 10: `RankingPage` — location→category→product drill-down; remove `RatingStars`
+### Task 10: `RankingPage` drill-down + fix `FeedPage` + remove `RatingStars`
+
+**Plan correction (found during Task 8's review, confirmed with the human partner):** the plan originally scoped `FeedPage.tsx` as "unchanged," but it actually depends on two things this plan removes: it imports `RatingStars` (deleted below) and its `handleSave` constructs an `Item` with a `rating` field (removed in Task 1). Both must be fixed here, in the same task that deletes `RatingStars`, so the app keeps compiling. `FeedPage`'s own visual layout and behavior stay the same — only its internal types are adapted: the dummy feed posts still show 1-5 stars (via a small feed-local star renderer, `FeedPost.rating` itself is untouched), and saving a post now maps that rating to a `recommendation` (`rating >= 4` → `'recommend'`, else `'notRecommend'`) instead of writing a nonexistent `rating` field onto the saved `Item`.
 
 **Files:**
 - Modify: `src/pages/RankingPage.tsx`
+- Modify: `src/pages/FeedPage.tsx`
 - Delete: `src/components/RatingStars.tsx`
 
 **Interfaces:**
-- Consumes: `getLocationsRankedByItemCount`, `getCategoriesRankedByItemCount`, `getRankingForCategory` (Task 2), `RecommendationBadge` (Task 3), `Badge` (existing).
+- Consumes: `getLocationsRankedByItemCount`, `getCategoriesRankedByItemCount`, `getRankingForCategory` (Task 2), `RecommendationBadge` (Task 3), `Badge` (existing), `FEED_POSTS` (existing, `FeedPost.rating: number` type is unchanged by this plan).
 
 - [ ] **Step 1: Rewrite `src/pages/RankingPage.tsx`**
 
@@ -1540,24 +1543,91 @@ export default function RankingPage() {
 }
 ```
 
-- [ ] **Step 2: Delete `src/components/RatingStars.tsx`**
+- [ ] **Step 2: Fix `src/pages/FeedPage.tsx`**
 
-Run: `rm src/components/RatingStars.tsx` (or delete the file). This was the last remaining consumer of `RatingStars` — `ItemCard` (Task 4) and `ItemDetailPage` (Task 8) were already migrated to `RecommendationBadge`/`RecommendationToggle`.
+Rewrite it to replace the `RatingStars` import with a small feed-local star renderer (since the shared `RatingStars` component is being deleted in Step 3, and `FeedPost.rating` is a different, untouched field from `Item.recommendation`), and to map `post.rating` into `recommendation` when saving a post into the locker:
 
-- [ ] **Step 3: Verify it compiles**
+```tsx
+import { useState } from 'react'
+import { useLocker } from '../state/LockerContext'
+import { FEED_POSTS } from '../data/feedData'
+
+function FeedRatingStars({ rating }: { rating: number }) {
+  const filled = Math.max(0, Math.min(5, rating))
+  const empty = Math.max(0, 5 - filled)
+  return (
+    <span className="text-stamp" aria-label={`평점 ${rating}점`}>
+      {'★'.repeat(filled)}
+      <span className="text-ink/30">{'★'.repeat(empty)}</span>
+    </span>
+  )
+}
+
+export default function FeedPage() {
+  const { addItem } = useLocker()
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
+
+  function handleSave(post: (typeof FEED_POSTS)[number]) {
+    addItem({
+      id: `feed-saved-${post.id}-${Date.now()}`,
+      name: post.itemName,
+      locationId: post.locationId,
+      categoryId: post.categoryId,
+      recommendation: post.rating >= 4 ? 'recommend' : 'notRecommend',
+      note: `${post.nickname}님 추천: ${post.comment}`,
+      createdAt: new Date().toISOString().slice(0, 10),
+    })
+    setSavedIds((prev) => new Set(prev).add(post.id))
+  }
+
+  return (
+    <div className="space-y-4 p-4">
+      <h1 className="text-xl font-bold">공유 피드</h1>
+      <ul className="space-y-3">
+        {FEED_POSTS.map((post) => (
+          <li key={post.id} className="rounded-lg border border-ink/10 bg-card p-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-ink/50">{post.nickname}</p>
+              <FeedRatingStars rating={post.rating} />
+            </div>
+            <p className="font-medium">{post.itemName}</p>
+            <p className="text-sm">{post.comment}</p>
+            <button
+              type="button"
+              disabled={savedIds.has(post.id)}
+              onClick={() => handleSave(post)}
+              className="mt-2 rounded-full bg-stamp px-3 py-1 text-sm text-white disabled:opacity-50"
+            >
+              {savedIds.has(post.id) ? '저장됨' : '저장하기'}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+```
+
+Note: `FeedRatingStars` is intentionally a private, near-duplicate of the old `RatingStars` — it is NOT exported or shared, because it renders `FeedPost.rating` (a plain 1-5 number on dummy feed data, untouched by this plan), which is a conceptually different thing from `Item.recommendation`. Do not try to reuse `RecommendationBadge`/`RecommendationToggle` here — those take a `'recommend' | 'notRecommend'` value, not a 1-5 number.
+
+- [ ] **Step 3: Delete `src/components/RatingStars.tsx`**
+
+Run: `rm src/components/RatingStars.tsx` (or delete the file). After Step 2, this is the last remaining consumer removed — `ItemCard` (Task 4) and `ItemDetailPage` (Task 8) were already migrated to `RecommendationBadge`/`RecommendationToggle`, and `FeedPage` (Step 2 above) now has its own local renderer.
+
+- [ ] **Step 4: Verify it compiles**
 
 Run: `npx tsc --noEmit`
-Expected: PASS with zero errors — this resolves the last of the pre-existing `item.rating` errors from Task 1, and confirms no file still imports the deleted `RatingStars`.
+Expected: PASS with zero errors — this resolves the last of the pre-existing `item.rating` errors from Task 1 (including `FeedPage.tsx`'s `addItem({..., rating: post.rating, ...})` call), and confirms no file still imports the deleted `RatingStars`.
 
-- [ ] **Step 4: Manual verification trace**
+- [ ] **Step 5: Manual verification trace**
 
-Trace against seed data: the locations list should show `bathroom` at the top (5 seed items: seed-1/2/3, plus any others in bathroom categories — recount: seed-1, seed-2, seed-3 = 3 items in `bathroom`) sorted above locations with fewer items. Drilling into `bathroom` should show `bathroom-skincare`, `bathroom-haircare`, `bathroom-oralcare` each with 1 item, and `bathroom-bodycare`/`bathroom-hygiene` with 0 items, sorted with the 1-item categories first (ties keep array order). Drilling into `bathroom-oralcare` should show `seed-3` (센소다인 치약, recommend) alone at rank 1 with the "다시 살래요" badge.
+Trace against seed data: the locations list should show `bathroom` at the top (5 seed items: seed-1/2/3, plus any others in bathroom categories — recount: seed-1, seed-2, seed-3 = 3 items in `bathroom`) sorted above locations with fewer items. Drilling into `bathroom` should show `bathroom-skincare`, `bathroom-haircare`, `bathroom-oralcare` each with 1 item, and `bathroom-bodycare`/`bathroom-hygiene` with 0 items, sorted with the 1-item categories first (ties keep array order). Drilling into `bathroom-oralcare` should show `seed-3` (센소다인 치약, recommend) alone at rank 1 with the "다시 살래요" badge. On `/feed`, saving a post with `rating: 5` (e.g. `feed-1`, `feed-3`, `feed-4` — check `src/data/feedData.ts` for actual values) should, after saving, show that item with a "👍 추천해요" badge on the Home/Ranking screens; a post with `rating <= 3` (if any exist in `feedData.ts`) should show "👎 비추천해요".
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add -A src/pages/RankingPage.tsx src/components/RatingStars.tsx
-git commit -m "feat: rewrite ranking as location->category->product drill-down"
+git add -A src/pages/RankingPage.tsx src/pages/FeedPage.tsx src/components/RatingStars.tsx
+git commit -m "feat: rewrite ranking as location->category->product drill-down, fix FeedPage for recommendation model"
 ```
 
 ---
