@@ -23,8 +23,9 @@ export type Item = {
   categoryId: string
   masterItemId?: string
   note?: string
-  rating?: number // 1-5, mutually exclusive with daysUntilEmpty
+  recommendation?: 'recommend' | 'notRecommend' // mutually exclusive with daysUntilEmpty
   daysUntilEmpty?: number
+  price?: number
   place?: string
   restockCycle?: string | null
   affiliateUrl?: string | null

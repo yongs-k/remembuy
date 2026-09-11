@@ -12,11 +12,23 @@ describe('seed items', () => {
     }
   })
 
-  it('never sets both rating and daysUntilEmpty', () => {
+  it('never sets both recommendation and daysUntilEmpty', () => {
     for (const item of SEED_ITEMS) {
-      const hasBoth = item.rating !== undefined && item.daysUntilEmpty !== undefined
+      const hasBoth = item.recommendation !== undefined && item.daysUntilEmpty !== undefined
       expect(hasBoth).toBe(false)
     }
+  })
+
+  it('recommendation is only ever "recommend" or "notRecommend" when set', () => {
+    for (const item of SEED_ITEMS) {
+      if (item.recommendation !== undefined) {
+        expect(['recommend', 'notRecommend']).toContain(item.recommendation)
+      }
+    }
+  })
+
+  it('includes at least one notRecommend item for testing variety', () => {
+    expect(SEED_ITEMS.some((i) => i.recommendation === 'notRecommend')).toBe(true)
   })
 
   it('every referenced masterItemId exists in its category', () => {
