@@ -12,7 +12,7 @@ const sampleItem: Item = {
   name: '테스트 상품',
   locationId: 'bathroom',
   categoryId: 'bathroom-haircare',
-  rating: 4,
+  recommendation: 'recommend',
   createdAt: '2026-09-10',
 }
 
