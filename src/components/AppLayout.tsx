@@ -20,7 +20,7 @@ export function AppLayout() {
   ).length
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col bg-paper">
+    <div className="mx-auto flex h-screen w-full max-w-md flex-col overflow-hidden bg-paper shadow-2xl">
       <header className="flex items-center justify-between border-b border-ink/10 bg-card px-4 py-3">
         <span className="font-heading text-lg">REMEMBUY</span>
         <button
