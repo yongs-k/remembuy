@@ -20,8 +20,13 @@ export function AppLayout() {
   ).length
 
   return (
-    <div className="mx-auto flex h-screen w-full max-w-md flex-col overflow-hidden bg-paper shadow-2xl">
-      <header className="flex items-center justify-between border-b border-ink/10 bg-card px-4 py-3">
+    <div
+      className="relative mx-auto flex h-screen w-full max-w-md flex-col overflow-hidden bg-paper shadow-2xl
+        sm:my-8 sm:h-[844px] sm:max-h-[85vh] sm:w-[390px] sm:max-w-none sm:rounded-[3rem] sm:border-[10px] sm:border-ink"
+    >
+      <div className="absolute left-1/2 top-2 z-20 hidden h-7 w-32 -translate-x-1/2 rounded-full bg-ink sm:block" />
+
+      <header className="flex items-center justify-between border-b border-ink/10 bg-card px-4 py-3 sm:pt-6">
         <span className="font-heading text-lg">REMEMBUY</span>
         <button
           type="button"
@@ -38,7 +43,7 @@ export function AppLayout() {
       <main className="flex-1 overflow-y-auto pb-20">
         <Outlet />
       </main>
-      <nav className="fixed bottom-0 left-1/2 grid w-full max-w-md -translate-x-1/2 grid-cols-5 border-t border-ink/10 bg-card">
+      <nav className="absolute inset-x-0 bottom-0 grid grid-cols-5 border-t border-ink/10 bg-card">
         {TABS.map((tab) => (
           <NavLink
             key={tab.to}
@@ -55,6 +60,8 @@ export function AppLayout() {
           </NavLink>
         ))}
       </nav>
+
+      <div className="absolute bottom-1 left-1/2 z-20 hidden h-1 w-32 -translate-x-1/2 rounded-full bg-ink/70 sm:block" />
     </div>
   )
 }
