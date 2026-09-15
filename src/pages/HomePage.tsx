@@ -161,14 +161,16 @@ export default function HomePage() {
         </>
       )}
 
-      <button
-        type="button"
-        onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-1/2 -mr-[calc(50%-2.5rem)] flex h-14 w-14 items-center justify-center rounded-full bg-stamp text-2xl text-white shadow-lg"
-        aria-label="새로 기록하기"
-      >
-        +
-      </button>
+      <div className="pointer-events-none fixed bottom-24 left-1/2 w-full max-w-md -translate-x-1/2">
+        <button
+          type="button"
+          onClick={() => setShowRecordOptions(true)}
+          className="pointer-events-auto absolute right-4 flex h-14 w-14 items-center justify-center rounded-full bg-stamp text-2xl text-white shadow-lg"
+          aria-label="새로 기록하기"
+        >
+          +
+        </button>
+      </div>
 
       {showRecordOptions && (
         <div
