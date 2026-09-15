@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
+import { RecommendationToggle } from '../components/RecommendationToggle'
 import type { Item } from '../types'
 
-type ProgressMode = 'rating' | 'daysUntilEmpty'
+type ProgressMode = 'recommendation' | 'daysUntilEmpty'
 
 export default function NewItemPage() {
   const navigate = useNavigate()
@@ -26,10 +27,14 @@ export default function NewItemPage() {
   const [place, setPlace] = useState(existing?.place ?? '')
   const [restockCycle, setRestockCycle] = useState(existing?.restockCycle ?? '')
   const [progressMode, setProgressMode] = useState<ProgressMode>(
-    existing?.daysUntilEmpty !== undefined ? 'daysUntilEmpty' : 'rating'
+    existing?.daysUntilEmpty !== undefined ? 'daysUntilEmpty' : 'recommendation'
   )
-  const [rating, setRating] = useState(existing?.rating ?? 5)
+  const [recommendation, setRecommendation] = useState<'recommend' | 'notRecommend'>(
+    existing?.recommendation ?? 'recommend'
+  )
   const [daysUntilEmpty, setDaysUntilEmpty] = useState(existing?.daysUntilEmpty ?? 30)
+  const [price, setPrice] = useState<number | ''>(existing?.price ?? '')
+  const [affiliateUrl, setAffiliateUrl] = useState(existing?.affiliateUrl ?? '')
   const [note, setNote] = useState(existing?.note ?? '')
   const [newLocationName, setNewLocationName] = useState('')
   const [newCategoryName, setNewCategoryName] = useState('')
@@ -69,9 +74,10 @@ export default function NewItemPage() {
       place: place || undefined,
       restockCycle: restockCycle || null,
       note: note || undefined,
-      rating: progressMode === 'rating' ? rating : undefined,
+      recommendation: progressMode === 'recommendation' ? recommendation : undefined,
       daysUntilEmpty: progressMode === 'daysUntilEmpty' ? daysUntilEmpty : undefined,
-      affiliateUrl: existing?.affiliateUrl ?? null,
+      price: price === '' ? undefined : Number(price),
+      affiliateUrl: affiliateUrl || null,
       createdAt: existing?.createdAt ?? new Date().toISOString().slice(0, 10),
     }
     if (existing) {
@@ -187,6 +193,27 @@ export default function NewItemPage() {
       </label>
 
       <label className="block text-sm">
+        가격 (원)
+        <input
+          type="number"
+          min={0}
+          value={price}
+          onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+        />
+      </label>
+
+      <label className="block text-sm">
+        구매 링크
+        <input
+          value={affiliateUrl ?? ''}
+          onChange={(e) => setAffiliateUrl(e.target.value)}
+          placeholder="https://..."
+          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+        />
+      </label>
+
+      <label className="block text-sm">
         재구매 주기
         <input
           value={restockCycle}
@@ -199,12 +226,12 @@ export default function NewItemPage() {
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={() => setProgressMode('rating')}
+          onClick={() => setProgressMode('recommendation')}
           className={`flex-1 rounded-lg py-2 text-sm ${
-            progressMode === 'rating' ? 'bg-stamp text-white' : 'bg-card text-ink'
+            progressMode === 'recommendation' ? 'bg-stamp text-white' : 'bg-card text-ink'
           }`}
         >
-          만족도(별점)
+          추천/비추천
         </button>
         <button
           type="button"
@@ -217,18 +244,8 @@ export default function NewItemPage() {
         </button>
       </div>
 
-      {progressMode === 'rating' ? (
-        <label className="block text-sm">
-          별점 (1-5)
-          <input
-            type="number"
-            min={1}
-            max={5}
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-            className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
-          />
-        </label>
+      {progressMode === 'recommendation' ? (
+        <RecommendationToggle value={recommendation} onChange={setRecommendation} />
       ) : (
         <label className="block text-sm">
           소진까지 남은 일수
