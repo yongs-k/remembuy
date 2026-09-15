@@ -14,6 +14,7 @@ export default function HomePage() {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [filter, setFilter] = useState<HomeFilter>('all')
+  const [showRecordOptions, setShowRecordOptions] = useState(false)
 
   const searchResults = useMemo(() => {
     if (!search) return null
@@ -162,12 +163,65 @@ export default function HomePage() {
 
       <button
         type="button"
-        onClick={() => navigate('/new')}
+        onClick={() => setShowRecordOptions(true)}
         className="fixed bottom-24 right-1/2 -mr-[calc(50%-2.5rem)] flex h-14 w-14 items-center justify-center rounded-full bg-stamp text-2xl text-white shadow-lg"
         aria-label="새로 기록하기"
       >
         +
       </button>
+
+      {showRecordOptions && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
+          onClick={() => setShowRecordOptions(false)}
+        >
+          <div
+            className="w-full max-w-md space-y-2 rounded-t-2xl bg-card p-4 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="pb-1 text-center text-sm text-ink/50">어떻게 기록할까요?</p>
+            <button
+              type="button"
+              onClick={() => navigate('/new')}
+              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+            >
+              <span className="text-xl">📷</span>
+              <span>카메라로 촬영</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/new')}
+              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+            >
+              <span className="text-xl">🖼️</span>
+              <span>사진 선택</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/new')}
+              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+            >
+              <span className="text-xl">🔗</span>
+              <span>링크로 가져오기</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/new')}
+              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+            >
+              <span className="text-xl">✏️</span>
+              <span>직접 입력</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRecordOptions(false)}
+              className="w-full pt-2 text-center text-sm text-ink/50"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
