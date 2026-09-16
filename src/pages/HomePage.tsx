@@ -175,11 +175,10 @@ export default function HomePage() {
         </>
       )}
 
-      {/* absolute positioning here relies on AppLayout's outer frame being the nearest position:relative ancestor — don't add relative/absolute/fixed to this root div or to AppLayout's <main> without checking that chain */}
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
-        className="absolute bottom-24 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-stamp text-2xl text-white shadow-lg"
+        className="fixed bottom-24 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-stamp text-2xl text-white shadow-lg md:bottom-8"
         aria-label="새로 기록하기"
       >
         +
@@ -187,7 +186,7 @@ export default function HomePage() {
 
       {showRecordOptions && (
         <div
-          className="absolute inset-0 z-50 flex items-end justify-center bg-black/40"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
           onClick={() => setShowRecordOptions(false)}
         >
           <div
