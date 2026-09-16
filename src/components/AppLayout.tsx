@@ -20,7 +20,7 @@ export function AppLayout() {
   ).length
 
   return (
-    <div className="flex min-h-screen bg-paper text-ink">
+    <div className="flex h-dvh bg-paper text-ink">
       <nav className="hidden w-56 flex-col gap-1 border-r border-ink/10 bg-card p-4 md:flex">
         <span className="mb-4 font-heading text-lg">REMEMBUY</span>
         {TABS.map((tab) => (
