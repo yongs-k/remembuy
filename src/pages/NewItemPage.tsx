@@ -79,6 +79,7 @@ export default function NewItemPage() {
       price: price === '' ? undefined : Number(price),
       affiliateUrl: affiliateUrl || null,
       createdAt: existing?.createdAt ?? new Date().toISOString().slice(0, 10),
+      podiumRank: categoryId === existing?.categoryId ? existing?.podiumRank : undefined,
     }
     if (existing) {
       updateItem(existing.id, item)

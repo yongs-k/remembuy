@@ -142,6 +142,20 @@ describe('LockerContext', () => {
     expect(second?.podiumRank).toBe(1)
   })
 
+  it('setPodiumRank only enforces exclusivity within the same category', () => {
+    const { result } = renderHook(() => useLocker(), { wrapper })
+    act(() => {
+      result.current.setPodiumRank('seed-1', 'bathroom-skincare', 1)
+    })
+    act(() => {
+      result.current.setPodiumRank('seed-2', 'bathroom-haircare', 1)
+    })
+    const first = result.current.items.find((i) => i.id === 'seed-1')
+    const second = result.current.items.find((i) => i.id === 'seed-2')
+    expect(first?.podiumRank).toBe(1)
+    expect(second?.podiumRank).toBe(1)
+  })
+
   it('setPodiumRank with null unassigns the rank', () => {
     const { result } = renderHook(() => useLocker(), { wrapper })
     act(() => {
