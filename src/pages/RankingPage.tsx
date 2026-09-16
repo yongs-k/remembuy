@@ -15,7 +15,7 @@ type DrillLevel =
   | { level: 'products'; locationId: string; categoryId: string }
 
 export default function RankingPage() {
-  const { items, locations, categories } = useLocker()
+  const { items, locations, categories, setPodiumRank } = useLocker()
   const navigate = useNavigate()
   const [drill, setDrill] = useState<DrillLevel>({ level: 'locations' })
 
@@ -106,7 +106,27 @@ export default function RankingPage() {
                   <RecommendationBadge recommendation={item.recommendation} />
                 )}
               </div>
-              {index === 0 && <Badge>다시 살래요</Badge>}
+              <div className="flex gap-1 text-lg">
+                {([1, 2, 3] as const).map((rank) => {
+                  const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'
+                  const isAssigned = item.podiumRank === rank
+                  return (
+                    <button
+                      key={rank}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setPodiumRank(item.id, item.categoryId, isAssigned ? null : rank)
+                      }}
+                      className={isAssigned ? 'opacity-100' : 'opacity-30'}
+                      aria-label={`${rank}등으로 지정`}
+                    >
+                      {medal}
+                    </button>
+                  )
+                })}
+              </div>
+              {item.podiumRank === 1 && <Badge>다시 살래요</Badge>}
             </li>
           ))}
         </ol>
