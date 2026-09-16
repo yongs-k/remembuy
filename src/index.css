@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply flex min-h-[100dvh] items-center justify-center bg-ink text-ink font-body;
+  @apply bg-paper text-ink font-body;
 }
 
 h1, h2, h3 {

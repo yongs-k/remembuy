@@ -20,31 +20,49 @@ export function AppLayout() {
   ).length
 
   return (
-    // HomePage's floating record button and options sheet position via `absolute` against this frame — keep it the nearest positioned ancestor
-    <div
-      className="relative mx-auto flex h-[100dvh] w-full max-w-md flex-col overflow-hidden bg-paper shadow-2xl
-        sm:my-8 sm:h-[844px] sm:max-h-[85vh] sm:w-[390px] sm:max-w-none sm:rounded-[3rem] sm:border-[10px] sm:border-ink"
-    >
-      <div className="absolute left-1/2 top-2 z-20 hidden h-7 w-32 -translate-x-1/2 rounded-full bg-ink sm:block" />
+    <div className="flex min-h-screen bg-paper text-ink">
+      <nav className="hidden w-56 flex-col gap-1 border-r border-ink/10 bg-card p-4 md:flex">
+        <span className="mb-4 font-heading text-lg">REMEMBUY</span>
+        {TABS.map((tab) => (
+          <NavLink
+            key={tab.to}
+            to={tab.to}
+            end={tab.to === '/'}
+            className={({ isActive }) =>
+              `flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
+                isActive ? 'bg-stamp text-white' : 'text-ink/70'
+              }`
+            }
+          >
+            <span>{tab.icon}</span>
+            {tab.label}
+          </NavLink>
+        ))}
+      </nav>
 
-      <header className="flex items-center justify-between border-b border-ink/10 bg-card px-4 py-3 sm:pt-6">
-        <span className="font-heading text-lg">REMEMBUY</span>
-        <button
-          type="button"
-          onClick={() => navigate('/notifications')}
-          className="relative text-xl"
-          aria-label="알림"
-        >
-          🔔
-          {unreadCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-stamp" />
-          )}
-        </button>
-      </header>
-      <main className="flex-1 overflow-y-auto pb-20">
-        <Outlet />
-      </main>
-      <nav className="absolute inset-x-0 bottom-0 grid grid-cols-5 border-t border-ink/10 bg-card">
+      <div className="flex flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-ink/10 bg-card px-4 py-3">
+          <span className="font-heading text-lg md:hidden">REMEMBUY</span>
+          <button
+            type="button"
+            onClick={() => navigate('/notifications')}
+            className="relative ml-auto text-xl"
+            aria-label="알림"
+          >
+            🔔
+            {unreadCount > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-stamp" />
+            )}
+          </button>
+        </header>
+        <main className="flex-1 overflow-y-auto pb-20 md:pb-4">
+          <div className="mx-auto w-full max-w-3xl">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+
+      <nav className="fixed inset-x-0 bottom-0 grid grid-cols-5 border-t border-ink/10 bg-card md:hidden">
         {TABS.map((tab) => (
           <NavLink
             key={tab.to}
@@ -61,8 +79,6 @@ export function AppLayout() {
           </NavLink>
         ))}
       </nav>
-
-      <div className="absolute bottom-1 left-1/2 z-20 hidden h-1 w-32 -translate-x-1/2 rounded-full bg-ink/70 sm:block" />
     </div>
   )
 }
