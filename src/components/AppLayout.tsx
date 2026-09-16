@@ -20,8 +20,9 @@ export function AppLayout() {
   ).length
 
   return (
+    // HomePage's floating record button and options sheet position via `absolute` against this frame — keep it the nearest positioned ancestor
     <div
-      className="relative mx-auto flex h-screen w-full max-w-md flex-col overflow-hidden bg-paper shadow-2xl
+      className="relative mx-auto flex h-[100dvh] w-full max-w-md flex-col overflow-hidden bg-paper shadow-2xl
         sm:my-8 sm:h-[844px] sm:max-h-[85vh] sm:w-[390px] sm:max-w-none sm:rounded-[3rem] sm:border-[10px] sm:border-ink"
     >
       <div className="absolute left-1/2 top-2 z-20 hidden h-7 w-32 -translate-x-1/2 rounded-full bg-ink sm:block" />

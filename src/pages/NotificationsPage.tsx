@@ -39,12 +39,22 @@ export default function NotificationsPage() {
                 >
                   상세보기
                 </button>
-                <a
-                  href={item.affiliateUrl ?? '#'}
-                  className="ml-auto rounded-full bg-stamp px-3 py-1 text-sm text-white"
-                >
-                  구매하기
-                </a>
+                {item.affiliateUrl ? (
+                  <a
+                    href={item.affiliateUrl}
+                    className="ml-auto rounded-full bg-stamp px-3 py-1 text-sm text-white"
+                  >
+                    구매하기
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="ml-auto rounded-full bg-ink/10 px-3 py-1 text-sm text-ink/40"
+                  >
+                    구매 링크 없음
+                  </button>
+                )}
               </div>
             </li>
           ))}

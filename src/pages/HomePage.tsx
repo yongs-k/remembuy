@@ -175,6 +175,7 @@ export default function HomePage() {
         </>
       )}
 
+      {/* absolute positioning here relies on AppLayout's outer frame being the nearest position:relative ancestor — don't add relative/absolute/fixed to this root div or to AppLayout's <main> without checking that chain */}
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
