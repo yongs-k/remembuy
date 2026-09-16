@@ -4,6 +4,9 @@ import { useLocker } from '../state/LockerContext'
 import { getLocationCompletion } from '../state/selectors'
 import { LocationIcon } from '../components/LocationIcon'
 import { ItemCard } from '../components/ItemCard'
+import { HomeProfileCard } from '../components/HomeProfileCard'
+import { QuestCarousel } from '../components/QuestCarousel'
+import { DUMMY_QUESTS } from '../data/homeDummy'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
 
@@ -72,6 +75,17 @@ export default function HomePage() {
 
   return (
     <div className="space-y-4 p-4">
+      {!selectedLocationId && (
+        <>
+          <HomeProfileCard itemCount={items.length} />
+          <div className="flex items-center justify-between">
+            <h2 className="font-heading text-lg">추천 퀘스트</h2>
+            <span className="text-sm text-ink/40">전체보기 →</span>
+          </div>
+          <QuestCarousel quests={DUMMY_QUESTS} />
+        </>
+      )}
+
       <input
         type="search"
         placeholder="상품 검색"
