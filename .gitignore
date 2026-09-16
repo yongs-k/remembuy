@@ -6,3 +6,4 @@ vite.config.d.ts
 vite.config.js
 .claude/
 .agents/
+server/data/

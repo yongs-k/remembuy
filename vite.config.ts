@@ -7,6 +7,9 @@ export default defineConfig({
   server: {
     port: 7777,
     strictPort: true,
+    proxy: {
+      '/api': 'http://localhost:8787',
+    },
   },
   test: {
     environment: 'jsdom',
