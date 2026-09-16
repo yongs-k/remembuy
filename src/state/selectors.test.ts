@@ -7,6 +7,7 @@ import {
   getUpcomingNotifications,
   getLocationsRankedByItemCount,
   getCategoriesRankedByItemCount,
+  getCompletedPodium,
 } from './selectors'
 import type { Category, Item, Location } from '../types'
 
@@ -165,5 +166,43 @@ describe('getCategoriesRankedByItemCount', () => {
       'loc-1'
     )
     expect(ranked.map((r) => r.category.id)).toEqual(['cat-1', 'cat-2'])
+  })
+})
+
+describe('getCompletedPodium', () => {
+  const baseItem = (overrides: Partial<Item>): Item => ({
+    id: 'x',
+    name: '테스트',
+    locationId: 'loc-1',
+    categoryId: 'cat-1',
+    createdAt: '2026-09-16',
+    ...overrides,
+  })
+
+  it('returns null when no ranks are assigned', () => {
+    const items = [baseItem({ id: 'a' }), baseItem({ id: 'b' })]
+    expect(getCompletedPodium(items, 'cat-1')).toBeNull()
+  })
+
+  it('returns null when only some ranks are assigned', () => {
+    const items = [
+      baseItem({ id: 'a', podiumRank: 1 }),
+      baseItem({ id: 'b', podiumRank: 2 }),
+      baseItem({ id: 'c' }),
+    ]
+    expect(getCompletedPodium(items, 'cat-1')).toBeNull()
+  })
+
+  it('returns the three entries sorted by rank when the podium is complete', () => {
+    const items = [
+      baseItem({ id: 'a', podiumRank: 2 }),
+      baseItem({ id: 'b', podiumRank: 1 }),
+      baseItem({ id: 'c', podiumRank: 3 }),
+      baseItem({ id: 'd', categoryId: 'other-cat', podiumRank: 1 }),
+    ]
+    const result = getCompletedPodium(items, 'cat-1')
+    expect(result).not.toBeNull()
+    expect(result?.map((e) => e.rank)).toEqual([1, 2, 3])
+    expect(result?.map((e) => e.item.id)).toEqual(['b', 'a', 'c'])
   })
 })

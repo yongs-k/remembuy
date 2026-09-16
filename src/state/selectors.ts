@@ -79,3 +79,17 @@ export function getCategoriesRankedByItemCount(
     }))
     .sort((a, b) => b.itemCount - a.itemCount)
 }
+
+export function getCompletedPodium(
+  items: Item[],
+  categoryId: string
+): { rank: 1 | 2 | 3; item: Item }[] | null {
+  const categoryItems = items.filter((i) => i.categoryId === categoryId)
+  const entries: { rank: 1 | 2 | 3; item: Item }[] = []
+  for (const rank of [1, 2, 3] as const) {
+    const item = categoryItems.find((i) => i.podiumRank === rank)
+    if (!item) return null
+    entries.push({ rank, item })
+  }
+  return entries
+}
