@@ -16,6 +16,7 @@ type Action =
   | { type: 'ADD_CATEGORY'; category: Category }
   | { type: 'RENAME_CATEGORY'; id: string; name: string }
   | { type: 'REMOVE_CATEGORY'; id: string }
+  | { type: 'SET_PODIUM_RANK'; itemId: string; categoryId: string; rank: 1 | 2 | 3 | null }
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -59,6 +60,20 @@ function reducer(state: State, action: Action): State {
         categories: state.categories.filter((c) => c.id !== action.id),
         items: state.items.filter((i) => i.categoryId !== action.id),
       }
+    case 'SET_PODIUM_RANK':
+      return {
+        ...state,
+        items: state.items.map((i) => {
+          if (i.categoryId !== action.categoryId) return i
+          if (i.id === action.itemId) {
+            return { ...i, podiumRank: action.rank ?? undefined }
+          }
+          if (action.rank !== null && i.podiumRank === action.rank) {
+            return { ...i, podiumRank: undefined }
+          }
+          return i
+        }),
+      }
     default:
       return state
   }
@@ -77,6 +92,7 @@ type LockerContextValue = {
   addCategory: (locationId: string, name: string) => Category
   renameCategory: (id: string, name: string) => void
   removeCategory: (id: string) => void
+  setPodiumRank: (itemId: string, categoryId: string, rank: 1 | 2 | 3 | null) => void
 }
 
 const LockerContext = createContext<LockerContextValue | null>(null)
@@ -117,6 +133,8 @@ export function LockerProvider({ children }: { children: ReactNode }) {
     },
     renameCategory: (id, name) => dispatch({ type: 'RENAME_CATEGORY', id, name }),
     removeCategory: (id) => dispatch({ type: 'REMOVE_CATEGORY', id }),
+    setPodiumRank: (itemId, categoryId, rank) =>
+      dispatch({ type: 'SET_PODIUM_RANK', itemId, categoryId, rank }),
   }
 
   return <LockerContext.Provider value={value}>{children}</LockerContext.Provider>

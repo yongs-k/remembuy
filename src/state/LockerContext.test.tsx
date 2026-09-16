@@ -109,4 +109,48 @@ describe('LockerContext', () => {
     expect(result.current.categories.find((c) => c.id === 'bathroom-haircare')).toBeUndefined()
     expect(result.current.items.some((i) => i.categoryId === 'bathroom-haircare')).toBe(false)
   })
+
+  it('setPodiumRank assigns a rank to an item', () => {
+    const { result } = renderHook(() => useLocker(), { wrapper })
+    act(() => {
+      result.current.setPodiumRank('seed-1', 'bathroom-skincare', 1)
+    })
+    const item = result.current.items.find((i) => i.id === 'seed-1')
+    expect(item?.podiumRank).toBe(1)
+  })
+
+  it('setPodiumRank reassigns a rank away from whichever item held it in the same category', () => {
+    const { result } = renderHook(() => useLocker(), { wrapper })
+    act(() => {
+      result.current.addItem({
+        id: 'podium-test-2',
+        name: '테스트 상품 2',
+        locationId: 'bathroom',
+        categoryId: 'bathroom-skincare',
+        createdAt: '2026-09-16',
+      })
+    })
+    act(() => {
+      result.current.setPodiumRank('seed-1', 'bathroom-skincare', 1)
+    })
+    act(() => {
+      result.current.setPodiumRank('podium-test-2', 'bathroom-skincare', 1)
+    })
+    const first = result.current.items.find((i) => i.id === 'seed-1')
+    const second = result.current.items.find((i) => i.id === 'podium-test-2')
+    expect(first?.podiumRank).toBeUndefined()
+    expect(second?.podiumRank).toBe(1)
+  })
+
+  it('setPodiumRank with null unassigns the rank', () => {
+    const { result } = renderHook(() => useLocker(), { wrapper })
+    act(() => {
+      result.current.setPodiumRank('seed-1', 'bathroom-skincare', 1)
+    })
+    act(() => {
+      result.current.setPodiumRank('seed-1', 'bathroom-skincare', null)
+    })
+    const item = result.current.items.find((i) => i.id === 'seed-1')
+    expect(item?.podiumRank).toBeUndefined()
+  })
 })

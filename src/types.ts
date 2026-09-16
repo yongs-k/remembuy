@@ -25,6 +25,7 @@ export type Item = {
   note?: string
   recommendation?: 'recommend' | 'notRecommend' // mutually exclusive with daysUntilEmpty
   daysUntilEmpty?: number
+  podiumRank?: 1 | 2 | 3 // per-category: at most one item holds each rank at a time
   price?: number
   place?: string
   restockCycle?: string | null
