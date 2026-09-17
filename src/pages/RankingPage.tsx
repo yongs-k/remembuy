@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import {
   getLocationsRankedByItemCount,
   getCategoriesRankedByItemCount,
   getRankingForCategory,
+  getCompletedPodium,
 } from '../state/selectors'
 import { RecommendationBadge } from '../components/RecommendationBadge'
 import { Badge } from '../components/Badge'
+import { getDeviceId } from '../lib/deviceId'
+
+type GlobalRankingEntry = { name: string; masterItemId: string | null; score: number; voters: number }
 
 type DrillLevel =
   | { level: 'locations' }
@@ -18,6 +22,48 @@ export default function RankingPage() {
   const { items, locations, categories, setPodiumRank } = useLocker()
   const navigate = useNavigate()
   const [drill, setDrill] = useState<DrillLevel>({ level: 'locations' })
+
+  const lastSubmittedRef = useRef<string | null>(null)
+  const [globalRanking, setGlobalRanking] = useState<GlobalRankingEntry[] | null>(null)
+
+  useEffect(() => {
+    if (drill.level !== 'products') return
+    const completed = getCompletedPodium(items, drill.categoryId)
+    if (!completed) return
+    const signature = completed.map((e) => `${e.rank}:${e.item.id}`).join(',')
+    if (lastSubmittedRef.current === signature) return
+    lastSubmittedRef.current = signature
+    fetch('/api/podium-submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        deviceId: getDeviceId(),
+        categoryId: drill.categoryId,
+        items: completed.map((e) => ({
+          rank: e.rank,
+          masterItemId: e.item.masterItemId ?? null,
+          name: e.item.name,
+        })),
+      }),
+    }).catch(() => {})
+  }, [items, drill])
+
+  useEffect(() => {
+    if (drill.level !== 'products') return
+    let cancelled = false
+    setGlobalRanking(null)
+    fetch(`/api/podium-rankings/${encodeURIComponent(drill.categoryId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled) setGlobalRanking(data?.ranking ?? [])
+      })
+      .catch(() => {
+        if (!cancelled) setGlobalRanking([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [drill])
 
   if (drill.level === 'locations') {
     const ranked = getLocationsRankedByItemCount(items, locations)
@@ -131,6 +177,29 @@ export default function RankingPage() {
           ))}
         </ol>
       )}
+
+      <div className="space-y-2 border-t border-ink/10 pt-4">
+        <h2 className="text-sm font-medium text-ink/70">🌍 전체 유저 인기 랭킹</h2>
+        {globalRanking === null ? (
+          <p className="text-sm text-ink/40">불러오는 중...</p>
+        ) : globalRanking.length === 0 ? (
+          <p className="text-sm text-ink/40">아직 데이터가 부족해요.</p>
+        ) : (
+          <ol className="space-y-1">
+            {globalRanking.map((entry, i) => (
+              <li
+                key={`${entry.masterItemId ?? entry.name}-${i}`}
+                className="flex items-center justify-between text-sm"
+              >
+                <span>
+                  {i + 1}. {entry.name}
+                </span>
+                <span className="text-ink/40">{entry.voters}명 선택</span>
+              </li>
+            ))}
+          </ol>
+        )}
+      </div>
     </div>
   )
 }
