@@ -7,3 +7,5 @@ vite.config.js
 .claude/
 .agents/
 server/data/
+.env
+server/.env
