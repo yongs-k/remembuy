@@ -6,12 +6,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_FILE = path.join(__dirname, 'data', 'podiums.json')
 
 export async function readSubmissions() {
+  let raw
   try {
-    const raw = await readFile(DATA_FILE, 'utf-8')
-    return JSON.parse(raw)
-  } catch {
-    return []
+    raw = await readFile(DATA_FILE, 'utf-8')
+  } catch (err) {
+    if (err.code === 'ENOENT') return []
+    throw err
   }
+  return JSON.parse(raw)
 }
 
 export async function writeSubmissions(submissions) {

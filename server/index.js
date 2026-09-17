@@ -21,7 +21,16 @@ const server = createServer((req, res) => {
         // multi-byte character (e.g. Korean) split across a chunk boundary.
         const body = Buffer.concat(chunks).toString('utf-8')
         const { deviceId, categoryId, items } = JSON.parse(body)
-        if (!deviceId || !categoryId || !Array.isArray(items)) {
+        const validItems =
+          Array.isArray(items) &&
+          items.every(
+            (item) =>
+              [1, 2, 3].includes(item.rank) &&
+              typeof item.name === 'string' &&
+              item.name.trim().length > 0 &&
+              (item.masterItemId === null || typeof item.masterItemId === 'string')
+          )
+        if (!deviceId || !categoryId || !validItems) {
           sendJson(res, 400, { error: 'invalid payload' })
           return
         }
