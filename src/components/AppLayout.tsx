@@ -6,7 +6,7 @@ import { useSeenNotifications } from '../hooks/useSeenNotifications'
 const TABS = [
   { to: '/', label: '홈', icon: '🏠' },
   { to: '/ranking', label: '랭킹', icon: '🏆' },
-  { to: '/feed', label: '공유', icon: '👥' },
+  { to: '/purchase', label: '구매', icon: '🛒' },
   { to: '/family', label: '가족', icon: '👪' },
   { to: '/collection', label: '컬렉션', icon: '📔' },
 ]

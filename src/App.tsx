@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage'
 import ItemDetailPage from './pages/ItemDetailPage'
 import RankingPage from './pages/RankingPage'
 import NotificationsPage from './pages/NotificationsPage'
-import FeedPage from './pages/FeedPage'
+import PurchasePage from './pages/PurchasePage'
 import FamilyPage from './pages/FamilyPage'
 import NewItemPage from './pages/NewItemPage'
 import CollectionPage from './pages/CollectionPage'
@@ -19,7 +19,7 @@ export default function App() {
           <Route path="/item/:id" element={<ItemDetailPage />} />
           <Route path="/ranking" element={<RankingPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/feed" element={<FeedPage />} />
+          <Route path="/purchase" element={<PurchasePage />} />
           <Route path="/family" element={<FamilyPage />} />
           <Route path="/new" element={<NewItemPage />} />
           <Route path="/collection" element={<CollectionPage />} />
