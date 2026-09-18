@@ -10,7 +10,7 @@ export function RecommendationToggle({
       <button
         type="button"
         onClick={() => onChange('recommend')}
-        className={`flex-1 rounded-lg py-2 text-sm ${
+        className={`flex-1 rounded-lg border-2 border-ink py-2 text-sm ${
           value === 'recommend' ? 'bg-accent text-white' : 'bg-card text-ink'
         }`}
       >
@@ -19,7 +19,7 @@ export function RecommendationToggle({
       <button
         type="button"
         onClick={() => onChange('notRecommend')}
-        className={`flex-1 rounded-lg py-2 text-sm ${
+        className={`flex-1 rounded-lg border-2 border-ink py-2 text-sm ${
           value === 'notRecommend' ? 'bg-stamp text-white' : 'bg-card text-ink'
         }`}
       >

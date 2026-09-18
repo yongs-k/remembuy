@@ -23,7 +23,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
         {quests.map((quest) => (
           <div
             key={quest.id}
-            className="w-full flex-shrink-0 snap-center rounded-2xl border border-stamp/30 bg-card p-4"
+            className="chunky-card w-full flex-shrink-0 snap-center p-4"
           >
             <div className="flex items-start gap-2">
               <span className="text-xl">{quest.icon}</span>
@@ -53,7 +53,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
               <button
                 type="button"
                 disabled={quest.progress.current < quest.progress.total}
-                className="rounded-full bg-stamp px-4 py-1.5 text-sm text-white disabled:opacity-40"
+                className="rounded-full border-2 border-ink bg-stamp px-4 py-1.5 text-sm text-white disabled:opacity-40"
               >
                 보상받기
               </button>

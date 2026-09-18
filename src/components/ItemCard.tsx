@@ -6,7 +6,7 @@ export function ItemCard({ item, onClick }: { item: Item; onClick: () => void })
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-3 rounded-lg border border-ink/10 bg-card p-3 text-left shadow-sm"
+      className="chunky-btn flex w-full items-center gap-3 rounded-2xl bg-card p-3 text-left"
     >
       <div className="flex h-12 w-12 items-center justify-center rounded bg-paper text-xl">
         🧴
