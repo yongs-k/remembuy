@@ -20,7 +20,9 @@ export function LocationIcon({
     <button
       type="button"
       onClick={onClick}
-      className={`chunky-btn flex flex-col items-center gap-1 rounded-2xl bg-transparent p-2 shadow-none active:shadow-none ${selected ? 'opacity-100' : 'opacity-80'}`}
+      className={`chunky-btn flex flex-col items-center gap-1 rounded-2xl p-2 ${
+        selected ? 'bg-card shadow-chunky opacity-100' : 'bg-transparent shadow-none opacity-80'
+      }`}
     >
       <ProgressRing percent={percent} color={color} size={56} strokeWidth={4}>
         <span className="text-lg">{emoji}</span>

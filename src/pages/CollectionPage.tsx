@@ -64,8 +64,8 @@ export default function CollectionPage() {
               <button
                 type="button"
                 onClick={() => setActiveLocationId(location.id)}
-                className={`chunky-btn flex flex-col items-center gap-1 rounded-2xl p-2 shadow-none active:shadow-none ${
-                  activeLocationId === location.id ? 'bg-card shadow-chunky active:shadow-none' : 'bg-transparent'
+                className={`chunky-btn flex flex-col items-center gap-1 rounded-2xl p-2 ${
+                  activeLocationId === location.id ? 'bg-card shadow-chunky' : 'bg-transparent shadow-none'
                 }`}
               >
                 <ProgressRing percent={percent} color={color} size={56} strokeWidth={4}>
