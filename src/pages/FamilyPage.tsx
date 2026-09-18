@@ -10,7 +10,7 @@ export default function FamilyPage() {
 
       <ul className="space-y-3">
         {FAMILY_MEMBERS.map((member) => (
-          <li key={member.id} className="rounded-lg border border-ink/10 bg-card p-3">
+          <li key={member.id} className="chunky-card p-3">
             <p className="font-medium">
               {member.name} <span className="text-xs text-ink/50">({member.relation})</span>
             </p>
@@ -29,7 +29,7 @@ export default function FamilyPage() {
       <button
         type="button"
         onClick={() => setInvited(true)}
-        className="w-full rounded-lg bg-stamp py-2 text-white"
+        className="chunky-btn w-full rounded-xl bg-stamp py-2 text-white"
       >
         가족 초대하기
       </button>

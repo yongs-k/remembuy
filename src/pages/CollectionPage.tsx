@@ -64,8 +64,8 @@ export default function CollectionPage() {
               <button
                 type="button"
                 onClick={() => setActiveLocationId(location.id)}
-                className={`flex flex-col items-center gap-1 rounded-lg p-2 ${
-                  activeLocationId === location.id ? 'bg-card' : ''
+                className={`chunky-btn flex flex-col items-center gap-1 rounded-2xl p-2 shadow-none active:shadow-none ${
+                  activeLocationId === location.id ? 'bg-card shadow-chunky active:shadow-none' : 'bg-transparent'
                 }`}
               >
                 <ProgressRing percent={percent} color={color} size={56} strokeWidth={4}>
@@ -94,7 +94,7 @@ export default function CollectionPage() {
             (m) => !missing.some((miss) => miss.id === m.id)
           )
           return (
-            <div key={category.id} className="rounded-lg border border-ink/10 bg-card p-3">
+            <div key={category.id} className="chunky-card p-3">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <p className="font-medium">{category.name}</p>

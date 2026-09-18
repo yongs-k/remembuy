@@ -136,7 +136,7 @@ export default function NewItemPage() {
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         />
       </label>
 
@@ -145,7 +145,7 @@ export default function NewItemPage() {
         <select
           value={locationId}
           onChange={(e) => handleLocationChange(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         >
           {locations.map((l) => (
             <option key={l.id} value={l.id}>
@@ -159,12 +159,12 @@ export default function NewItemPage() {
           value={newLocationName}
           onChange={(e) => setNewLocationName(e.target.value)}
           placeholder="새 장소 이름 (예: 베란다)"
-          className="flex-1 rounded-lg border border-ink/20 bg-card p-2 text-sm"
+          className="chunky-input flex-1 bg-card p-2 text-sm"
         />
         <button
           type="button"
           onClick={handleAddLocation}
-          className="rounded-lg border border-ink/20 px-3 text-sm"
+          className="chunky-btn rounded-xl bg-card px-3 text-sm"
         >
           장소 추가
         </button>
@@ -178,7 +178,7 @@ export default function NewItemPage() {
             setCategoryId(e.target.value)
             setMasterItemId('')
           }}
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         >
           {categoriesForLocation.map((c) => (
             <option key={c.id} value={c.id}>
@@ -192,12 +192,12 @@ export default function NewItemPage() {
           value={newCategoryName}
           onChange={(e) => setNewCategoryName(e.target.value)}
           placeholder="새 카테고리 이름"
-          className="flex-1 rounded-lg border border-ink/20 bg-card p-2 text-sm"
+          className="chunky-input flex-1 bg-card p-2 text-sm"
         />
         <button
           type="button"
           onClick={handleAddCategory}
-          className="rounded-lg border border-ink/20 px-3 text-sm"
+          className="chunky-btn rounded-xl bg-card px-3 text-sm"
         >
           카테고리 추가
         </button>
@@ -209,7 +209,7 @@ export default function NewItemPage() {
           <select
             value={masterItemId}
             onChange={(e) => setMasterItemId(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+            className="chunky-input mt-1 w-full bg-card p-2"
           >
             <option value="">직접 입력 (커스텀 상품)</option>
             {selectedCategory.masterItems.map((m) => (
@@ -226,7 +226,7 @@ export default function NewItemPage() {
         <input
           value={place}
           onChange={(e) => setPlace(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         />
       </label>
 
@@ -237,7 +237,7 @@ export default function NewItemPage() {
           min={0}
           value={price}
           onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         />
       </label>
 
@@ -247,7 +247,7 @@ export default function NewItemPage() {
           value={affiliateUrl ?? ''}
           onChange={(e) => setAffiliateUrl(e.target.value)}
           placeholder="https://..."
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         />
       </label>
 
@@ -257,7 +257,7 @@ export default function NewItemPage() {
           value={restockCycle}
           onChange={(e) => setRestockCycle(e.target.value)}
           placeholder="예: 약 2개월마다"
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
         />
       </label>
 
@@ -265,7 +265,7 @@ export default function NewItemPage() {
         <button
           type="button"
           onClick={() => setProgressMode('recommendation')}
-          className={`flex-1 rounded-lg py-2 text-sm ${
+          className={`flex-1 rounded-lg border-2 border-ink py-2 text-sm ${
             progressMode === 'recommendation' ? 'bg-stamp text-white' : 'bg-card text-ink'
           }`}
         >
@@ -274,7 +274,7 @@ export default function NewItemPage() {
         <button
           type="button"
           onClick={() => setProgressMode('daysUntilEmpty')}
-          className={`flex-1 rounded-lg py-2 text-sm ${
+          className={`flex-1 rounded-lg border-2 border-ink py-2 text-sm ${
             progressMode === 'daysUntilEmpty' ? 'bg-stamp text-white' : 'bg-card text-ink'
           }`}
         >
@@ -292,7 +292,7 @@ export default function NewItemPage() {
             min={0}
             value={daysUntilEmpty}
             onChange={(e) => setDaysUntilEmpty(Number(e.target.value))}
-            className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+            className="chunky-input mt-1 w-full bg-card p-2"
           />
         </label>
       )}
@@ -302,12 +302,12 @@ export default function NewItemPage() {
         <textarea
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input mt-1 w-full bg-card p-2"
           rows={3}
         />
       </label>
 
-      <button type="submit" className="w-full rounded-lg bg-stamp py-2 text-white">
+      <button type="submit" className="chunky-btn w-full rounded-xl bg-stamp py-2 text-white">
         저장하기
       </button>
     </form>
