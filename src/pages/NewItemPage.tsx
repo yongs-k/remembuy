@@ -1,31 +1,54 @@
 import { useMemo, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import type { Item } from '../types'
 
 type ProgressMode = 'recommendation' | 'daysUntilEmpty'
 
+type LinkAnalysisPrefill = {
+  name: string | null
+  locationId: string | null
+  suggestedLocationName: string | null
+  categoryId: string | null
+  suggestedCategoryName: string | null
+  masterItemId: string | null
+  place: string | null
+  price: number | null
+  restockCycle: string | null
+  sourceUrl: string
+}
+
 export default function NewItemPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const editId = searchParams.get('editId')
   const { items, locations, categories, addItem, updateItem, addLocation, addCategory } =
     useLocker()
   const existing = editId ? items.find((i) => i.id === editId) : undefined
+  const prefill = !existing
+    ? (location.state as { prefill?: LinkAnalysisPrefill } | null)?.prefill
+    : undefined
 
-  const [name, setName] = useState(existing?.name ?? '')
-  const [locationId, setLocationId] = useState(existing?.locationId ?? locations[0].id)
+  const [name, setName] = useState(existing?.name ?? prefill?.name ?? '')
+  const [locationId, setLocationId] = useState(
+    existing?.locationId ?? prefill?.locationId ?? locations[0].id
+  )
   const categoriesForLocation = useMemo(
     () => categories.filter((c) => c.locationId === locationId),
     [categories, locationId]
   )
   const [categoryId, setCategoryId] = useState(
-    existing?.categoryId ?? categoriesForLocation[0]?.id ?? ''
+    existing?.categoryId ?? prefill?.categoryId ?? categoriesForLocation[0]?.id ?? ''
   )
-  const [masterItemId, setMasterItemId] = useState(existing?.masterItemId ?? '')
-  const [place, setPlace] = useState(existing?.place ?? '')
-  const [restockCycle, setRestockCycle] = useState(existing?.restockCycle ?? '')
+  const [masterItemId, setMasterItemId] = useState(
+    existing?.masterItemId ?? prefill?.masterItemId ?? ''
+  )
+  const [place, setPlace] = useState(existing?.place ?? prefill?.place ?? '')
+  const [restockCycle, setRestockCycle] = useState(
+    existing?.restockCycle ?? prefill?.restockCycle ?? ''
+  )
   const [progressMode, setProgressMode] = useState<ProgressMode>(
     existing?.daysUntilEmpty !== undefined ? 'daysUntilEmpty' : 'recommendation'
   )
@@ -33,11 +56,13 @@ export default function NewItemPage() {
     existing?.recommendation ?? 'recommend'
   )
   const [daysUntilEmpty, setDaysUntilEmpty] = useState(existing?.daysUntilEmpty ?? 30)
-  const [price, setPrice] = useState<number | ''>(existing?.price ?? '')
-  const [affiliateUrl, setAffiliateUrl] = useState(existing?.affiliateUrl ?? '')
+  const [price, setPrice] = useState<number | ''>(existing?.price ?? prefill?.price ?? '')
+  const [affiliateUrl, setAffiliateUrl] = useState(
+    existing?.affiliateUrl ?? prefill?.sourceUrl ?? ''
+  )
   const [note, setNote] = useState(existing?.note ?? '')
-  const [newLocationName, setNewLocationName] = useState('')
-  const [newCategoryName, setNewCategoryName] = useState('')
+  const [newLocationName, setNewLocationName] = useState(prefill?.suggestedLocationName ?? '')
+  const [newCategoryName, setNewCategoryName] = useState(prefill?.suggestedCategoryName ?? '')
 
   const selectedCategory = categoriesForLocation.find((c) => c.id === categoryId)
 
