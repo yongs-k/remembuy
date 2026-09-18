@@ -31,19 +31,31 @@ export default function NewItemPage() {
     ? (location.state as { prefill?: LinkAnalysisPrefill } | null)?.prefill
     : undefined
 
+  const prefillLocation = prefill?.locationId
+    ? locations.find((l) => l.id === prefill.locationId)
+    : undefined
+  const prefillCategory =
+    prefillLocation && prefill?.categoryId
+      ? categories.find((c) => c.id === prefill.categoryId && c.locationId === prefillLocation.id)
+      : undefined
+  const prefillMasterItemId =
+    prefillCategory && prefill?.masterItemId
+      ? prefillCategory.masterItems.find((m) => m.id === prefill.masterItemId)?.id
+      : undefined
+
   const [name, setName] = useState(existing?.name ?? prefill?.name ?? '')
   const [locationId, setLocationId] = useState(
-    existing?.locationId ?? prefill?.locationId ?? locations[0].id
+    existing?.locationId ?? prefillLocation?.id ?? locations[0].id
   )
   const categoriesForLocation = useMemo(
     () => categories.filter((c) => c.locationId === locationId),
     [categories, locationId]
   )
   const [categoryId, setCategoryId] = useState(
-    existing?.categoryId ?? prefill?.categoryId ?? categoriesForLocation[0]?.id ?? ''
+    existing?.categoryId ?? prefillCategory?.id ?? categoriesForLocation[0]?.id ?? ''
   )
   const [masterItemId, setMasterItemId] = useState(
-    existing?.masterItemId ?? (prefill?.categoryId ? prefill?.masterItemId : null) ?? ''
+    existing?.masterItemId ?? prefillMasterItemId ?? ''
   )
   const [place, setPlace] = useState(existing?.place ?? prefill?.place ?? '')
   const [restockCycle, setRestockCycle] = useState(
