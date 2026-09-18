@@ -43,7 +43,7 @@ export default function NewItemPage() {
     existing?.categoryId ?? prefill?.categoryId ?? categoriesForLocation[0]?.id ?? ''
   )
   const [masterItemId, setMasterItemId] = useState(
-    existing?.masterItemId ?? prefill?.masterItemId ?? ''
+    existing?.masterItemId ?? (prefill?.categoryId ? prefill?.masterItemId : null) ?? ''
   )
   const [place, setPlace] = useState(existing?.place ?? prefill?.place ?? '')
   const [restockCycle, setRestockCycle] = useState(
