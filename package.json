@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "dev:server": "node server/index.js",
+    "dev:server": "node --env-file=server/.env server/index.js",
     "test:server": "node --test server/podium.test.mjs"
   },
   "dependencies": {
