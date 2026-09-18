@@ -9,3 +9,4 @@ vite.config.js
 server/data/
 .env
 server/.env
+.superpowers/
