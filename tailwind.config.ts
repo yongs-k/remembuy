@@ -75,8 +75,11 @@ export default {
         'surface-variant': '#eae0de',
       },
       fontFamily: {
-        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
-        body: ['"Noto Sans"', 'sans-serif'],
+        // Noto Sans KR is a fallback, not a duplicate: "Plus Jakarta Sans"/
+        // "Noto Sans" ship no Hangul glyphs, so without it every Korean
+        // character in this app would silently fall back to the OS default.
+        heading: ['"Plus Jakarta Sans"', '"Noto Sans KR"', 'sans-serif'],
+        body: ['"Noto Sans"', '"Noto Sans KR"', 'sans-serif'],
       },
       fontSize: {
         'display-lg': ['36px', { lineHeight: '44px', letterSpacing: '-0.03em', fontWeight: '800' }],
