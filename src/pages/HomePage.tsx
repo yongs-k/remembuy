@@ -54,6 +54,13 @@ export default function HomePage() {
     }
   }
 
+  function closeRecordSheet() {
+    setShowRecordOptions(false)
+    setShowLinkInput(false)
+    setLinkUrl('')
+    setAnalyzeError(null)
+  }
+
   async function handleAnalyzeLink() {
     setIsAnalyzing(true)
     setAnalyzeError(null)
@@ -210,7 +217,7 @@ export default function HomePage() {
       {showRecordOptions && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
-          onClick={() => setShowRecordOptions(false)}
+          onClick={closeRecordSheet}
         >
           <div
             className="w-full max-w-md space-y-2 rounded-t-2xl bg-card p-4 pb-8"
@@ -253,7 +260,7 @@ export default function HomePage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowRecordOptions(false)}
+                  onClick={closeRecordSheet}
                   className="w-full pt-2 text-center text-sm text-ink/50"
                 >
                   취소
