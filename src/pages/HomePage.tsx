@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { getLocationCompletion } from '../state/selectors'
-import { LocationIcon } from '../components/LocationIcon'
 import { ItemCard } from '../components/ItemCard'
 import { HomeProfileCard } from '../components/HomeProfileCard'
 import { QuestCarousel } from '../components/QuestCarousel'
+import { HomeLocationTile } from '../components/HomeLocationTile'
+import { Icon } from '../data/materialIcons'
 import { DUMMY_QUESTS } from '../data/homeDummy'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
@@ -83,13 +84,25 @@ export default function HomePage() {
   if (searchResults !== null) {
     return (
       <div className="space-y-4 p-4">
-        <input
-          type="search"
-          placeholder="상품 검색"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="chunky-input w-full bg-card p-2"
-        />
+        <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de]">
+          <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
+            <Icon name="search" className="text-[20px]" />
+          </div>
+          <input
+            type="search"
+            placeholder="상품 검색"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="min-w-0 w-full bg-transparent py-1.5 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+          />
+          <button
+            type="button"
+            aria-label="바코드 스캔"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-on-surface transition-colors hover:bg-surface-variant active:scale-95"
+          >
+            <Icon name="qr_code_scanner" className="text-[20px]" />
+          </button>
+        </div>
         <div className="space-y-2">
           {searchResults.length === 0 ? (
             <p className="text-sm text-ink/50">검색 결과가 없습니다.</p>
@@ -116,13 +129,25 @@ export default function HomePage() {
         </>
       )}
 
-      <input
-        type="search"
-        placeholder="상품 검색"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="chunky-input w-full bg-card p-2"
-      />
+      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de]">
+        <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
+          <Icon name="search" className="text-[20px]" />
+        </div>
+        <input
+          type="search"
+          placeholder="상품 검색"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="min-w-0 w-full bg-transparent py-1.5 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+        />
+        <button
+          type="button"
+          aria-label="바코드 스캔"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-on-surface transition-colors hover:bg-surface-variant active:scale-95"
+        >
+          <Icon name="qr_code_scanner" className="text-[20px]" />
+        </button>
+      </div>
 
       {(selectedLocationId || selectedCategoryId) && (
         <button type="button" onClick={handleBack} className="text-sm text-ink/60">
@@ -131,12 +156,13 @@ export default function HomePage() {
       )}
 
       {!selectedLocationId && (
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 gap-space-sm">
           {locations.map((location) => (
-            <LocationIcon
+            <HomeLocationTile
               key={location.id}
               location={location}
               percent={getLocationCompletion(items, location.id, categories)}
+              count={categories.filter((c) => c.locationId === location.id).length}
               onClick={() => setSelectedLocationId(location.id)}
             />
           ))}
@@ -208,10 +234,13 @@ export default function HomePage() {
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full border-2 border-ink bg-stamp text-2xl text-white shadow-chunky active:translate-x-1 active:translate-y-1 active:shadow-none md:bottom-8"
+        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-[0_6px_16px_rgba(170,48,21,0.35),0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-1 active:shadow-[0_2px_0px_#8b1901] md:bottom-8"
         aria-label="새로 기록하기"
       >
-        +
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
+          <Icon name="add" className="text-[18px]" />
+        </span>
+        <span className="font-label-lg text-label-lg font-bold">물품 등록</span>
       </button>
 
       {showRecordOptions && (
@@ -220,48 +249,50 @@ export default function HomePage() {
           onClick={closeRecordSheet}
         >
           <div
-            className="w-full max-w-md space-y-2 rounded-t-2xl bg-card p-4 pb-8"
+            className="w-full max-w-md space-y-2 rounded-t-2xl bg-surface-container-lowest p-4 pb-8"
             onClick={(e) => e.stopPropagation()}
           >
             {!showLinkInput ? (
               <>
-                <p className="pb-1 text-center text-sm text-ink/50">어떻게 기록할까요?</p>
+                <p className="pb-1 text-center font-body-sm text-body-sm text-on-surface-variant">
+                  어떻게 기록할까요?
+                </p>
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
+                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
                 >
-                  <span className="text-xl">📷</span>
+                  <Icon name="photo_camera" className="text-[20px] text-primary" />
                   <span>카메라로 촬영</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
+                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
                 >
-                  <span className="text-xl">🖼️</span>
+                  <Icon name="image" className="text-[20px] text-primary" />
                   <span>사진 선택</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowLinkInput(true)}
-                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
+                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
                 >
-                  <span className="text-xl">🔗</span>
+                  <Icon name="link" className="text-[20px] text-primary" />
                   <span>링크로 가져오기</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
+                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
                 >
-                  <span className="text-xl">✏️</span>
+                  <Icon name="edit_note" className="text-[20px] text-primary" />
                   <span>직접 입력</span>
                 </button>
                 <button
                   type="button"
                   onClick={closeRecordSheet}
-                  className="w-full pt-2 text-center text-sm text-ink/50"
+                  className="w-full pt-2 text-center font-body-sm text-body-sm text-on-surface-variant"
                 >
                   취소
                 </button>
