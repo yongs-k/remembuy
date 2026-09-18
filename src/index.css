@@ -9,3 +9,15 @@ body {
 h1, h2, h3 {
   @apply font-heading;
 }
+
+@layer components {
+  .chunky-card {
+    @apply rounded-2xl border-2 border-ink bg-card shadow-chunky;
+  }
+  .chunky-btn {
+    @apply rounded-xl border-2 border-ink shadow-chunky transition-transform active:translate-x-1 active:translate-y-1 active:shadow-none;
+  }
+  .chunky-input {
+    @apply rounded-xl border-2 border-ink;
+  }
+}

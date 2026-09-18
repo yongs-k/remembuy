@@ -20,8 +20,8 @@ export function AppLayout() {
   ).length
 
   return (
-    <div className="flex h-dvh bg-paper text-ink">
-      <nav className="hidden w-56 flex-col gap-1 border-r border-ink/10 bg-card p-4 md:flex">
+    <div className="flex h-dvh bg-paper text-ink md:mx-auto md:max-w-[820px]">
+      <nav className="hidden w-56 flex-col gap-1 border-r-2 border-ink bg-card p-4 md:flex">
         <span className="mb-4 font-heading text-lg">REMEMBUY</span>
         {TABS.map((tab) => (
           <NavLink
@@ -29,8 +29,10 @@ export function AppLayout() {
             to={tab.to}
             end={tab.to === '/'}
             className={({ isActive }) =>
-              `flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${
-                isActive ? 'bg-stamp text-white' : 'text-ink/70'
+              `flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-sm ${
+                isActive
+                  ? 'border-ink bg-stamp text-white shadow-chunky'
+                  : 'border-transparent text-ink/70'
               }`
             }
           >
@@ -41,7 +43,7 @@ export function AppLayout() {
       </nav>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-ink/10 bg-card px-4 py-3">
+        <header className="flex items-center justify-between border-b-2 border-ink bg-card px-4 py-3">
           <span className="font-heading text-lg md:hidden">REMEMBUY</span>
           <button
             type="button"
@@ -62,7 +64,7 @@ export function AppLayout() {
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 grid grid-cols-5 border-t border-ink/10 bg-card md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 grid grid-cols-5 border-t-2 border-ink bg-card md:hidden">
         {TABS.map((tab) => (
           <NavLink
             key={tab.to}

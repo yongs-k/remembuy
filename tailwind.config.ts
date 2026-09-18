@@ -28,6 +28,9 @@ export default {
         heading: ['"Gowun Batang"', 'serif'],
         body: ['"IBM Plex Sans KR"', 'sans-serif'],
       },
+      boxShadow: {
+        chunky: '4px 4px 0 0 #2A2420',
+      },
     },
   },
   plugins: [],
