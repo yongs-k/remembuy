@@ -9,7 +9,7 @@ export default function PurchasePage() {
         <h2 className="font-heading text-lg">🤖 AI 추천 상품</h2>
         <div className="space-y-2">
           {DUMMY_RECOMMENDATIONS.map((rec) => (
-            <div key={rec.id} className="rounded-lg border border-ink/10 bg-card p-3">
+            <div key={rec.id} className="chunky-card p-3">
               <p className="font-medium">{rec.name}</p>
               <p className="text-sm text-ink/50">{rec.reason}</p>
               <p className="mt-1 text-sm font-medium text-stamp">{rec.price.toLocaleString()}원</p>
@@ -24,7 +24,7 @@ export default function PurchasePage() {
           {DUMMY_DISCOUNTS.map((deal) => {
             const percentOff = Math.round((1 - deal.discountedPrice / deal.originalPrice) * 100)
             return (
-              <div key={deal.id} className="rounded-lg border border-ink/10 bg-card p-3">
+              <div key={deal.id} className="chunky-card p-3">
                 <p className="font-medium">{deal.name}</p>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-sm text-ink/40 line-through">
@@ -33,7 +33,7 @@ export default function PurchasePage() {
                   <span className="text-sm font-medium text-stamp">
                     {deal.discountedPrice.toLocaleString()}원
                   </span>
-                  <span className="rounded-full bg-stamp px-2 py-0.5 text-xs text-white">
+                  <span className="rounded-full border-2 border-ink bg-stamp px-2 py-0.5 text-xs text-white">
                     {percentOff}% 할인
                   </span>
                 </div>
@@ -49,7 +49,7 @@ export default function PurchasePage() {
           {DUMMY_GROUP_BUYS.map((gb) => {
             const percent = Math.round((gb.currentParticipants / gb.targetParticipants) * 100)
             return (
-              <div key={gb.id} className="rounded-lg border border-ink/10 bg-card p-3">
+              <div key={gb.id} className="chunky-card p-3">
                 <p className="font-medium">{gb.name}</p>
                 <div className="mt-2 h-2 rounded-full bg-paper">
                   <div className="h-2 rounded-full bg-accent" style={{ width: `${percent}%` }} />
@@ -62,7 +62,7 @@ export default function PurchasePage() {
                 </div>
                 <button
                   type="button"
-                  className="mt-2 w-full rounded-lg bg-stamp py-2 text-sm text-white"
+                  className="chunky-btn mt-2 w-full rounded-xl bg-stamp py-2 text-sm text-white"
                 >
                   참여하기
                 </button>

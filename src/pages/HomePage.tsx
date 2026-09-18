@@ -88,7 +88,7 @@ export default function HomePage() {
           placeholder="상품 검색"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-lg border border-ink/20 bg-card p-2"
+          className="chunky-input w-full bg-card p-2"
         />
         <div className="space-y-2">
           {searchResults.length === 0 ? (
@@ -121,7 +121,7 @@ export default function HomePage() {
         placeholder="상품 검색"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full rounded-lg border border-ink/20 bg-card p-2"
+        className="chunky-input w-full bg-card p-2"
       />
 
       {(selectedLocationId || selectedCategoryId) && (
@@ -152,7 +152,7 @@ export default function HomePage() {
                 key={category.id}
                 type="button"
                 onClick={() => setSelectedCategoryId(category.id)}
-                className="rounded-lg border border-ink/10 bg-card p-3 text-left"
+                className="chunky-btn rounded-2xl bg-card p-3 text-left"
               >
                 <p className="font-medium">{category.name}</p>
                 <p className="text-xs text-ink/50">{count}개 보유</p>
@@ -168,7 +168,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setFilter('all')}
-              className={`rounded-full px-3 py-1 text-sm ${
+              className={`rounded-full border-2 border-ink px-3 py-1 text-sm ${
                 filter === 'all' ? 'bg-stamp text-white' : 'bg-card text-ink'
               }`}
             >
@@ -177,7 +177,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setFilter('urgent')}
-              className={`rounded-full px-3 py-1 text-sm ${
+              className={`rounded-full border-2 border-ink px-3 py-1 text-sm ${
                 filter === 'urgent' ? 'bg-stamp text-white' : 'bg-card text-ink'
               }`}
             >
@@ -186,7 +186,7 @@ export default function HomePage() {
             <button
               type="button"
               onClick={() => setFilter('recommended')}
-              className={`rounded-full px-3 py-1 text-sm ${
+              className={`rounded-full border-2 border-ink px-3 py-1 text-sm ${
                 filter === 'recommended' ? 'bg-stamp text-white' : 'bg-card text-ink'
               }`}
             >
@@ -208,7 +208,7 @@ export default function HomePage() {
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-stamp text-2xl text-white shadow-lg md:bottom-8"
+        className="fixed bottom-24 right-4 z-30 flex h-14 w-14 items-center justify-center rounded-full border-2 border-ink bg-stamp text-2xl text-white shadow-chunky active:translate-x-1 active:translate-y-1 active:shadow-none md:bottom-8"
         aria-label="새로 기록하기"
       >
         +
@@ -229,7 +229,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
                 >
                   <span className="text-xl">📷</span>
                   <span>카메라로 촬영</span>
@@ -237,7 +237,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
                 >
                   <span className="text-xl">🖼️</span>
                   <span>사진 선택</span>
@@ -245,7 +245,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => setShowLinkInput(true)}
-                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
                 >
                   <span className="text-xl">🔗</span>
                   <span>링크로 가져오기</span>
@@ -253,7 +253,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                  className="chunky-btn flex w-full items-center gap-3 rounded-xl p-3 text-left"
                 >
                   <span className="text-xl">✏️</span>
                   <span>직접 입력</span>
@@ -274,7 +274,7 @@ export default function HomePage() {
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm"
+                  className="chunky-input w-full bg-paper p-2 text-sm"
                   disabled={isAnalyzing}
                 />
                 {analyzeError && <p className="text-sm text-stamp">{analyzeError}</p>}
@@ -282,7 +282,7 @@ export default function HomePage() {
                   type="button"
                   onClick={handleAnalyzeLink}
                   disabled={isAnalyzing || !linkUrl.trim()}
-                  className="w-full rounded-lg bg-stamp py-2 text-sm text-white disabled:opacity-40"
+                  className="chunky-btn w-full rounded-xl bg-stamp py-2 text-sm text-white disabled:opacity-40 disabled:active:translate-x-0 disabled:active:translate-y-0 disabled:active:shadow-chunky"
                 >
                   {isAnalyzing ? '분석 중...' : '분석하기'}
                 </button>
