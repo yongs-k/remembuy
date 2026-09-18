@@ -8,8 +8,8 @@ test('extractText pulls title, og:title, og:description, and stripped body text'
       <title>테스트 상품 - 쇼핑몰</title>
       <meta property="og:title" content="테스트 상품" />
       <meta property="og:description" content="아주 좋은 상품입니다" />
-      <script>console.log('should be stripped')</script>
     </head><body>
+      <script>console.log('should be stripped')</script>
       <div>가격: 12,000원 <span>재고 있음</span></div>
     </body></html>
   `
@@ -19,6 +19,14 @@ test('extractText pulls title, og:title, og:description, and stripped body text'
   assert.match(result, /OG Description: 아주 좋은 상품입니다/)
   assert.match(result, /가격: 12,000원/)
   assert.doesNotMatch(result, /console\.log/)
+})
+
+test('extractText captures OG content containing an apostrophe without truncating', () => {
+  const html = `<html><head>
+      <meta property="og:title" content="It's a great deal" />
+    </head><body>ok</body></html>`
+  const result = extractText(html)
+  assert.match(result, /OG Title: It's a great deal/)
 })
 
 test('extractText truncates body text to 4000 characters', () => {

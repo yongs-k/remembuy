@@ -1,11 +1,19 @@
+function extractMetaContent(html, propertyValue) {
+  const metaTagRegex = /<meta\b[^>]*>/gi
+  const tags = html.match(metaTagRegex) || []
+  for (const tag of tags) {
+    const propMatch = tag.match(/property\s*=\s*(["'])([^"']*og:[a-z]+)\1/i)
+    if (!propMatch || propMatch[2].toLowerCase() !== propertyValue) continue
+    const contentMatch = tag.match(/content\s*=\s*(["'])([\s\S]*?)\1/i)
+    if (contentMatch) return contentMatch[2]
+  }
+  return null
+}
+
 export function extractText(html) {
   const titleMatch = html.match(/<title[^>]*>([^<]*)<\/title>/i)
-  const ogTitleMatch = html.match(
-    /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']*)["']/i
-  )
-  const ogDescMatch = html.match(
-    /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']*)["']/i
-  )
+  const ogTitle = extractMetaContent(html, 'og:title')
+  const ogDesc = extractMetaContent(html, 'og:description')
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
   const bodyText = (bodyMatch ? bodyMatch[1] : html)
     .replace(/<script[\s\S]*?<\/script>/gi, '')
@@ -17,8 +25,8 @@ export function extractText(html) {
 
   const parts = []
   if (titleMatch) parts.push(`Title: ${titleMatch[1].trim()}`)
-  if (ogTitleMatch) parts.push(`OG Title: ${ogTitleMatch[1].trim()}`)
-  if (ogDescMatch) parts.push(`OG Description: ${ogDescMatch[1].trim()}`)
+  if (ogTitle) parts.push(`OG Title: ${ogTitle.trim()}`)
+  if (ogDesc) parts.push(`OG Description: ${ogDesc.trim()}`)
   parts.push(`Body: ${bodyText}`)
   return parts.join('\n')
 }
