@@ -32,7 +32,7 @@ export default function ItemDetailPage() {
         ← 뒤로
       </button>
 
-      <div className="flex h-40 items-center justify-center rounded-lg bg-card text-5xl">
+      <div className="chunky-card flex h-40 items-center justify-center text-5xl">
         🧴
       </div>
 
@@ -55,7 +55,7 @@ export default function ItemDetailPage() {
         />
       )}
 
-      {item.note && <p className="rounded-lg bg-card p-3 text-sm">{item.note}</p>}
+      {item.note && <p className="chunky-card p-3 text-sm">{item.note}</p>}
 
       <dl className="space-y-1 text-sm">
         {item.place && (
@@ -76,7 +76,7 @@ export default function ItemDetailPage() {
         {item.affiliateUrl ? (
           <a
             href={item.affiliateUrl}
-            className="flex-1 rounded-lg bg-stamp py-2 text-center text-white"
+            className="chunky-btn flex-1 rounded-xl bg-stamp py-2 text-center text-white"
           >
             구매하기
           </a>
@@ -84,7 +84,7 @@ export default function ItemDetailPage() {
           <button
             type="button"
             disabled
-            className="flex-1 rounded-lg bg-ink/10 py-2 text-center text-ink/40"
+            className="flex-1 rounded-xl border-2 border-ink/20 bg-ink/10 py-2 text-center text-ink/40"
           >
             구매 링크 없음
           </button>
@@ -92,7 +92,7 @@ export default function ItemDetailPage() {
         <button
           type="button"
           onClick={() => navigate(`/new?editId=${item.id}`)}
-          className="flex-1 rounded-lg border border-ink/20 py-2 text-center"
+          className="chunky-btn flex-1 rounded-xl bg-card py-2 text-center"
         >
           메모 수정하기
         </button>

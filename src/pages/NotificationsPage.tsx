@@ -26,7 +26,7 @@ export default function NotificationsPage() {
       ) : (
         <ul className="space-y-2">
           {upcoming.map((item) => (
-            <li key={item.id} className="rounded-lg border border-ink/10 bg-card p-3">
+            <li key={item.id} className="chunky-card p-3">
               <div className="flex items-center justify-between">
                 <p className="font-medium">{item.name}</p>
                 <span className="text-warn">D-{item.daysUntilEmpty}</span>
@@ -42,7 +42,7 @@ export default function NotificationsPage() {
                 {item.affiliateUrl ? (
                   <a
                     href={item.affiliateUrl}
-                    className="ml-auto rounded-full bg-stamp px-3 py-1 text-sm text-white"
+                    className="chunky-btn ml-auto rounded-full bg-stamp px-3 py-1 text-sm text-white"
                   >
                     구매하기
                   </a>
@@ -50,7 +50,7 @@ export default function NotificationsPage() {
                   <button
                     type="button"
                     disabled
-                    className="ml-auto rounded-full bg-ink/10 px-3 py-1 text-sm text-ink/40"
+                    className="ml-auto rounded-full border-2 border-ink/20 bg-ink/10 px-3 py-1 text-sm text-ink/40"
                   >
                     구매 링크 없음
                   </button>

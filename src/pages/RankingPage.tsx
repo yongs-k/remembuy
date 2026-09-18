@@ -75,7 +75,7 @@ export default function RankingPage() {
             <li
               key={location.id}
               onClick={() => setDrill({ level: 'categories', locationId: location.id })}
-              className="flex cursor-pointer items-center justify-between rounded-lg border border-ink/10 bg-card p-3"
+              className="chunky-btn flex cursor-pointer items-center justify-between rounded-2xl bg-card p-3"
             >
               <span className="font-medium">{location.name}</span>
               <span className="text-sm text-ink/50">{itemCount}개 저장됨</span>
@@ -110,7 +110,7 @@ export default function RankingPage() {
                   categoryId: category.id,
                 })
               }
-              className="flex cursor-pointer items-center justify-between rounded-lg border border-ink/10 bg-card p-3"
+              className="chunky-btn flex cursor-pointer items-center justify-between rounded-2xl bg-card p-3"
             >
               <span className="font-medium">{category.name}</span>
               <span className="text-sm text-ink/50">{itemCount}개 등록됨</span>
@@ -143,7 +143,7 @@ export default function RankingPage() {
             <li
               key={item.id}
               onClick={() => navigate(`/item/${item.id}`)}
-              className="flex cursor-pointer items-center gap-3 rounded-lg border border-ink/10 bg-card p-3"
+              className="chunky-btn flex cursor-pointer items-center gap-3 rounded-2xl bg-card p-3"
             >
               <span className="w-6 text-center font-heading text-lg">{index + 1}</span>
               <div className="flex-1">
@@ -164,7 +164,7 @@ export default function RankingPage() {
                         e.stopPropagation()
                         setPodiumRank(item.id, item.categoryId, isAssigned ? null : rank)
                       }}
-                      className={isAssigned ? 'opacity-100' : 'opacity-30'}
+                      className={`rounded-full border-2 border-ink ${isAssigned ? 'opacity-100' : 'opacity-30'}`}
                       aria-label={`${rank}등으로 지정`}
                     >
                       {medal}
