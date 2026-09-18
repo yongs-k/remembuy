@@ -18,6 +18,10 @@ export default function HomePage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [filter, setFilter] = useState<HomeFilter>('all')
   const [showRecordOptions, setShowRecordOptions] = useState(false)
+  const [showLinkInput, setShowLinkInput] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null)
 
   const searchResults = useMemo(() => {
     if (!search) return null
@@ -47,6 +51,25 @@ export default function HomePage() {
       setFilter('all')
     } else if (selectedLocationId) {
       setSelectedLocationId(null)
+    }
+  }
+
+  async function handleAnalyzeLink() {
+    setIsAnalyzing(true)
+    setAnalyzeError(null)
+    try {
+      const res = await fetch('/api/analyze-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: linkUrl, locations, categories }),
+      })
+      if (!res.ok) throw new Error('analyze failed')
+      const result = await res.json()
+      navigate('/new', { state: { prefill: { ...result, sourceUrl: linkUrl } } })
+    } catch {
+      setAnalyzeError('페이지를 분석하지 못했어요.')
+    } finally {
+      setIsAnalyzing(false)
     }
   }
 
@@ -193,46 +216,88 @@ export default function HomePage() {
             className="w-full max-w-md space-y-2 rounded-t-2xl bg-card p-4 pb-8"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="pb-1 text-center text-sm text-ink/50">어떻게 기록할까요?</p>
-            <button
-              type="button"
-              onClick={() => navigate('/new')}
-              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
-            >
-              <span className="text-xl">📷</span>
-              <span>카메라로 촬영</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/new')}
-              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
-            >
-              <span className="text-xl">🖼️</span>
-              <span>사진 선택</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/new')}
-              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
-            >
-              <span className="text-xl">🔗</span>
-              <span>링크로 가져오기</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/new')}
-              className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
-            >
-              <span className="text-xl">✏️</span>
-              <span>직접 입력</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowRecordOptions(false)}
-              className="w-full pt-2 text-center text-sm text-ink/50"
-            >
-              취소
-            </button>
+            {!showLinkInput ? (
+              <>
+                <p className="pb-1 text-center text-sm text-ink/50">어떻게 기록할까요?</p>
+                <button
+                  type="button"
+                  onClick={() => navigate('/new')}
+                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                >
+                  <span className="text-xl">📷</span>
+                  <span>카메라로 촬영</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/new')}
+                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                >
+                  <span className="text-xl">🖼️</span>
+                  <span>사진 선택</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowLinkInput(true)}
+                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                >
+                  <span className="text-xl">🔗</span>
+                  <span>링크로 가져오기</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/new')}
+                  className="flex w-full items-center gap-3 rounded-lg border border-ink/10 p-3 text-left"
+                >
+                  <span className="text-xl">✏️</span>
+                  <span>직접 입력</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowRecordOptions(false)}
+                  className="w-full pt-2 text-center text-sm text-ink/50"
+                >
+                  취소
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="pb-1 text-center text-sm text-ink/50">상품 링크를 붙여넣어주세요</p>
+                <input
+                  type="url"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full rounded-lg border border-ink/20 bg-paper p-2 text-sm"
+                  disabled={isAnalyzing}
+                />
+                {analyzeError && <p className="text-sm text-stamp">{analyzeError}</p>}
+                <button
+                  type="button"
+                  onClick={handleAnalyzeLink}
+                  disabled={isAnalyzing || !linkUrl.trim()}
+                  className="w-full rounded-lg bg-stamp py-2 text-sm text-white disabled:opacity-40"
+                >
+                  {isAnalyzing ? '분석 중...' : '분석하기'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate('/new')}
+                  className="w-full pt-1 text-center text-sm text-accent underline"
+                >
+                  직접 입력하기
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLinkInput(false)
+                    setAnalyzeError(null)
+                  }}
+                  className="w-full pt-1 text-center text-sm text-ink/50"
+                >
+                  뒤로
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
