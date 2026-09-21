@@ -93,7 +93,7 @@ export default function HomePage() {
   if (searchResults !== null) {
     return (
       <div className="space-y-4 p-4">
-        <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de]">
+        <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
           <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
             <Icon name="search" className="text-[20px]" />
           </div>
@@ -138,7 +138,7 @@ export default function HomePage() {
         </>
       )}
 
-      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de]">
+      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
         <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
           <Icon name="search" className="text-[20px]" />
         </div>
@@ -162,7 +162,7 @@ export default function HomePage() {
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-1 self-start rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+          className="inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
         >
           <Icon name="arrow_back" className="text-[16px]" />
           뒤로

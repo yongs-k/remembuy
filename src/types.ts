@@ -1,7 +1,7 @@
 export type Location = {
   id: string
   name: string
-  colorToken: string // key into tailwind `loc` palette, e.g. "bathroom"
+  colorToken: string // key into LOCATION_COLOR_HEX (src/data/locationColors.ts), e.g. "bathroom"
 }
 
 export type MasterItem = {

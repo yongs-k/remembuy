@@ -37,7 +37,7 @@ export default function ItemDetailPage() {
       <button
         type="button"
         onClick={() => navigate(-1)}
-        className="flex items-center gap-1 self-start rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+        className="inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
       >
         <Icon name="arrow_back" className="text-[16px]" />
         뒤로
