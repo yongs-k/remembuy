@@ -318,9 +318,16 @@ describe('getCompletionGain', () => {
     })
   })
 
-  it('excludes the edited item from the baseline', () => {
+  it('an unchanged edit shows no gain', () => {
     expect(getCompletionGain([owned], [catA, catB], 'L1', 'a', 'a1', 'i1')).toEqual({
-      before: 0,
+      before: 25,
+      after: 25,
+    })
+  })
+
+  it('switching the linked master item in an edit is not a gain', () => {
+    expect(getCompletionGain([owned], [catA, catB], 'L1', 'a', 'a2', 'i1')).toEqual({
+      before: 25,
       after: 25,
     })
   })

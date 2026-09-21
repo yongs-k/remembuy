@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Icon } from '../data/materialIcons'
 
 type StepState = 'done' | 'active' | 'waiting'
@@ -24,6 +25,14 @@ export function AnalyzingOverlay({
   entryNumber: number
   onCancel: () => void
 }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCancel()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
+
   return (
     <div
       role="dialog"

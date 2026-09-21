@@ -200,7 +200,9 @@ export default function NewItemPage() {
             <span className="text-body-sm text-on-surface-variant">
               {hasGain
                 ? `${locationName}도감 수집률 ${gain.before}% → ${gain.after}% UP!`
-                : '표준 품목을 연결하면 수집률이 올라가요'}
+                : masterItemId
+                  ? '이미 수집한 표준 품목이에요'
+                  : '표준 품목을 연결하면 수집률이 올라가요'}
             </span>
           </div>
           <span className="shrink-0 font-heading text-headline-md text-tertiary">+20P</span>
@@ -249,6 +251,12 @@ export default function NewItemPage() {
           <input
             value={newLocationName}
             onChange={(e) => setNewLocationName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleAddLocation()
+              }
+            }}
             placeholder="새 장소 이름 (예: 베란다)"
             className="w-full min-w-0 flex-1 rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 text-body-sm text-on-surface focus:border-primary focus:outline-none"
           />
@@ -278,6 +286,12 @@ export default function NewItemPage() {
           <input
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleAddCategory()
+              }
+            }}
             placeholder="새 카테고리 이름"
             className="w-full min-w-0 flex-1 rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 text-body-sm text-on-surface focus:border-primary focus:outline-none"
           />
@@ -433,7 +447,7 @@ export default function NewItemPage() {
         className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary p-3.5 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
       >
         <Icon name="check_circle" className="text-[20px]" />
-        {existing ? '저장하기' : `${locationName}도감에 등록하기(+20P)`}
+        {existing ? '저장하기' : `${locationName}도감에 등록하기`}
       </button>
 
       <div
