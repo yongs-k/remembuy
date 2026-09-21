@@ -9,6 +9,7 @@ import {
   getCategoriesRankedByItemCount,
   getCompletedPodium,
   getMasterItemCounts,
+  getCompletionGain,
 } from './selectors'
 import type { Category, Item, Location } from '../types'
 
@@ -265,5 +266,62 @@ describe('getMasterItemCounts', () => {
 
   it('ignores items without a masterItemId', () => {
     expect(getMasterItemCounts([mk('i1', 'a')], [catA], 'L1')).toEqual({ owned: 0, total: 2 })
+  })
+})
+
+describe('getCompletionGain', () => {
+  const catA: Category = {
+    id: 'a',
+    locationId: 'L1',
+    name: 'A',
+    masterItems: [
+      { id: 'a1', name: 'a1' },
+      { id: 'a2', name: 'a2' },
+    ],
+  }
+  const catB: Category = {
+    id: 'b',
+    locationId: 'L1',
+    name: 'B',
+    masterItems: [
+      { id: 'b1', name: 'b1' },
+      { id: 'b2', name: 'b2' },
+    ],
+  }
+  const owned: Item = {
+    id: 'i1',
+    name: 'i1',
+    locationId: 'L1',
+    categoryId: 'a',
+    masterItemId: 'a1',
+    createdAt: '2026-01-01',
+  }
+
+  it('raises completion when an unowned master item is linked', () => {
+    expect(getCompletionGain([owned], [catA, catB], 'L1', 'a', 'a2')).toEqual({
+      before: 25,
+      after: 50,
+    })
+  })
+
+  it('does not change completion without a linked master item', () => {
+    expect(getCompletionGain([owned], [catA, catB], 'L1', 'a', '')).toEqual({
+      before: 25,
+      after: 25,
+    })
+  })
+
+  it('does not change completion for an already owned master item', () => {
+    expect(getCompletionGain([owned], [catA, catB], 'L1', 'a', 'a1')).toEqual({
+      before: 25,
+      after: 25,
+    })
+  })
+
+  it('excludes the edited item from the baseline', () => {
+    expect(getCompletionGain([owned], [catA, catB], 'L1', 'a', 'a1', 'i1')).toEqual({
+      before: 0,
+      after: 25,
+    })
   })
 })

@@ -110,3 +110,26 @@ export function getMasterItemCounts(
   }
   return { owned, total }
 }
+
+export function getCompletionGain(
+  items: Item[],
+  categories: Category[],
+  locationId: string,
+  categoryId: string,
+  masterItemId: string,
+  excludeItemId?: string
+): { before: number; after: number } {
+  const base = excludeItemId ? items.filter((i) => i.id !== excludeItemId) : items
+  const preview: Item = {
+    id: '__preview__',
+    name: '',
+    locationId,
+    categoryId,
+    masterItemId: masterItemId || undefined,
+    createdAt: '',
+  }
+  return {
+    before: getLocationCompletion(base, locationId, categories),
+    after: getLocationCompletion([...base, preview], locationId, categories),
+  }
+}
