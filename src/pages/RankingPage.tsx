@@ -260,7 +260,7 @@ export default function RankingPage() {
         )}
       </div>
 
-      <div className="sticky bottom-20 z-40 flex items-center gap-space-sm md:bottom-4">
+      <div className="sticky bottom-20 z-40 flex items-stretch gap-space-sm md:bottom-4">
         <button
           type="button"
           onClick={() => navigate('/new')}
@@ -271,8 +271,8 @@ export default function RankingPage() {
         </button>
         <button
           type="button"
-          aria-label="바코드 스캔"
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
+          disabled
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 disabled:opacity-60 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
         >
           <Icon name="barcode_scanner" className="text-[20px]" />
           바코드 찍고 랭킹 등록

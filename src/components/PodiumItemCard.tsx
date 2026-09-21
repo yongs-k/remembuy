@@ -37,7 +37,7 @@ export function PodiumItemCard({
       {isFirst && (
         <div className="flex items-center gap-1.5 bg-primary-container px-space-md py-1.5 text-on-primary-container">
           <Icon name="workspace_premium" className="text-[18px] text-tertiary-fixed" />
-          <span className="text-label-md tracking-wider">1ST PLACE</span>
+          <span className="text-label-md tracking-wider">추천 순 1위</span>
         </div>
       )}
       <div className={`flex gap-space-md ${compact ? 'p-space-sm' : 'p-space-md'}`}>
@@ -71,7 +71,7 @@ export function PodiumItemCard({
             {item.podiumRank === 1 && <Badge>다시 살래요</Badge>}
           </div>
           <h3
-            className={`truncate font-heading text-on-surface ${
+            className={`line-clamp-2 font-heading text-on-surface ${
               compact ? 'text-label-lg' : 'text-headline-md'
             }`}
           >
