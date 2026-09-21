@@ -129,7 +129,7 @@ export function getCompletionGain(
     createdAt: '',
   }
   return {
-    before: getLocationCompletion(items,locationId, categories),
+    before: getLocationCompletion(items, locationId, categories),
     after: getLocationCompletion([...base, preview], locationId, categories),
   }
 }

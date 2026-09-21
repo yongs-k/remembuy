@@ -201,7 +201,7 @@ export default function NewItemPage() {
               {hasGain
                 ? `${locationName}도감 수집률 ${gain.before}% → ${gain.after}% UP!`
                 : masterItemId
-                  ? '이미 수집한 표준 품목이에요'
+                  ? '이번 등록으로는 수집률이 그대로예요'
                   : '표준 품목을 연결하면 수집률이 올라가요'}
             </span>
           </div>
@@ -252,7 +252,7 @@ export default function NewItemPage() {
             value={newLocationName}
             onChange={(e) => setNewLocationName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                 e.preventDefault()
                 handleAddLocation()
               }
@@ -287,7 +287,7 @@ export default function NewItemPage() {
             value={newCategoryName}
             onChange={(e) => setNewCategoryName(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                 e.preventDefault()
                 handleAddCategory()
               }
