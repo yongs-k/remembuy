@@ -44,6 +44,7 @@ export function ButlerHero({
             <span className="rounded bg-tertiary-fixed px-1.5 py-0.5 text-on-tertiary-fixed">
               {B.rankTag}
             </span>
+            <span className="rounded bg-surface-container-high px-1.5 py-0.5 text-on-surface-variant">예시 가격</span>
             <span className="truncate text-on-surface-variant">
               {locationName} {B.slotLabel}
             </span>
@@ -58,7 +59,7 @@ export function ButlerHero({
             <Icon name="inventory_2" className="text-[28px]" />
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h3 className="line-clamp-2 font-heading text-headline-md text-on-surface">{itemName}</h3>
+            <h2 className="line-clamp-2 font-heading text-headline-md text-on-surface">{itemName}</h2>
             <p className="text-body-sm text-on-surface-variant">
               평균 소모 주기 {B.cycleDays}일 기준 · 잔여 {B.remainPercent}% ({B.remainText})
             </p>

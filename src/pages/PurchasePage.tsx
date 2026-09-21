@@ -63,6 +63,7 @@ export default function PurchasePage() {
             <button
               key={chip.key}
               type="button"
+              aria-pressed={filter === chip.key}
               onClick={() => setFilter(chip.key)}
               className={`shrink-0 rounded-full px-3 py-1.5 text-label-md ${
                 filter === chip.key
@@ -119,14 +120,17 @@ export default function PurchasePage() {
         </button>
       </section>
 
-      {notice && (
-        <div
-          role="status"
-          className="fixed inset-x-0 bottom-24 z-50 mx-auto w-fit max-w-[90%] rounded-full bg-inverse-surface px-4 py-2 text-label-md text-inverse-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.2)] md:bottom-8"
-        >
-          아직 준비 중인 기능이에요
-        </div>
-      )}
+      <div
+        role="status"
+        aria-live="polite"
+        className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center md:bottom-8"
+      >
+        {notice && (
+          <span className="max-w-[90%] rounded-full bg-inverse-surface px-4 py-2 text-label-md text-inverse-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+            아직 준비 중인 기능이에요
+          </span>
+        )}
+      </div>
     </div>
   )
 }
