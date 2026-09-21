@@ -114,7 +114,7 @@ export default function HomePage() {
         </div>
         <div className="space-y-2">
           {searchResults.length === 0 ? (
-            <p className="text-sm text-ink/50">검색 결과가 없습니다.</p>
+            <p className="text-body-sm text-on-surface-variant">검색 결과가 없습니다.</p>
           ) : (
             searchResults.map((item) => (
               <ItemCard key={item.id} item={item} onClick={() => navigate(`/item/${item.id}`)} />
@@ -132,7 +132,7 @@ export default function HomePage() {
           <HomeProfileCard itemCount={items.length} />
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg">추천 퀘스트</h2>
-            <span className="text-sm text-ink/40">전체보기 →</span>
+            <span className="text-label-md text-on-surface-variant">전체보기 →</span>
           </div>
           <QuestCarousel quests={DUMMY_QUESTS} />
         </>
@@ -159,8 +159,13 @@ export default function HomePage() {
       </div>
 
       {(selectedLocationId || selectedCategoryId) && (
-        <button type="button" onClick={handleBack} className="text-sm text-ink/60">
-          ← 뒤로
+        <button
+          type="button"
+          onClick={handleBack}
+          className="flex items-center gap-1 self-start rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+        >
+          <Icon name="arrow_back" className="text-[16px]" />
+          뒤로
         </button>
       )}
 
@@ -187,10 +192,10 @@ export default function HomePage() {
                 key={category.id}
                 type="button"
                 onClick={() => setSelectedCategoryId(category.id)}
-                className="chunky-btn rounded-2xl bg-card p-3 text-left"
+                className="rounded-xl bg-surface-container-lowest p-space-md text-left shadow-[0_3px_0px_#eae0de]"
               >
-                <p className="font-medium">{category.name}</p>
-                <p className="text-xs text-ink/50">{count}개 보유</p>
+                <p className="text-label-lg text-on-surface">{category.name}</p>
+                <p className="text-body-sm text-on-surface-variant">{count}개 보유</p>
               </button>
             )
           })}
@@ -199,38 +204,32 @@ export default function HomePage() {
 
       {selectedCategoryId && (
         <>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setFilter('all')}
-              className={`rounded-full border-2 border-ink px-3 py-1 text-sm ${
-                filter === 'all' ? 'bg-stamp text-white' : 'bg-card text-ink'
-              }`}
-            >
-              전체
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('urgent')}
-              className={`rounded-full border-2 border-ink px-3 py-1 text-sm ${
-                filter === 'urgent' ? 'bg-stamp text-white' : 'bg-card text-ink'
-              }`}
-            >
-              임박만
-            </button>
-            <button
-              type="button"
-              onClick={() => setFilter('recommended')}
-              className={`rounded-full border-2 border-ink px-3 py-1 text-sm ${
-                filter === 'recommended' ? 'bg-stamp text-white' : 'bg-card text-ink'
-              }`}
-            >
-              추천한 상품만
-            </button>
+          <div className="flex flex-wrap gap-1.5">
+            {(
+              [
+                ['all', '전체'],
+                ['urgent', '임박만'],
+                ['recommended', '추천한 상품만'],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                aria-pressed={filter === key}
+                onClick={() => setFilter(key)}
+                className={`rounded-full px-3 py-1.5 text-label-md ${
+                  filter === key
+                    ? 'bg-primary text-on-primary shadow-[0_2px_0px_#8b1901]'
+                    : 'bg-surface-container text-on-surface-variant shadow-[0_2px_0px_#e1bfb8]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
           <div className="space-y-2">
             {itemsForCategory.length === 0 ? (
-              <p className="text-sm text-ink/50">조건에 맞는 상품이 없습니다.</p>
+              <p className="text-body-sm text-on-surface-variant">조건에 맞는 상품이 없습니다.</p>
             ) : (
               itemsForCategory.map((item) => (
                 <ItemCard key={item.id} item={item} onClick={() => navigate(`/item/${item.id}`)} />
@@ -308,28 +307,34 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <p className="pb-1 text-center text-sm text-ink/50">상품 링크를 붙여넣어주세요</p>
+                <p className="pb-1 text-center text-body-sm text-on-surface-variant">
+                  상품 링크를 붙여넣어주세요
+                </p>
                 <input
                   type="url"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://..."
-                  className="chunky-input w-full bg-paper p-2 text-sm"
+                  className="w-full rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 text-body-md text-on-surface focus:border-primary focus:outline-none"
                   disabled={isAnalyzing}
                 />
-                {analyzeError && <p className="text-sm text-stamp">{analyzeError}</p>}
+                {analyzeError && (
+                  <p role="alert" className="text-body-sm text-primary">
+                    {analyzeError}
+                  </p>
+                )}
                 <button
                   type="button"
                   onClick={handleAnalyzeLink}
                   disabled={isAnalyzing || !linkUrl.trim()}
-                  className="chunky-btn w-full rounded-xl bg-stamp py-2 text-sm text-white disabled:opacity-40 disabled:active:translate-x-0 disabled:active:translate-y-0 disabled:active:shadow-chunky"
+                  className="w-full rounded-xl bg-primary py-2.5 text-label-lg text-on-primary shadow-[0_3px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901] disabled:opacity-40 disabled:active:translate-y-0 disabled:active:shadow-[0_3px_0px_#8b1901]"
                 >
                   {isAnalyzing ? '분석 중...' : '분석하기'}
                 </button>
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="w-full pt-1 text-center text-sm text-accent underline"
+                  className="w-full pt-1 text-center text-label-md text-primary underline"
                 >
                   직접 입력하기
                 </button>
@@ -339,7 +344,7 @@ export default function HomePage() {
                     setShowLinkInput(false)
                     setAnalyzeError(null)
                   }}
-                  className="w-full pt-1 text-center text-sm text-ink/50"
+                  className="w-full pt-1 text-center text-label-md text-on-surface-variant"
                 >
                   뒤로
                 </button>
