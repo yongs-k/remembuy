@@ -37,21 +37,21 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
                   </div>
                   <div className="flex min-w-0 flex-col">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="font-headline-md text-headline-md font-bold text-on-surface">
+                      <span className="font-heading text-headline-md font-bold text-on-surface">
                         {quest.title}
                       </span>
                       {isComplete && (
-                        <span className="rounded bg-secondary/10 px-1.5 py-0.5 font-label-sm text-label-sm font-bold text-secondary">
+                        <span className="rounded bg-secondary/10 px-1.5 py-0.5 text-label-sm font-bold text-secondary">
                           도감 완성!
                         </span>
                       )}
                     </div>
-                    <p className="mt-0.5 truncate font-body-sm text-body-sm text-on-surface-variant">
+                    <p className="mt-0.5 truncate text-body-sm text-on-surface-variant">
                       {quest.subtitle}
                     </p>
                   </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-0.5 rounded-full bg-tertiary-fixed px-2 py-1 font-stat-counter text-body-sm text-on-tertiary-fixed shadow-sm">
+                <div className="flex shrink-0 items-center gap-0.5 rounded-full bg-tertiary-fixed px-2 py-1 font-heading text-body-sm text-on-tertiary-fixed shadow-sm">
                   <Icon name="stars" className="text-[14px]" />
                   +{quest.rewardPoints}P
                 </div>
@@ -65,7 +65,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/25" />
                   </div>
                 </div>
-                <div className="flex items-center justify-between px-0.5 font-label-sm text-label-sm text-on-surface-variant">
+                <div className="flex items-center justify-between px-0.5 text-label-sm text-on-surface-variant">
                   <span>달성 현황: {quest.progress.current}종 수집 완료</span>
                   <span className="font-bold text-primary">
                     {quest.progress.current} / {quest.progress.total} 달성
@@ -88,7 +88,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
                 <button
                   type="button"
                   disabled={!isComplete}
-                  className="flex items-center gap-1.5 rounded-lg bg-primary px-space-lg py-2 font-label-lg text-label-lg text-on-primary shadow-[0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901] disabled:opacity-40 disabled:active:translate-y-0 disabled:active:shadow-[0_3px_0px_#8b1901]"
+                  className="flex items-center gap-1.5 rounded-lg bg-primary px-space-lg py-2 text-label-lg text-on-primary shadow-[0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901] disabled:opacity-40 disabled:active:translate-y-0 disabled:active:shadow-[0_3px_0px_#8b1901]"
                 >
                   <Icon name="redeem" className="text-[18px]" />
                   보상받기

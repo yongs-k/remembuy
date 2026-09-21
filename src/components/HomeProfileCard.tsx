@@ -17,7 +17,7 @@ export function HomeProfileCard({ itemCount }: { itemCount: number }) {
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-headline-md text-headline-md text-on-surface">
+              <span className="font-heading text-headline-md text-on-surface">
                 {DUMMY_PROFILE.name}
               </span>
               <button
@@ -25,14 +25,14 @@ export function HomeProfileCard({ itemCount }: { itemCount: number }) {
                 aria-label="칭호 변경"
                 className="flex items-center gap-0.5 rounded-full bg-secondary-container/60 px-2 py-0.5 transition-colors hover:bg-secondary-container"
               >
-                <span className="flex items-center gap-0.5 font-label-sm text-label-sm font-extrabold text-secondary">
+                <span className="flex items-center gap-0.5 text-label-sm font-extrabold text-secondary">
                   <Icon name="auto_awesome" className="text-[13px] text-tertiary" />
                   {DUMMY_PROFILE.titleBadge.text}
                 </span>
                 <Icon name="expand_more" className="text-[14px] text-secondary" />
               </button>
             </div>
-            <span className="font-body-sm text-body-sm text-on-surface-variant">
+            <span className="text-body-sm text-on-surface-variant">
               LV.4 꼼꼼한 살림 탐험가
             </span>
           </div>
@@ -47,34 +47,34 @@ export function HomeProfileCard({ itemCount }: { itemCount: number }) {
       </div>
       <div className="grid grid-cols-4 gap-1 rounded-lg bg-surface-container-low p-space-sm pt-space-sm">
         <div className="flex flex-col items-center text-center">
-          <span className="font-stat-counter text-body-lg font-extrabold text-primary">
+          <span className="font-heading text-body-lg font-extrabold text-primary">
             {itemCount}
-            <span className="ml-0.5 font-label-sm text-label-sm font-bold">개</span>
+            <span className="ml-0.5 text-label-sm font-bold">개</span>
           </span>
-          <span className="mt-0.5 font-label-sm text-label-sm text-on-surface-variant">기록 상품</span>
+          <span className="mt-0.5 text-label-sm text-on-surface-variant">기록 상품</span>
         </div>
         <div className="flex flex-col items-center text-center">
-          <span className="font-stat-counter text-body-lg font-extrabold text-secondary">
+          <span className="font-heading text-body-lg font-extrabold text-secondary">
             {(DUMMY_STATS.totalSaved / 10000).toFixed(1)}
-            <span className="ml-0.5 font-label-sm text-label-sm font-bold">만</span>
+            <span className="ml-0.5 text-label-sm font-bold">만</span>
           </span>
-          <span className="mt-0.5 font-label-sm text-label-sm text-on-surface-variant">누적 절약</span>
+          <span className="mt-0.5 text-label-sm text-on-surface-variant">누적 절약</span>
         </div>
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center gap-0.5 text-tertiary">
             <Icon name="monetization_on" className="text-[14px]" />
-            <span className="font-stat-counter text-body-lg font-extrabold">{DUMMY_STATS.points}</span>
+            <span className="font-heading text-body-lg font-extrabold">{DUMMY_STATS.points}</span>
           </div>
-          <span className="mt-0.5 font-label-sm text-label-sm text-on-surface-variant">포인트</span>
+          <span className="mt-0.5 text-label-sm text-on-surface-variant">포인트</span>
         </div>
         <div className="flex flex-col items-center text-center">
-          <span className="font-stat-counter text-body-lg font-extrabold text-on-surface">
+          <span className="font-heading text-body-lg font-extrabold text-on-surface">
             {DUMMY_STATS.titleProgress.current}
-            <span className="font-label-sm text-label-sm font-normal text-on-surface-variant">
+            <span className="text-label-sm font-normal text-on-surface-variant">
               /{DUMMY_STATS.titleProgress.total}
             </span>
           </span>
-          <span className="mt-0.5 font-label-sm text-label-sm text-on-surface-variant">칭호 도감</span>
+          <span className="mt-0.5 text-label-sm text-on-surface-variant">칭호 도감</span>
         </div>
       </div>
     </div>

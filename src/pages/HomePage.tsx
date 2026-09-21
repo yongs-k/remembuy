@@ -93,7 +93,7 @@ export default function HomePage() {
             placeholder="상품 검색"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="min-w-0 w-full bg-transparent py-1.5 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+            className="min-w-0 w-full bg-transparent py-1.5 text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
           />
           <button
             type="button"
@@ -138,7 +138,7 @@ export default function HomePage() {
           placeholder="상품 검색"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-0 w-full bg-transparent py-1.5 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+          className="min-w-0 w-full bg-transparent py-1.5 text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
         />
         <button
           type="button"
@@ -240,7 +240,7 @@ export default function HomePage() {
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
           <Icon name="add" className="text-[18px]" />
         </span>
-        <span className="font-label-lg text-label-lg font-bold">물품 등록</span>
+        <span className="text-label-lg font-bold">물품 등록</span>
       </button>
 
       {showRecordOptions && (
@@ -254,7 +254,7 @@ export default function HomePage() {
           >
             {!showLinkInput ? (
               <>
-                <p className="pb-1 text-center font-body-sm text-body-sm text-on-surface-variant">
+                <p className="pb-1 text-center text-body-sm text-on-surface-variant">
                   어떻게 기록할까요?
                 </p>
                 <button
@@ -292,7 +292,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={closeRecordSheet}
-                  className="w-full pt-2 text-center font-body-sm text-body-sm text-on-surface-variant"
+                  className="w-full pt-2 text-center text-body-sm text-on-surface-variant"
                 >
                   취소
                 </button>

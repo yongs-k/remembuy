@@ -51,7 +51,7 @@ export function HomeLocationTile({
         </div>
       </div>
       <div className="mt-2 flex flex-col">
-        <span className="truncate font-headline-md text-headline-md font-bold text-on-surface">
+        <span className="truncate font-heading text-headline-md font-bold text-on-surface">
           {location.name}
         </span>
         <span className="flex items-center gap-1 text-body-sm text-on-surface-variant">
