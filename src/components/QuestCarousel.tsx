@@ -30,7 +30,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
               className="relative w-full flex-shrink-0 snap-center overflow-hidden rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#eae0de]"
             >
               <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-tertiary-fixed/30 blur-xl" />
-              <div className="flex items-start justify-between gap-space-sm">
+              <div className="relative flex items-start justify-between gap-space-sm">
                 <div className="flex items-start gap-space-sm">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary-container text-secondary shadow-[0_2px_0px_#aecdc4]">
                     <Icon name={quest.icon} className="text-[24px]" />
@@ -56,7 +56,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
                   +{quest.rewardPoints}P
                 </div>
               </div>
-              <div className="my-0.5 flex flex-col gap-1">
+              <div className="relative my-0.5 flex flex-col gap-1">
                 <div className="h-3 w-full overflow-hidden rounded-full bg-surface-container p-0.5 shadow-inner">
                   <div
                     className="relative h-full rounded-full bg-gradient-to-r from-secondary to-primary-container shadow-sm transition-all duration-500"
@@ -72,7 +72,7 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between pt-1">
+              <div className="relative flex items-center justify-between pt-1">
                 <div className="flex items-center gap-1">
                   {quests.map((q, i) => (
                     <span

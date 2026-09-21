@@ -26,7 +26,7 @@ export function HomeProfileCard({ itemCount }: { itemCount: number }) {
                 className="flex items-center gap-0.5 rounded-full bg-secondary-container/60 px-2 py-0.5 transition-colors hover:bg-secondary-container"
               >
                 <span className="flex items-center gap-0.5 text-label-sm font-extrabold text-secondary">
-                  <Icon name="auto_awesome" className="text-[13px] text-tertiary" />
+                  <Icon name={DUMMY_PROFILE.titleBadge.icon} className="text-[13px] text-tertiary" />
                   {DUMMY_PROFILE.titleBadge.text}
                 </span>
                 <Icon name="expand_more" className="text-[14px] text-secondary" />

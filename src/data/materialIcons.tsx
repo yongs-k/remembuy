@@ -1,5 +1,5 @@
 export function Icon({ name, className }: { name: string; className?: string }) {
-  return <span className={`material-symbols-outlined ${className ?? ''}`}>{name}</span>
+  return <span aria-hidden="true" className={`material-symbols-outlined ${className ?? ''}`}>{name}</span>
 }
 
 export const LOCATION_MATERIAL_ICON: Record<string, string> = {
