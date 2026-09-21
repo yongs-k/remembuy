@@ -2,6 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { ItemCard } from '../components/ItemCard'
+import { Icon } from '../data/materialIcons'
 
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -11,9 +12,13 @@ export default function ItemDetailPage() {
 
   if (!item) {
     return (
-      <div className="p-4">
-        <p>상품을 찾을 수 없습니다.</p>
-        <button type="button" onClick={() => navigate('/')} className="mt-2 text-accent underline">
+      <div className="space-y-space-sm p-margin">
+        <p className="text-body-md text-on-surface">상품을 찾을 수 없습니다.</p>
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="text-label-md text-primary underline"
+        >
           홈으로 돌아가기
         </button>
       </div>
@@ -25,66 +30,102 @@ export default function ItemDetailPage() {
   const relatedItems = items
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
+  const urgent = item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
 
   return (
-    <div className="space-y-4 p-4">
-      <button type="button" onClick={() => navigate(-1)} className="text-sm text-ink/60">
-        ← 뒤로
+    <div className="space-y-space-md p-margin">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-1 self-start rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+      >
+        <Icon name="arrow_back" className="text-[16px]" />
+        뒤로
       </button>
 
-      <div className="chunky-card flex h-40 items-center justify-center text-5xl">
-        🧴
+      <div className="rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#e1bfb8]">
+        <div className="flex gap-space-md">
+          <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant">
+            <Icon name="inventory_2" className="text-[36px]" />
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <div className="flex flex-wrap items-center gap-1.5 text-label-sm">
+              {location && (
+                <span className="rounded bg-secondary-container px-1.5 py-0.5 text-on-secondary-container">
+                  {location.name}
+                </span>
+              )}
+              {category && (
+                <span className="rounded bg-surface-container-high px-1.5 py-0.5 text-on-surface-variant">
+                  {category.name}
+                </span>
+              )}
+            </div>
+            <h1 className="font-heading text-headline-lg text-on-surface">{item.name}</h1>
+            {item.price !== undefined && (
+              <span className="font-heading text-headline-md text-primary">
+                {item.price.toLocaleString()}원
+              </span>
+            )}
+            {item.daysUntilEmpty !== undefined && (
+              <span
+                className={`self-start rounded px-1.5 py-0.5 text-label-sm ${
+                  urgent
+                    ? 'bg-error-container text-on-error-container'
+                    : 'bg-surface-container-high text-on-surface-variant'
+                }`}
+              >
+                D-{item.daysUntilEmpty}
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div>
-        <p className="text-xs text-ink/50">
-          {location?.name} &gt; {category?.name}
-        </p>
-        <h1 className="text-xl font-bold">{item.name}</h1>
-        {item.price !== undefined && (
-          <p className="mt-1 text-lg font-semibold text-ink">{item.price.toLocaleString()}원</p>
-        )}
-      </div>
-
-      {item.daysUntilEmpty !== undefined ? (
-        <p className="text-warn">D-{item.daysUntilEmpty}</p>
-      ) : (
+      {item.daysUntilEmpty === undefined && (
         <RecommendationToggle
           value={item.recommendation}
           onChange={(value) => updateItem(item.id, { recommendation: value })}
         />
       )}
 
-      {item.note && <p className="chunky-card p-3 text-sm">{item.note}</p>}
+      {item.note && (
+        <p className="rounded-xl bg-surface-container-lowest p-space-md text-body-sm text-on-surface shadow-[0_3px_0px_#eae0de]">
+          {item.note}
+        </p>
+      )}
 
-      <dl className="space-y-1 text-sm">
-        {item.place && (
-          <div className="flex justify-between">
-            <dt className="text-ink/50">구매처</dt>
-            <dd>{item.place}</dd>
-          </div>
-        )}
-        {item.restockCycle && (
-          <div className="flex justify-between">
-            <dt className="text-ink/50">재구매 주기</dt>
-            <dd>{item.restockCycle}</dd>
-          </div>
-        )}
-      </dl>
+      {(item.place || item.restockCycle) && (
+        <dl className="space-y-1.5 rounded-xl bg-surface-container-low p-space-md text-body-sm">
+          {item.place && (
+            <div className="flex justify-between gap-2">
+              <dt className="text-on-surface-variant">구매처</dt>
+              <dd className="text-on-surface">{item.place}</dd>
+            </div>
+          )}
+          {item.restockCycle && (
+            <div className="flex justify-between gap-2">
+              <dt className="text-on-surface-variant">재구매 주기</dt>
+              <dd className="text-on-surface">{item.restockCycle}</dd>
+            </div>
+          )}
+        </dl>
+      )}
 
-      <div className="flex gap-2">
+      <div className="flex items-stretch gap-2">
         {item.affiliateUrl ? (
           <a
             href={item.affiliateUrl}
-            className="chunky-btn flex-1 rounded-xl bg-stamp py-2 text-center text-white"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] active:translate-y-0.5"
           >
+            <Icon name="shopping_cart" className="text-[18px]" />
             구매하기
           </a>
         ) : (
           <button
             type="button"
             disabled
-            className="flex-1 rounded-xl border-2 border-ink/20 bg-ink/10 py-2 text-center text-ink/40"
+            className="flex flex-1 items-center justify-center rounded-xl bg-surface-container p-3 text-label-lg text-on-surface-variant opacity-60"
           >
             구매 링크 없음
           </button>
@@ -92,16 +133,17 @@ export default function ItemDetailPage() {
         <button
           type="button"
           onClick={() => navigate(`/new?editId=${item.id}`)}
-          className="chunky-btn flex-1 rounded-xl bg-card py-2 text-center"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-surface-container-lowest p-3 text-label-lg text-on-surface shadow-[0_3px_0px_#e1bfb8] active:translate-y-0.5"
         >
+          <Icon name="edit_note" className="text-[18px]" />
           메모 수정하기
         </button>
       </div>
 
       {relatedItems.length > 0 && (
-        <section className="space-y-2">
-          <h2 className="text-sm font-semibold text-ink/70">이런 상품은 어때요?</h2>
-          <div className="space-y-2">
+        <section className="space-y-space-sm">
+          <h2 className="text-label-lg text-on-surface-variant">이런 상품은 어때요?</h2>
+          <div className="space-y-space-sm">
             {relatedItems.map((related) => (
               <ItemCard
                 key={related.id}
