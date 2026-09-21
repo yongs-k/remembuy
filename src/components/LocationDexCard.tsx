@@ -45,7 +45,7 @@ export function LocationDexCard({
           </div>
           <div className="flex min-w-0 flex-col">
             <div className="flex items-center gap-1.5">
-              <h4 className="truncate font-heading text-headline-md text-on-surface">{location.name}</h4>
+              <span className="truncate font-heading text-headline-md text-on-surface">{location.name}</span>
               {tag && (
                 <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-label-sm ${tag.cls}`}>
                   {tag.text}

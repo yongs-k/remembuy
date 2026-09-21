@@ -81,6 +81,24 @@ describe('getLocationCompletion', () => {
     const completion = getLocationCompletion(items, 'loc-1', [category, category2])
     expect(completion).toBe(38)
   })
+
+  const emptyCategory: Category = {
+    id: 'cat-empty',
+    locationId: 'loc-1',
+    name: '빈 카테고리',
+    masterItems: [],
+  }
+
+  it('ignores empty categories when averaging', () => {
+    const items = ['m1', 'm2', 'm3', 'm4'].map((m) =>
+      makeItem({ id: `i-${m}`, categoryId: 'cat-1', masterItemId: m })
+    )
+    expect(getLocationCompletion(items, 'loc-1', [category, emptyCategory])).toBe(100)
+  })
+
+  it('returns 0 when the location has only empty categories', () => {
+    expect(getLocationCompletion([], 'loc-1', [emptyCategory])).toBe(0)
+  })
 })
 
 describe('getMissingMasterItems', () => {

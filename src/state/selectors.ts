@@ -16,7 +16,9 @@ export function getLocationCompletion(
   locationId: string,
   categories: Category[]
 ): number {
-  const locationCategories = categories.filter((c) => c.locationId === locationId)
+  const locationCategories = categories.filter(
+    (c) => c.locationId === locationId && c.masterItems.length > 0
+  )
   if (locationCategories.length === 0) return 0
   const total = locationCategories.reduce(
     (sum, category) => sum + getCategoryCompletion(items, category),

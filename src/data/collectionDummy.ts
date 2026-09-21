@@ -1,5 +1,5 @@
 export const DUMMY_COLLECTION_PROFILE = {
-  title: '살림 탐험가 민우',
+  title: '살림 탐험가',
   levelLabel: 'Lv.4',
   nextLevel: 'Lv.5 도감 마스터',
   exp: { current: 180, total: 250 },
