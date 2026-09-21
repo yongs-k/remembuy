@@ -28,8 +28,8 @@ export const DUMMY_BADGES: DummyBadge[] = [
 export const DUMMY_MONTHLY_QUEST = {
   icon: 'local_florist',
   title: '봄맞이 주방 소모품 3종 채우기',
-  reward: "한정판 '봄날의 주방 요정' 배지와 150P 지급!",
+  reward: "한정판 ‘봄날의 주방 요정’ 배지와 150P 지급!",
   progress: { current: 2, total: 3 },
 }
 
-export const DUMMY_DETAIL_GOAL = "목표: 5개 달성 시 '반짝이는 세면대' 칭호 획득! +50P 예정"
+export const DUMMY_DETAIL_GOAL = "목표: 5개 달성 시 ‘반짝이는 세면대’ 칭호 획득! +50P 예정"
