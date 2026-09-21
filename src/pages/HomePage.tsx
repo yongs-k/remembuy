@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { getLocationCompletion } from '../state/selectors'
@@ -6,6 +6,7 @@ import { ItemCard } from '../components/ItemCard'
 import { HomeProfileCard } from '../components/HomeProfileCard'
 import { QuestCarousel } from '../components/QuestCarousel'
 import { HomeLocationTile } from '../components/HomeLocationTile'
+import { AnalyzingOverlay } from '../components/AnalyzingOverlay'
 import { Icon } from '../data/materialIcons'
 import { DUMMY_QUESTS } from '../data/homeDummy'
 
@@ -23,6 +24,7 @@ export default function HomePage() {
   const [linkUrl, setLinkUrl] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
+  const abortRef = useRef<AbortController | null>(null)
 
   const searchResults = useMemo(() => {
     if (!search) return null
@@ -63,6 +65,8 @@ export default function HomePage() {
   }
 
   async function handleAnalyzeLink() {
+    const controller = new AbortController()
+    abortRef.current = controller
     setIsAnalyzing(true)
     setAnalyzeError(null)
     try {
@@ -70,15 +74,20 @@ export default function HomePage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: linkUrl, locations, categories }),
+        signal: controller.signal,
       })
       if (!res.ok) throw new Error('analyze failed')
       const result = await res.json()
       navigate('/new', { state: { prefill: { ...result, sourceUrl: linkUrl } } })
     } catch {
-      setAnalyzeError('페이지를 분석하지 못했어요.')
+      if (!controller.signal.aborted) setAnalyzeError('페이지를 분석하지 못했어요.')
     } finally {
       setIsAnalyzing(false)
     }
+  }
+
+  function handleCancelAnalyze() {
+    abortRef.current?.abort()
   }
 
   if (searchResults !== null) {
@@ -338,6 +347,14 @@ export default function HomePage() {
             )}
           </div>
         </div>
+      )}
+
+      {isAnalyzing && (
+        <AnalyzingOverlay
+          url={linkUrl}
+          entryNumber={items.length + 1}
+          onCancel={handleCancelAnalyze}
+        />
       )}
     </div>
   )
