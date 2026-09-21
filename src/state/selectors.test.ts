@@ -8,6 +8,7 @@ import {
   getLocationsRankedByItemCount,
   getCategoriesRankedByItemCount,
   getCompletedPodium,
+  getMasterItemCounts,
 } from './selectors'
 import type { Category, Item, Location } from '../types'
 
@@ -204,5 +205,47 @@ describe('getCompletedPodium', () => {
     expect(result).not.toBeNull()
     expect(result?.map((e) => e.rank)).toEqual([1, 2, 3])
     expect(result?.map((e) => e.item.id)).toEqual(['b', 'a', 'c'])
+  })
+})
+
+describe('getMasterItemCounts', () => {
+  const catA: Category = {
+    id: 'a',
+    locationId: 'L1',
+    name: 'A',
+    masterItems: [
+      { id: 'a1', name: 'a1' },
+      { id: 'a2', name: 'a2' },
+    ],
+  }
+  const catB: Category = {
+    id: 'b',
+    locationId: 'L2',
+    name: 'B',
+    masterItems: [{ id: 'b1', name: 'b1' }],
+  }
+  const mk = (id: string, categoryId: string, masterItemId?: string): Item => ({
+    id,
+    name: id,
+    locationId: 'x',
+    categoryId,
+    masterItemId,
+    createdAt: '2026-01-01',
+  })
+
+  it('counts owned and total across all categories', () => {
+    const items = [mk('i1', 'a', 'a1'), mk('i2', 'b', 'b1')]
+    expect(getMasterItemCounts(items, [catA, catB])).toEqual({ owned: 2, total: 3 })
+  })
+
+  it('scopes to one location', () => {
+    expect(getMasterItemCounts([mk('i1', 'a', 'a1')], [catA, catB], 'L1')).toEqual({
+      owned: 1,
+      total: 2,
+    })
+  })
+
+  it('ignores items without a masterItemId', () => {
+    expect(getMasterItemCounts([mk('i1', 'a')], [catA], 'L1')).toEqual({ owned: 0, total: 2 })
   })
 })

@@ -93,3 +93,18 @@ export function getCompletedPodium(
   }
   return entries
 }
+
+export function getMasterItemCounts(
+  items: Item[],
+  categories: Category[],
+  locationId?: string
+): { owned: number; total: number } {
+  const scoped = locationId ? categories.filter((c) => c.locationId === locationId) : categories
+  let owned = 0
+  let total = 0
+  for (const category of scoped) {
+    total += category.masterItems.length
+    owned += category.masterItems.length - getMissingMasterItems(items, category).length
+  }
+  return { owned, total }
+}
