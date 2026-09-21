@@ -5,27 +5,9 @@ export default {
   theme: {
     extend: {
       colors: {
-        paper: '#E9DFC3',
-        card: '#F8F2E2',
         ink: '#2A2420',
-        stamp: '#B0472E',
-        accent: '#3F6459',
-        warn: '#B9822C',
-        loc: {
-          bathroom: '#6E8F87',
-          kitchen: '#C98F2B',
-          laundry: '#7D93A6',
-          closet: '#B0472E',
-          vanity: '#A9789A',
-          bedroom: '#8A8F6E',
-          livingroom: '#9C8B5E',
-          entrance: '#6F7D5C',
-          medicine: '#B0763F',
-          car: '#5C7A8B',
-        },
         // Material-3-style tokens from the Stitch design export
         // (docs/superpowers/specs/2026-09-18-stitch-foundation-design.md).
-        // Additive only — used by later per-screen migration sub-projects.
         surface: '#fff8f6',
         'surface-dim': '#e2d8d6',
         'surface-bright': '#fff8f6',
@@ -106,7 +88,6 @@ export default {
         'space-xl': '1.75rem',
       },
       boxShadow: {
-        chunky: '4px 4px 0 0 #2A2420',
         'elevation-1': '0px 3px 0px rgba(43,38,37,0.08)',
         'elevation-2': '0px 4px 0px #1E3A34',
         'elevation-3': '0px 4px 0px #A3361E',
