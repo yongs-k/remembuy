@@ -6,6 +6,7 @@ import { RecommendationToggle } from '../components/RecommendationToggle'
 import { EntryTabs } from '../components/EntryTabs'
 import { EntryPreviewCard } from '../components/EntryPreviewCard'
 import { Icon } from '../data/materialIcons'
+import { useGame } from '../state/GameContext'
 import type { Item } from '../types'
 
 type ProgressMode = 'recommendation' | 'daysUntilEmpty'
@@ -47,6 +48,7 @@ export default function NewItemPage() {
   const editId = searchParams.get('editId')
   const { items, locations, categories, addItem, updateItem, addLocation, addCategory } =
     useLocker()
+  const game = useGame()
   const existing = editId ? items.find((i) => i.id === editId) : undefined
   const prefill = !existing
     ? (location.state as { prefill?: LinkAnalysisPrefill } | null)?.prefill
@@ -153,6 +155,7 @@ export default function NewItemPage() {
     } else {
       addItem(item)
     }
+    if (masterItemId) void game.claim([masterItemId])
     navigate('/')
   }
 

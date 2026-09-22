@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { LockerProvider } from './state/LockerContext'
+import { GameProvider } from './state/GameContext'
 import { AppLayout } from './components/AppLayout'
 import HomePage from './pages/HomePage'
 import ItemDetailPage from './pages/ItemDetailPage'
@@ -13,6 +14,7 @@ import CollectionPage from './pages/CollectionPage'
 export default function App() {
   return (
     <LockerProvider>
+      <GameProvider>
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
@@ -25,6 +27,7 @@ export default function App() {
           <Route path="/collection" element={<CollectionPage />} />
         </Route>
       </Routes>
+      </GameProvider>
     </LockerProvider>
   )
 }
