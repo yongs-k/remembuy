@@ -1,0 +1,550 @@
+{
+  "spaces": [
+    {
+      "id": "bathroom",
+      "name": "욕실",
+      "groups": [
+        {
+          "id": "bathroom-haircare",
+          "name": "헤어케어",
+          "slots": [
+            {
+              "id": "bathroom-haircare-shampoo",
+              "name": "샴푸"
+            },
+            {
+              "id": "bathroom-haircare-rinse",
+              "name": "린스"
+            },
+            {
+              "id": "bathroom-haircare-treatment",
+              "name": "트리트먼트"
+            },
+            {
+              "id": "bathroom-haircare-essence",
+              "name": "헤어에센스"
+            },
+            {
+              "id": "bathroom-haircare-scaler",
+              "name": "두피스케일러"
+            }
+          ]
+        },
+        {
+          "id": "bathroom-bodycare",
+          "name": "바디케어",
+          "slots": [
+            {
+              "id": "bathroom-bodycare-wash",
+              "name": "바디워시"
+            },
+            {
+              "id": "bathroom-bodycare-lotion",
+              "name": "바디로션"
+            },
+            {
+              "id": "bathroom-bodycare-scrub",
+              "name": "각질제거제"
+            },
+            {
+              "id": "bathroom-bodycare-handcream",
+              "name": "핸드크림"
+            }
+          ]
+        },
+        {
+          "id": "bathroom-oralcare",
+          "name": "구강케어",
+          "slots": [
+            {
+              "id": "bathroom-oralcare-toothpaste",
+              "name": "치약"
+            },
+            {
+              "id": "bathroom-oralcare-toothbrush",
+              "name": "칫솔"
+            },
+            {
+              "id": "bathroom-oralcare-floss",
+              "name": "치실"
+            },
+            {
+              "id": "bathroom-oralcare-mouthwash",
+              "name": "가글"
+            }
+          ]
+        },
+        {
+          "id": "bathroom-skincare",
+          "name": "스킨케어",
+          "slots": [
+            {
+              "id": "bathroom-skincare-cleanser",
+              "name": "클렌징폼"
+            },
+            {
+              "id": "bathroom-skincare-toner",
+              "name": "스킨/토너"
+            },
+            {
+              "id": "bathroom-skincare-lotion",
+              "name": "로션"
+            },
+            {
+              "id": "bathroom-skincare-essence",
+              "name": "에센스"
+            },
+            {
+              "id": "bathroom-skincare-cream",
+              "name": "크림"
+            },
+            {
+              "id": "bathroom-skincare-sunscreen",
+              "name": "선크림"
+            }
+          ]
+        },
+        {
+          "id": "bathroom-hygiene",
+          "name": "위생용품",
+          "slots": [
+            {
+              "id": "bathroom-hygiene-razor",
+              "name": "면도기"
+            },
+            {
+              "id": "bathroom-hygiene-swab",
+              "name": "면봉"
+            },
+            {
+              "id": "bathroom-hygiene-cottonpad",
+              "name": "화장솜"
+            },
+            {
+              "id": "bathroom-hygiene-toiletpaper",
+              "name": "두루마리 휴지"
+            },
+            {
+              "id": "bathroom-hygiene-wetwipe",
+              "name": "물티슈"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kitchen",
+      "name": "주방",
+      "groups": [
+        {
+          "id": "kitchen-grocery",
+          "name": "식료품",
+          "slots": [
+            {
+              "id": "kitchen-grocery-coffee",
+              "name": "원두/커피"
+            },
+            {
+              "id": "kitchen-grocery-teabag",
+              "name": "티백"
+            },
+            {
+              "id": "kitchen-grocery-salt",
+              "name": "소금"
+            },
+            {
+              "id": "kitchen-grocery-sugar",
+              "name": "설탕"
+            },
+            {
+              "id": "kitchen-grocery-oil",
+              "name": "식용유"
+            },
+            {
+              "id": "kitchen-grocery-soysauce",
+              "name": "간장"
+            }
+          ]
+        },
+        {
+          "id": "kitchen-household",
+          "name": "생활용품",
+          "slots": [
+            {
+              "id": "kitchen-household-detergent",
+              "name": "주방세제"
+            },
+            {
+              "id": "kitchen-household-sponge",
+              "name": "수세미"
+            },
+            {
+              "id": "kitchen-household-towel",
+              "name": "키친타올"
+            },
+            {
+              "id": "kitchen-household-wrap",
+              "name": "랩"
+            },
+            {
+              "id": "kitchen-household-foil",
+              "name": "호일"
+            }
+          ]
+        },
+        {
+          "id": "kitchen-storage",
+          "name": "보관용품",
+          "slots": [
+            {
+              "id": "kitchen-storage-ziplock",
+              "name": "지퍼백"
+            },
+            {
+              "id": "kitchen-storage-container",
+              "name": "밀폐용기"
+            },
+            {
+              "id": "kitchen-storage-trashbag",
+              "name": "종량제 봉투"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "laundry",
+      "name": "세탁실/다용도실",
+      "groups": [
+        {
+          "id": "laundry-supplies",
+          "name": "세탁용품",
+          "slots": [
+            {
+              "id": "laundry-supplies-detergent",
+              "name": "세탁세제"
+            },
+            {
+              "id": "laundry-supplies-softener",
+              "name": "섬유유연제"
+            },
+            {
+              "id": "laundry-supplies-bleach",
+              "name": "표백제"
+            },
+            {
+              "id": "laundry-supplies-net",
+              "name": "세탁망"
+            }
+          ]
+        },
+        {
+          "id": "laundry-cleaning",
+          "name": "청소용품",
+          "slots": [
+            {
+              "id": "laundry-cleaning-allpurpose",
+              "name": "다목적세제"
+            },
+            {
+              "id": "laundry-cleaning-moldremover",
+              "name": "곰팡이 제거제"
+            },
+            {
+              "id": "laundry-cleaning-gloves",
+              "name": "고무장갑"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "closet",
+      "name": "옷장/드레스룸",
+      "groups": [
+        {
+          "id": "closet-clothing",
+          "name": "상의·하의·아우터",
+          "slots": [
+            {
+              "id": "closet-clothing-tshirt",
+              "name": "티셔츠"
+            },
+            {
+              "id": "closet-clothing-knit",
+              "name": "니트"
+            },
+            {
+              "id": "closet-clothing-pants",
+              "name": "바지"
+            },
+            {
+              "id": "closet-clothing-jacket",
+              "name": "재킷"
+            }
+          ]
+        },
+        {
+          "id": "closet-care",
+          "name": "의류관리용품",
+          "slots": [
+            {
+              "id": "closet-care-dehumidifier",
+              "name": "제습제"
+            },
+            {
+              "id": "closet-care-freshener",
+              "name": "방향제"
+            },
+            {
+              "id": "closet-care-mothball",
+              "name": "좀약"
+            },
+            {
+              "id": "closet-care-lintremover",
+              "name": "보풀제거기"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "vanity",
+      "name": "화장대",
+      "groups": [
+        {
+          "id": "vanity-makeup",
+          "name": "메이크업",
+          "slots": [
+            {
+              "id": "vanity-makeup-foundation",
+              "name": "파운데이션"
+            },
+            {
+              "id": "vanity-makeup-lipstick",
+              "name": "립스틱"
+            },
+            {
+              "id": "vanity-makeup-eyeshadow",
+              "name": "아이섀도우"
+            },
+            {
+              "id": "vanity-makeup-blusher",
+              "name": "블러셔"
+            }
+          ]
+        },
+        {
+          "id": "vanity-hairstyling",
+          "name": "헤어스타일링",
+          "slots": [
+            {
+              "id": "vanity-hairstyling-wax",
+              "name": "왁스"
+            },
+            {
+              "id": "vanity-hairstyling-spray",
+              "name": "헤어스프레이"
+            },
+            {
+              "id": "vanity-hairstyling-dryessence",
+              "name": "드라이 에센스"
+            }
+          ]
+        },
+        {
+          "id": "vanity-fragrance",
+          "name": "향",
+          "slots": [
+            {
+              "id": "vanity-fragrance-perfume",
+              "name": "향수"
+            },
+            {
+              "id": "vanity-fragrance-mist",
+              "name": "바디미스트"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bedroom",
+      "name": "침실",
+      "groups": [
+        {
+          "id": "bedroom-bedding",
+          "name": "침구",
+          "slots": [
+            {
+              "id": "bedroom-bedding-cover",
+              "name": "이불커버"
+            },
+            {
+              "id": "bedroom-bedding-pillowcase",
+              "name": "베개커버"
+            },
+            {
+              "id": "bedroom-bedding-mattresspad",
+              "name": "매트리스 패드"
+            }
+          ]
+        },
+        {
+          "id": "bedroom-air",
+          "name": "공기관리",
+          "slots": [
+            {
+              "id": "bedroom-air-diffuser",
+              "name": "디퓨저"
+            },
+            {
+              "id": "bedroom-air-humidifierfilter",
+              "name": "가습기 필터"
+            },
+            {
+              "id": "bedroom-air-freshener",
+              "name": "방향제"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "livingroom",
+      "name": "거실",
+      "groups": [
+        {
+          "id": "livingroom-cleaning",
+          "name": "청소용품",
+          "slots": [
+            {
+              "id": "livingroom-cleaning-wetwipe",
+              "name": "물티슈"
+            },
+            {
+              "id": "livingroom-cleaning-dustcloth",
+              "name": "먼지제거포"
+            },
+            {
+              "id": "livingroom-cleaning-cleaningpad",
+              "name": "청소포"
+            }
+          ]
+        },
+        {
+          "id": "livingroom-misc",
+          "name": "소모 잡화",
+          "slots": [
+            {
+              "id": "livingroom-misc-battery",
+              "name": "리모컨 건전지"
+            },
+            {
+              "id": "livingroom-misc-freshener",
+              "name": "방향제"
+            },
+            {
+              "id": "livingroom-misc-candle",
+              "name": "초"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entrance",
+      "name": "현관/신발장",
+      "groups": [
+        {
+          "id": "entrance-shoecare",
+          "name": "신발관리",
+          "slots": [
+            {
+              "id": "entrance-shoecare-deodorizer",
+              "name": "신발탈취제"
+            },
+            {
+              "id": "entrance-shoecare-waterproof",
+              "name": "방수스프레이"
+            },
+            {
+              "id": "entrance-shoecare-polish",
+              "name": "구두약"
+            }
+          ]
+        },
+        {
+          "id": "entrance-outing",
+          "name": "외출용품",
+          "slots": [
+            {
+              "id": "entrance-outing-umbrella",
+              "name": "우산"
+            },
+            {
+              "id": "entrance-outing-mask",
+              "name": "여분 마스크"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "medicine",
+      "name": "상비약함",
+      "groups": [
+        {
+          "id": "medicine-firstaid",
+          "name": "구급용품",
+          "slots": [
+            {
+              "id": "medicine-firstaid-antacid",
+              "name": "소화제"
+            },
+            {
+              "id": "medicine-firstaid-coldmed",
+              "name": "감기약"
+            },
+            {
+              "id": "medicine-firstaid-bandage",
+              "name": "밴드"
+            },
+            {
+              "id": "medicine-firstaid-ointment",
+              "name": "연고"
+            },
+            {
+              "id": "medicine-firstaid-thermometer",
+              "name": "체온계"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "car",
+      "name": "차량",
+      "groups": [
+        {
+          "id": "car-supplies",
+          "name": "차량용품",
+          "slots": [
+            {
+              "id": "car-supplies-washerfluid",
+              "name": "워셔액"
+            },
+            {
+              "id": "car-supplies-freshener",
+              "name": "방향제"
+            },
+            {
+              "id": "car-supplies-wetwipe",
+              "name": "실내용 물티슈"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
