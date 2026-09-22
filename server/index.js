@@ -1,8 +1,13 @@
 import { createServer } from 'node:http'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { upsertSubmission, readSubmissions, aggregateRanking } from './podium.js'
 import { analyzeLink } from './linkAnalysis.js'
+import { openDb } from './game/db.js'
+import { handleGameRequest } from './game/routes.js'
 
 const PORT = 8787
+const db = openDb(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'game.sqlite'))
 
 function sendJson(res, status, body) {
   res.writeHead(status, { 'Content-Type': 'application/json' })
@@ -10,6 +15,11 @@ function sendJson(res, status, body) {
 }
 
 const server = createServer((req, res) => {
+  if (req.url?.startsWith('/api/game/')) {
+    handleGameRequest(req, res, db)
+    return
+  }
+
   if (req.method === 'POST' && req.url === '/api/podium-submissions') {
     const chunks = []
     req.on('data', (chunk) => {

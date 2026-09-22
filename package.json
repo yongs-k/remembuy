@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev:server": "node --env-file=server/.env server/index.js",
-    "test:server": "node --test server/podium.test.mjs server/linkAnalysis.test.mjs"
+    "test:server": "node --test server/podium.test.mjs server/linkAnalysis.test.mjs server/game/db.test.mjs server/game/rules.test.mjs server/game/service.test.mjs server/game/routes.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
