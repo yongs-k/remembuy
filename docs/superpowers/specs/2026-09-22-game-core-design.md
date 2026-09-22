@@ -52,8 +52,8 @@ per process, `PRAGMA foreign_keys = ON`, schema created by an idempotent
 Catalog (seeded from the client's current data, then owned by the server DB;
 ids are unchanged):
 - `spaces(id PK, name, sort, active)`
-- `groups(id PK, space_id -> spaces, name, sort, active)`
-- `slots(id PK, group_id -> groups, name, sort, active)`
+- `product_groups(id PK, space_id -> spaces, name, sort, active)` (named this way because GROUPS is an SQLite keyword)
+- `slots(id PK, group_id -> product_groups, name, sort, active)`
 
 The seed comes from `server/game/catalog.seed.json`, generated once by
 `scripts/export-catalog.mjs` importing `src/data/locations.ts`
