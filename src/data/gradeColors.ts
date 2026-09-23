@@ -9,6 +9,7 @@ const GRADE_LABEL: Record<string, string> = {
   LEGENDARY: '전설',
 }
 
+// `text` is only legible when painted over that same grade's `bg` — never over an unrelated fixed background.
 const GRADE_COLOR: Record<string, GradeStyle> = {
   COMMON: {
     bg: 'bg-surface-container-high',

@@ -23,7 +23,7 @@ export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => 
       onClick={onOpen}
       className={`flex w-full flex-col items-center gap-1 rounded-xl ${color.bg} p-space-sm text-center ${color.shadow} transition-transform active:scale-95`}
     >
-      <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest ${color.text}`}>
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-on-surface">
         <Icon name={entry.status === 'COMPLETE' ? 'check_circle' : 'inventory_2'} className="text-[18px]" />
       </div>
       <span className={`text-label-md font-bold ${color.text}`}>{entry.name}</span>

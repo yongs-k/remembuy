@@ -1,15 +1,27 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { DexItemCard } from '../components/DexItemCard'
+import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeLabel } from '../data/gradeColors'
 import type { DexEntry } from '../lib/gameApi'
 
 export default function DexPage() {
   const { dex } = useGame()
+  const navigate = useNavigate()
   const [selected, setSelected] = useState<DexEntry | null>(null)
 
   return (
     <div className="space-y-4 p-4">
+      <button
+        type="button"
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+      >
+        <Icon name="arrow_back" className="text-[16px]" />
+        뒤로
+      </button>
+
       <h1 className="font-heading text-headline-lg text-on-surface">가상 아이템 도감</h1>
 
       {dex.length === 0 ? (
