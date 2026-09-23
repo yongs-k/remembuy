@@ -114,6 +114,53 @@ test('claim, state and history work end to end and are per device', async () => 
   }
 })
 
+test('boxes and dex endpoints respond', async () => {
+  const { base, close } = await start()
+  try {
+    const boxes = await (await call(base, '/api/game/boxes')).json()
+    assert.equal(boxes.boxes.length, 1)
+    assert.equal(boxes.boxes[0].id, 'box-starter')
+    const dex = await (await call(base, '/api/game/dex')).json()
+    assert.equal(dex.items.length, 14)
+    assert.ok(dex.items.every((item) => item.status === 'LOCKED'))
+  } finally {
+    await close()
+  }
+})
+
+test('opening an unknown box or one that costs too much returns 400', async () => {
+  const { base, close } = await start()
+  try {
+    const missing = await call(base, '/api/game/boxes/no-such-box/open', { method: 'POST' })
+    assert.equal(missing.status, 400)
+    assert.deepEqual(await missing.json(), { error: 'box not found' })
+
+    const poor = await call(base, '/api/game/boxes/box-starter/open', { method: 'POST' })
+    assert.equal(poor.status, 400)
+    assert.deepEqual(await poor.json(), { error: 'insufficient points' })
+  } finally {
+    await close()
+  }
+})
+
+test('opening a box with enough points succeeds and updates the dex', async () => {
+  const { base, close } = await start()
+  try {
+    // this fixture's catalog has only sp1's 4 slots, so claim them all to raise points to 1200
+    await call(base, '/api/game/claims', { method: 'POST', body: { slotIds: ['a1', 'a2', 'a3', 'a4'] } })
+    const opened = await call(base, '/api/game/boxes/box-starter/open', { method: 'POST' })
+    assert.equal(opened.status, 200)
+    const body = await opened.json()
+    assert.equal(body.pointsSpent, 500)
+    assert.ok(['FRAGMENT', 'FULL_ITEM'].includes(body.result.type))
+    const dex = await (await call(base, '/api/game/dex')).json()
+    const touched = dex.items.find((item) => item.id === body.result.itemId)
+    assert.notEqual(touched.status, 'LOCKED')
+  } finally {
+    await close()
+  }
+})
+
 test('points-history validates its query and unknown routes return 404', async () => {
   const { base, close } = await start()
   try {
