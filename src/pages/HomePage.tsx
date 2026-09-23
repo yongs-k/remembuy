@@ -7,6 +7,7 @@ import { HomeProfileCard } from '../components/HomeProfileCard'
 import { QuestCarousel } from '../components/QuestCarousel'
 import { HomeLocationTile } from '../components/HomeLocationTile'
 import { AnalyzingOverlay } from '../components/AnalyzingOverlay'
+import { HomeGameCard } from '../components/HomeGameCard'
 import { Icon } from '../data/materialIcons'
 import { DUMMY_QUESTS } from '../data/homeDummy'
 
@@ -130,6 +131,7 @@ export default function HomePage() {
       {!selectedLocationId && (
         <>
           <HomeProfileCard itemCount={items.length} />
+          <HomeGameCard />
           <div className="flex items-center justify-between">
             <h2 className="font-heading text-lg">추천 퀘스트</h2>
             <span className="text-label-md text-on-surface-variant">전체보기 →</span>
