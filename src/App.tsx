@@ -12,12 +12,14 @@ import NewItemPage from './pages/NewItemPage'
 import CollectionPage from './pages/CollectionPage'
 import StorePage from './pages/StorePage'
 import DexPage from './pages/DexPage'
+import AdminPage from './pages/AdminPage'
 
 export default function App() {
   return (
     <LockerProvider>
       <GameProvider>
       <Routes>
+        <Route path="/admin" element={<AdminPage />} />
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/item/:id" element={<ItemDetailPage />} />
