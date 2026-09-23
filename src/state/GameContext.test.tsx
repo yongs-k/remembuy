@@ -63,7 +63,7 @@ describe('GameContext', () => {
     expect(api.fetchGameState).toHaveBeenCalledTimes(1)
   })
 
-  it('openBox updates points and the touched dex entry', async () => {
+  it('openBox updates points and the touched dex entry, and resolves the result', async () => {
     vi.mocked(api.claimSlots).mockResolvedValue(claimResult(0))
     vi.mocked(api.fetchGameState).mockResolvedValue({ ...emptyState, points: 1000 })
     vi.mocked(api.fetchDex).mockResolvedValue({
@@ -71,18 +71,34 @@ describe('GameContext', () => {
     })
     const { result } = renderHook(() => useGame(), { wrapper })
     await waitFor(() => expect(result.current.dex.length).toBe(1))
-    vi.mocked(api.openBox).mockResolvedValue({
+    const openResult: api.OpenBoxResult = {
       result: { type: 'FRAGMENT', itemId: 'item-x', itemName: 'X', grade: 'COMMON' },
       pointsSpent: 500,
       pointsBalance: 1500,
       dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, status: 'COLLECTING', fragmentCount: 1 },
-    })
+    }
+    vi.mocked(api.openBox).mockResolvedValue(openResult)
+    let returned: api.OpenBoxResult | undefined
     await act(async () => {
-      await result.current.openBox('box-starter')
+      returned = await result.current.openBox('box-starter')
     })
+    expect(returned).toEqual(openResult)
     expect(result.current.state?.points).toBe(1500)
     expect(result.current.dex[0].status).toBe('COLLECTING')
     expect(result.current.dex[0].fragmentCount).toBe(1)
+  })
+
+  it('openBox resolves undefined when the API call fails', async () => {
+    vi.mocked(api.claimSlots).mockResolvedValue(claimResult(0))
+    vi.mocked(api.fetchGameState).mockResolvedValue({ ...emptyState, points: 1000 })
+    vi.mocked(api.openBox).mockRejectedValue(new Error('offline'))
+    const { result } = renderHook(() => useGame(), { wrapper })
+    await waitFor(() => expect(result.current.state?.points).toBe(1000))
+    let returned: api.OpenBoxResult | undefined
+    await act(async () => {
+      returned = await result.current.openBox('box-starter')
+    })
+    expect(returned).toBeUndefined()
   })
 
   it('swallows API failures', async () => {

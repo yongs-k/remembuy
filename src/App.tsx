@@ -10,6 +10,8 @@ import PurchasePage from './pages/PurchasePage'
 import FamilyPage from './pages/FamilyPage'
 import NewItemPage from './pages/NewItemPage'
 import CollectionPage from './pages/CollectionPage'
+import StorePage from './pages/StorePage'
+import DexPage from './pages/DexPage'
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/family" element={<FamilyPage />} />
           <Route path="/new" element={<NewItemPage />} />
           <Route path="/collection" element={<CollectionPage />} />
+          <Route path="/store" element={<StorePage />} />
+          <Route path="/dex" element={<DexPage />} />
         </Route>
       </Routes>
       </GameProvider>
