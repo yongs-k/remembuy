@@ -9,6 +9,7 @@ import {
   type GameState,
   type Box,
   type DexEntry,
+  type OpenBoxResult,
 } from '../lib/gameApi'
 
 type GameContextValue = {
@@ -17,7 +18,7 @@ type GameContextValue = {
   dex: DexEntry[]
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<void>
-  openBox: (boxId: string) => Promise<void>
+  openBox: (boxId: string) => Promise<OpenBoxResult | undefined>
 }
 
 const GameContext = createContext<GameContextValue | null>(null)
@@ -70,8 +71,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const result = await openBoxApi(boxId)
       setState((prev) => (prev ? { ...prev, points: result.pointsBalance } : prev))
       setDex((prev) => prev.map((entry) => (entry.id === result.dexEntry.id ? result.dexEntry : entry)))
+      return result
     } catch (error) {
       console.warn('open box failed', error)
+      return undefined
     }
   }, [])
 
