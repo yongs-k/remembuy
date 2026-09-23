@@ -5,6 +5,7 @@ import { upsertSubmission, readSubmissions, aggregateRanking } from './podium.js
 import { analyzeLink } from './linkAnalysis.js'
 import { openDb } from './game/db.js'
 import { handleGameRequest } from './game/routes.js'
+import { handleAdminRequest } from './game/adminRoutes.js'
 
 const PORT = 8787
 const db = openDb(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'game.sqlite'))
@@ -17,6 +18,11 @@ function sendJson(res, status, body) {
 const server = createServer((req, res) => {
   if (req.url?.startsWith('/api/game/')) {
     handleGameRequest(req, res, db)
+    return
+  }
+
+  if (req.url?.startsWith('/api/admin/')) {
+    handleAdminRequest(req, res, db)
     return
   }
 
