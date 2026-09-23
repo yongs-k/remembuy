@@ -1,4 +1,5 @@
 import { getCatalog, getState, claimSlots, getHistory } from './service.js'
+import { getBoxes, getDex, openBox } from './itemService.js'
 
 const DEVICE_ID = /^[A-Za-z0-9-]{8,64}$/
 const MAX_BODY_BYTES = 64 * 1024
@@ -68,6 +69,30 @@ export async function handleGameRequest(req, res, db) {
         return
       }
       sendJson(res, 200, claimSlots(db, deviceId, ids))
+      return
+    }
+
+    if (route === 'GET /api/game/boxes') {
+      sendJson(res, 200, { boxes: getBoxes(db) })
+      return
+    }
+
+    if (route === 'GET /api/game/dex') {
+      sendJson(res, 200, { items: getDex(db, deviceId) })
+      return
+    }
+
+    const openMatch = url.pathname.match(/^\/api\/game\/boxes\/([^/]+)\/open$/)
+    if (req.method === 'POST' && openMatch) {
+      try {
+        sendJson(res, 200, openBox(db, deviceId, decodeURIComponent(openMatch[1])))
+      } catch (error) {
+        if (error.message === 'box not found' || error.message === 'insufficient points') {
+          sendJson(res, 400, { error: error.message })
+        } else {
+          throw error
+        }
+      }
       return
     }
 

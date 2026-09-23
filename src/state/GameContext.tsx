@@ -1,11 +1,23 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocker } from './LockerContext'
-import { claimSlots as claimSlotsApi, fetchGameState, type GameState } from '../lib/gameApi'
+import {
+  claimSlots as claimSlotsApi,
+  fetchGameState,
+  fetchBoxes,
+  fetchDex,
+  openBox as openBoxApi,
+  type GameState,
+  type Box,
+  type DexEntry,
+} from '../lib/gameApi'
 
 type GameContextValue = {
   state: GameState | null
+  boxes: Box[]
+  dex: DexEntry[]
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<void>
+  openBox: (boxId: string) => Promise<void>
 }
 
 const GameContext = createContext<GameContextValue | null>(null)
@@ -13,7 +25,19 @@ const GameContext = createContext<GameContextValue | null>(null)
 export function GameProvider({ children }: { children: ReactNode }) {
   const { items } = useLocker()
   const [state, setState] = useState<GameState | null>(null)
+  const [boxes, setBoxes] = useState<Box[]>([])
+  const [dex, setDex] = useState<DexEntry[]>([])
   const reconciled = useRef(false)
+
+  const loadCatalogState = useCallback(async () => {
+    try {
+      const [boxList, dexList] = await Promise.all([fetchBoxes(), fetchDex()])
+      setBoxes(boxList.boxes)
+      setDex(dexList.items)
+    } catch (error) {
+      console.warn('game catalog unavailable', error)
+    }
+  }, [])
 
   const refresh = useCallback(async () => {
     try {
@@ -21,15 +45,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.warn('game state unavailable', error)
     }
-  }, [])
+    await loadCatalogState()
+  }, [loadCatalogState])
 
-  const claim = useCallback(async (slotIds: string[]) => {
-    if (slotIds.length === 0) return
+  const claim = useCallback(
+    async (slotIds: string[]) => {
+      if (slotIds.length === 0) {
+        await refresh()
+        return
+      }
+      try {
+        const result = await claimSlotsApi(slotIds)
+        setState(result.state)
+      } catch (error) {
+        console.warn('game claim failed', error)
+      }
+      await loadCatalogState()
+    },
+    [refresh, loadCatalogState]
+  )
+
+  const openBox = useCallback(async (boxId: string) => {
     try {
-      const result = await claimSlotsApi(slotIds)
-      setState(result.state)
+      const result = await openBoxApi(boxId)
+      setState((prev) => (prev ? { ...prev, points: result.pointsBalance } : prev))
+      setDex((prev) => prev.map((entry) => (entry.id === result.dexEntry.id ? result.dexEntry : entry)))
     } catch (error) {
-      console.warn('game claim failed', error)
+      console.warn('open box failed', error)
     }
   }, [])
 
@@ -37,14 +79,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (reconciled.current) return
     reconciled.current = true
     const ids = [
-      ...new Set(items.map((item) => item.masterItemId).filter((id): id is string => Boolean(id))),
+      ...new Set(
+        items
+          .filter((item) => !item.id.startsWith('seed-'))
+          .map((item) => item.masterItemId)
+          .filter((id): id is string => Boolean(id))
+      ),
     ]
-    void (ids.length > 0 ? claim(ids) : refresh())
+    void claim(ids)
     // reconcile once per app session
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <GameContext.Provider value={{ state, refresh, claim }}>{children}</GameContext.Provider>
+  return (
+    <GameContext.Provider value={{ state, boxes, dex, refresh, claim, openBox }}>{children}</GameContext.Provider>
+  )
 }
 
 export function useGame(): GameContextValue {

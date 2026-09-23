@@ -34,6 +34,19 @@ test('openDb seeds the catalog and the default config', () => {
   ])
   const rule = { ...db.prepare("SELECT key, amount FROM point_rules WHERE key = 'COLLECTION_COMPLETE'").get() }
   assert.deepEqual(rule, { key: 'COLLECTION_COMPLETE', amount: 500 })
+  assert.equal(count(db, 'virtual_items'), 14)
+  assert.equal(count(db, 'boxes'), 1)
+  assert.equal(count(db, 'box_drop_entries'), 28)
+  const grades = db
+    .prepare('SELECT grade, COUNT(*) AS n FROM virtual_items GROUP BY grade ORDER BY grade')
+    .all()
+    .map((row) => ({ ...row }))
+  assert.deepEqual(grades, [
+    { grade: 'ADVANCED', n: 4 },
+    { grade: 'COMMON', n: 4 },
+    { grade: 'LEGENDARY', n: 3 },
+    { grade: 'RARE', n: 3 },
+  ])
 })
 
 test('migrate is idempotent and never re-seeds a populated database', () => {
@@ -44,6 +57,8 @@ test('migrate is idempotent and never re-seeds a populated database', () => {
   assert.equal(count(db, 'slots'), 87)
   assert.equal(count(db, 'title_tiers'), 4)
   assert.equal(count(db, 'title_benefits'), 4)
+  assert.equal(count(db, 'virtual_items'), 14)
+  assert.equal(count(db, 'boxes'), 1)
 })
 
 test('foreign keys are enforced', () => {
