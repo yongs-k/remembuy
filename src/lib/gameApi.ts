@@ -86,3 +86,28 @@ export const fetchPointHistory = (limit = 50, before?: number) =>
   request<{ items: PointHistoryItem[]; nextBefore: number | null }>(
     `/api/game/points-history?limit=${limit}${before === undefined ? '' : `&before=${before}`}`
   )
+
+export type Box = { id: string; name: string; costPoints: number }
+
+export type DexEntry = {
+  id: string
+  name: string
+  grade: string
+  fragmentsRequired: number
+  status: 'LOCKED' | 'COLLECTING' | 'COMPLETE'
+  fragmentCount: number
+}
+
+export type OpenBoxResult = {
+  result: { type: 'FRAGMENT' | 'FULL_ITEM'; itemId: string; itemName: string; grade: string }
+  pointsSpent: number
+  pointsBalance: number
+  dexEntry: DexEntry
+}
+
+export const fetchBoxes = () => request<{ boxes: Box[] }>('/api/game/boxes')
+
+export const fetchDex = () => request<{ items: DexEntry[] }>('/api/game/dex')
+
+export const openBox = (boxId: string) =>
+  request<OpenBoxResult>(`/api/game/boxes/${encodeURIComponent(boxId)}/open`, { method: 'POST' })
