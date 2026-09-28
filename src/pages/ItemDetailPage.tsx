@@ -3,6 +3,7 @@ import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { ItemCard } from '../components/ItemCard'
 import { Icon } from '../data/materialIcons'
+import { getRemainingDays, formatDday } from '../state/selectors'
 
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -30,7 +31,8 @@ export default function ItemDetailPage() {
   const relatedItems = items
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
-  const urgent = item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
+  const remaining = getRemainingDays(item)
+  const urgent = remaining !== undefined && remaining <= 7
 
   return (
     <div className="space-y-space-md p-margin">
@@ -67,7 +69,7 @@ export default function ItemDetailPage() {
                 {item.price.toLocaleString()}원
               </span>
             )}
-            {item.daysUntilEmpty !== undefined && (
+            {remaining !== undefined && (
               <span
                 className={`self-start rounded px-1.5 py-0.5 text-label-sm ${
                   urgent
@@ -75,7 +77,7 @@ export default function ItemDetailPage() {
                     : 'bg-surface-container-high text-on-surface-variant'
                 }`}
               >
-                D-{item.daysUntilEmpty}
+                {formatDday(remaining)}
               </span>
             )}
           </div>
