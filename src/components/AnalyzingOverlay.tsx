@@ -34,58 +34,60 @@ export function AnalyzingOverlay({
       role="dialog"
       aria-modal="true"
       aria-label={dialogLabel}
-      className="fixed inset-0 z-[60] flex flex-col items-center justify-center gap-space-md bg-[#1e1512] p-margin text-white"
+      className="fixed inset-0 z-[60] overflow-y-auto bg-[#1e1512] text-white"
     >
-      <div className="relative h-[120px] w-[120px]">
-        <div className="absolute inset-0 animate-ring-glow rounded-full bg-[radial-gradient(circle,rgba(255,185,95,0.35),transparent_70%)]" />
-        <div className="absolute inset-2 animate-spin rounded-full border-4 border-transparent border-r-primary-container border-t-tertiary-fixed-dim" />
-        <div className="absolute inset-3.5 overflow-hidden rounded-full">
-          {SCAN_ICONS.map((name, i) => (
+      <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-center justify-center gap-space-md p-margin">
+        <div className="relative h-[120px] w-[120px] shrink-0">
+          <div className="absolute inset-0 animate-ring-glow rounded-full bg-[radial-gradient(circle,rgba(255,185,95,0.35),transparent_70%)]" />
+          <div className="absolute inset-2 animate-spin rounded-full border-4 border-transparent border-r-primary-container border-t-tertiary-fixed-dim" />
+          <div className="absolute inset-3.5 overflow-hidden rounded-full">
+            {SCAN_ICONS.map((name, i) => (
+              <span
+                key={name}
+                className="absolute inset-0 flex animate-icon-cycle items-center justify-center opacity-0"
+                style={{ animationDelay: ICON_DELAYS[i] }}
+              >
+                <Icon name={name} className="text-[34px] text-tertiary-fixed-dim" />
+              </span>
+            ))}
+            <div className="absolute inset-x-0 h-3.5 animate-scan-sweep bg-gradient-to-b from-transparent via-tertiary-fixed-dim/90 to-transparent" />
+          </div>
+        </div>
+
+        <div className="relative h-8 w-full max-w-[10rem] shrink-0 text-center">
+          {PERCENTS.map((pct, i) => (
             <span
-              key={name}
-              className="absolute inset-0 flex animate-icon-cycle items-center justify-center opacity-0"
-              style={{ animationDelay: ICON_DELAYS[i] }}
+              key={pct}
+              className="absolute inset-0 animate-text-cycle bg-gradient-to-r from-tertiary-fixed-dim to-primary-container bg-clip-text text-headline-lg font-bold text-transparent opacity-0"
+              style={{ animationDelay: CYCLE_DELAYS[i] }}
             >
-              <Icon name={name} className="text-[34px] text-tertiary-fixed-dim" />
+              {pct}%
             </span>
           ))}
-          <div className="absolute inset-x-0 h-3.5 animate-scan-sweep bg-gradient-to-b from-transparent via-tertiary-fixed-dim/90 to-transparent" />
         </div>
-      </div>
 
-      <div className="relative h-8 w-40 text-center">
-        {PERCENTS.map((pct, i) => (
-          <span
-            key={pct}
-            className="absolute inset-0 animate-text-cycle bg-gradient-to-r from-tertiary-fixed-dim to-primary-container bg-clip-text text-headline-lg font-bold text-transparent opacity-0"
-            style={{ animationDelay: CYCLE_DELAYS[i] }}
-          >
-            {pct}%
-          </span>
-        ))}
-      </div>
+        <div className="relative h-5 w-full max-w-xs shrink-0 px-space-sm text-center">
+          {STATUS_LABELS.map((label, i) => (
+            <span
+              key={label}
+              className="absolute inset-0 animate-text-cycle truncate text-body-sm text-outline-variant opacity-0"
+              style={{ animationDelay: CYCLE_DELAYS[i] }}
+            >
+              {label}
+            </span>
+          ))}
+        </div>
 
-      <div className="relative h-5 w-64 text-center">
-        {STATUS_LABELS.map((label, i) => (
-          <span
-            key={label}
-            className="absolute inset-0 animate-text-cycle text-body-sm text-outline-variant opacity-0"
-            style={{ animationDelay: CYCLE_DELAYS[i] }}
-          >
-            {label}
-          </span>
-        ))}
+        <button
+          type="button"
+          autoFocus
+          onClick={onCancel}
+          className="mt-space-sm flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white/10 px-5 py-2.5 text-label-lg text-outline-variant active:translate-y-0.5"
+        >
+          <Icon name="close" className="text-[18px]" />
+          분석 중단 및 취소
+        </button>
       </div>
-
-      <button
-        type="button"
-        autoFocus
-        onClick={onCancel}
-        className="mt-space-sm flex items-center justify-center gap-1.5 rounded-xl bg-white/10 px-5 py-2.5 text-label-lg text-outline-variant active:translate-y-0.5"
-      >
-        <Icon name="close" className="text-[18px]" />
-        분석 중단 및 취소
-      </button>
     </div>
   )
 }
