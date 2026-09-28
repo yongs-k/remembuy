@@ -104,6 +104,13 @@ exact and needs no timezone handling.
    negative") since it's a presentational component with no `Item`
    access of its own; internally, both of its two `{daysUntilEmpty}`-
    based text spots switch to `formatDday(daysUntilEmpty)`.
+8. **`src/pages/NotificationsPage.tsx`** — same `urgent`/`D-{n}` pattern
+   as `ItemCard.tsx`. **Correction, found during implementation:** this
+   site was missed from the original read-site list above; it has the
+   identical pattern and needed the identical fix. `src/components/
+   AppLayout.tsx` also calls `getUpcomingNotifications` but only for a
+   count/badge, with no direct `daysUntilEmpty` read — confirmed no
+   change needed there.
 
 No change to `Item`, `src/types.ts`, `NewItemPage.tsx`'s write path, or
 `FamilyMember`/`familyData.ts`.
@@ -120,9 +127,10 @@ No change to `Item`, `src/types.ts`, `NewItemPage.tsx`'s write path, or
   case: an item whose *stored* `daysUntilEmpty` is above the threshold
   but whose *live* remaining days (given a later `today`) is at or below
   it — confirming the live value, not the stored one, drives inclusion.
-- Confirmed: none of the six UI read-sites (`ItemCard.tsx`,
+- Confirmed: none of the seven UI read-sites (`ItemCard.tsx`,
   `CategoryChecklist.tsx`, `PodiumItemCard.tsx`, `HomePage.tsx`,
-  `PurchasePage.tsx`, `ButlerHero.tsx`) have an existing test file
+  `PurchasePage.tsx`, `ButlerHero.tsx`, `NotificationsPage.tsx`) have an
+  existing test file
   (`src/state/selectors.test.ts` does exist and is where the new
   selector tests go; `DexItemCard.test.tsx` exists but `DexItemCard` is
   unrelated to this plan). No new test file is created for wiring an

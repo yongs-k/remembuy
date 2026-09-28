@@ -4,7 +4,9 @@
 
 **Goal:** Make every "D-N days until empty" display and filter computed live from `Item.createdAt` instead of showing the stale number the user typed once at creation — the smallest possible slice of the product roadmap's Phase 3 "rule-based nudge" idea.
 
-**Architecture:** Two new pure functions (`getRemainingDays`, `formatDday`) in `src/state/selectors.ts`, TDD'd against the existing `src/state/selectors.test.ts`. `getUpcomingNotifications` (same file) switches to computing live values internally. Six UI call sites across components/pages then swap their direct `item.daysUntilEmpty` reads for `getRemainingDays(item)` + `formatDday(...)` — purely mechanical, no new UI logic, no new test files (none of the six have one today).
+**Architecture:** Two new pure functions (`getRemainingDays`, `formatDday`) in `src/state/selectors.ts`, TDD'd against the existing `src/state/selectors.test.ts`. `getUpcomingNotifications` (same file) switches to computing live values internally. Seven UI call sites across components/pages then swap their direct `item.daysUntilEmpty` reads for `getRemainingDays(item)` + `formatDday(...)` — purely mechanical, no new UI logic, no new test files (none of the seven have one today).
+
+**Correction (found during Task 1's review, before Task 2 was dispatched):** the design spec's read-site list missed `src/pages/NotificationsPage.tsx`, which has the identical `urgent`/`D-{item.daysUntilEmpty}` pattern as the other six sites. It's added to Task 2 below as a 7th site. `src/components/AppLayout.tsx` also calls `getUpcomingNotifications` but only for a count/badge — no direct `daysUntilEmpty` read there, so it needs no change.
 
 **Tech Stack:** TypeScript, Vitest. No new dependency.
 
@@ -29,6 +31,7 @@ src/components/PodiumItemCard.tsx     # Modify
 src/components/ButlerHero.tsx         # Modify
 src/pages/HomePage.tsx                # Modify
 src/pages/PurchasePage.tsx            # Modify
+src/pages/NotificationsPage.tsx       # Modify
 ```
 
 ---
@@ -231,17 +234,17 @@ git commit -m "feat: compute remaining-days live from createdAt instead of a sta
 
 ---
 
-### Task 2: Wire the six UI read-sites to the live value
+### Task 2: Wire the seven UI read-sites to the live value
 
 **Files:**
-- Modify: `src/components/ItemCard.tsx`, `src/components/CategoryChecklist.tsx`, `src/components/PodiumItemCard.tsx`, `src/components/ButlerHero.tsx`, `src/pages/HomePage.tsx`, `src/pages/PurchasePage.tsx`
+- Modify: `src/components/ItemCard.tsx`, `src/components/CategoryChecklist.tsx`, `src/components/PodiumItemCard.tsx`, `src/components/ButlerHero.tsx`, `src/pages/HomePage.tsx`, `src/pages/PurchasePage.tsx`, `src/pages/NotificationsPage.tsx`
 
 **Interfaces:**
 - Consumes: `getRemainingDays(item, today?)`, `formatDday(days)` (Task 1).
 
-None of these six files have an existing test file (confirmed absent
+None of these seven files have an existing test file (confirmed absent
 from `src/components/*.test.tsx` and `src/pages/*.test.tsx` for all
-six) — this task is verified by `tsc` + the full `vitest` suite staying
+seven) — this task is verified by `tsc` + the full `vitest` suite staying
 green, not by new failing tests.
 
 - [ ] **Step 1: `src/components/ItemCard.tsx`**
@@ -568,17 +571,92 @@ whose filter already requires a defined `daysUntilEmpty` — the `??
 fallback.daysUntilEmpty` is defensive, not reachable in practice, same
 as the original code's own implicit assumption.)
 
-- [ ] **Step 7: Run full verification**
+- [ ] **Step 7: `src/pages/NotificationsPage.tsx`**
+
+Find:
+
+```tsx
+import { useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useLocker } from '../state/LockerContext'
+import { getUpcomingNotifications } from '../state/selectors'
+import { useSeenNotifications } from '../hooks/useSeenNotifications'
+import { Icon } from '../data/materialIcons'
+```
+
+Replace with:
+
+```tsx
+import { useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useLocker } from '../state/LockerContext'
+import { getUpcomingNotifications, getRemainingDays, formatDday } from '../state/selectors'
+import { useSeenNotifications } from '../hooks/useSeenNotifications'
+import { Icon } from '../data/materialIcons'
+```
+
+Find:
+
+```tsx
+          {upcoming.map((item) => {
+            const urgent = item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
+            return (
+```
+
+Replace with:
+
+```tsx
+          {upcoming.map((item) => {
+            const remaining = getRemainingDays(item)
+            const urgent = remaining !== undefined && remaining <= 7
+            return (
+```
+
+Find:
+
+```tsx
+                  <span
+                    className={`shrink-0 rounded px-1.5 py-0.5 text-label-sm ${
+                      urgent
+                        ? 'bg-error-container text-on-error-container'
+                        : 'bg-surface-container-high text-on-surface-variant'
+                    }`}
+                  >
+                    D-{item.daysUntilEmpty}
+                  </span>
+```
+
+Replace with:
+
+```tsx
+                  <span
+                    className={`shrink-0 rounded px-1.5 py-0.5 text-label-sm ${
+                      urgent
+                        ? 'bg-error-container text-on-error-container'
+                        : 'bg-surface-container-high text-on-surface-variant'
+                    }`}
+                  >
+                    {remaining !== undefined ? formatDday(remaining) : null}
+                  </span>
+```
+
+(`remaining` is guaranteed defined here in practice — `upcoming` comes
+from `getUpcomingNotifications`, whose filter already excludes items
+with no `daysUntilEmpty` — the ternary only guards TypeScript's
+`number | undefined` type, matching the same defensive pattern used for
+`heroDays` in Step 6.)
+
+- [ ] **Step 8: Run full verification**
 
 Run: `npx tsc --noEmit` — expected clean.
-Run: `npx vitest run` — expected PASS, 116/116 (Task 1 already added its
-tests; this task adds no new test files).
+Run: `npx vitest run` — expected PASS, 123/123 (116 baseline + Task 1's
+7 net-new tests; this task adds no new test files).
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
-git add src/components/ItemCard.tsx src/components/CategoryChecklist.tsx src/components/PodiumItemCard.tsx src/components/ButlerHero.tsx src/pages/HomePage.tsx src/pages/PurchasePage.tsx
-git commit -m "feat: wire item cards, home/purchase filters, and the AI butler hero to live remaining-days"
+git add src/components/ItemCard.tsx src/components/CategoryChecklist.tsx src/components/PodiumItemCard.tsx src/components/ButlerHero.tsx src/pages/HomePage.tsx src/pages/PurchasePage.tsx src/pages/NotificationsPage.tsx
+git commit -m "feat: wire item cards, home/purchase/notifications, and the AI butler hero to live remaining-days"
 ```
 
 ---
