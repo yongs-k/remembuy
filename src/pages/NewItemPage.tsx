@@ -11,7 +11,7 @@ import type { Item } from '../types'
 
 type ProgressMode = 'recommendation' | 'daysUntilEmpty'
 
-type LinkAnalysisPrefill = {
+type RecordPrefill = {
   name: string | null
   locationId: string | null
   suggestedLocationName: string | null
@@ -21,7 +21,7 @@ type LinkAnalysisPrefill = {
   place: string | null
   price: number | null
   restockCycle: string | null
-  sourceUrl: string
+  sourceUrl?: string
 }
 
 const CYCLE_PRESETS = [45, 60, 90]
@@ -51,7 +51,7 @@ export default function NewItemPage() {
   const game = useGame()
   const existing = editId ? items.find((i) => i.id === editId) : undefined
   const prefill = !existing
-    ? (location.state as { prefill?: LinkAnalysisPrefill } | null)?.prefill
+    ? (location.state as { prefill?: RecordPrefill } | null)?.prefill
     : undefined
 
   const prefillLocation = prefill?.locationId
