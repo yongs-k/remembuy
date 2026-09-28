@@ -63,7 +63,13 @@ const server = createServer((req, res) => {
   }
 
   if (req.method === 'GET' && req.url?.startsWith('/api/podium-rankings/')) {
-    const categoryId = decodeURIComponent(req.url.replace('/api/podium-rankings/', ''))
+    let categoryId
+    try {
+      categoryId = decodeURIComponent(req.url.replace('/api/podium-rankings/', ''))
+    } catch {
+      sendJson(res, 400, { error: 'invalid category id' })
+      return
+    }
     readSubmissions()
       .then((submissions) => {
         const ranking = aggregateRanking(submissions, categoryId)
