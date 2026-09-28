@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getCompletionGain } from '../state/selectors'
+import { getCompletionGain, getRemainingDays } from '../state/selectors'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { EntryTabs } from '../components/EntryTabs'
 import { EntryPreviewCard } from '../components/EntryPreviewCard'
@@ -90,7 +90,9 @@ export default function NewItemPage() {
   const [recommendation, setRecommendation] = useState<'recommend' | 'notRecommend'>(
     existing?.recommendation ?? 'recommend'
   )
-  const [daysUntilEmpty, setDaysUntilEmpty] = useState(existing?.daysUntilEmpty ?? 30)
+  const [daysUntilEmpty, setDaysUntilEmpty] = useState(
+    existing ? Math.max(0, getRemainingDays(existing) ?? 30) : 30
+  )
   const [price, setPrice] = useState<number | ''>(existing?.price ?? prefill?.price ?? '')
   const [affiliateUrl, setAffiliateUrl] = useState(
     existing?.affiliateUrl ?? prefill?.sourceUrl ?? ''
@@ -144,7 +146,12 @@ export default function NewItemPage() {
       restockCycle: restockCycle || null,
       note: note || undefined,
       recommendation: progressMode === 'recommendation' ? recommendation : undefined,
-      daysUntilEmpty: progressMode === 'daysUntilEmpty' ? daysUntilEmpty : undefined,
+      daysUntilEmpty:
+        progressMode === 'daysUntilEmpty'
+          ? existing
+            ? daysUntilEmpty - (getRemainingDays({ ...existing, daysUntilEmpty: 0 }) ?? 0)
+            : daysUntilEmpty
+          : undefined,
       price: price === '' ? undefined : Number(price),
       affiliateUrl: affiliateUrl || null,
       createdAt: existing?.createdAt ?? new Date().toISOString().slice(0, 10),

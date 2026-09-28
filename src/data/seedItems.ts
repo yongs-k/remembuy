@@ -1,5 +1,11 @@
 import type { Item } from '../types'
 
+function daysAgo(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - n)
+  return d.toISOString().slice(0, 10)
+}
+
 export const SEED_ITEMS: Item[] = [
   {
     id: 'seed-1',
@@ -25,7 +31,7 @@ export const SEED_ITEMS: Item[] = [
     place: '쿠팡',
     restockCycle: '약 1.5개월마다',
     affiliateUrl: null,
-    createdAt: '2026-08-01',
+    createdAt: daysAgo(0),
   },
   {
     id: 'seed-3',
@@ -61,7 +67,7 @@ export const SEED_ITEMS: Item[] = [
     place: '쿠팡',
     restockCycle: '약 2개월마다',
     affiliateUrl: null,
-    createdAt: '2026-07-20',
+    createdAt: daysAgo(0),
   },
   {
     id: 'seed-6',
@@ -121,7 +127,7 @@ export const SEED_ITEMS: Item[] = [
     place: '다이소',
     restockCycle: '약 3개월마다',
     affiliateUrl: null,
-    createdAt: '2026-06-15',
+    createdAt: daysAgo(0),
   },
   {
     id: 'seed-11',
@@ -169,7 +175,7 @@ export const SEED_ITEMS: Item[] = [
     place: '무인양품',
     restockCycle: '약 3개월마다',
     affiliateUrl: null,
-    createdAt: '2026-06-01',
+    createdAt: daysAgo(0),
   },
   {
     id: 'seed-15',
@@ -229,7 +235,7 @@ export const SEED_ITEMS: Item[] = [
     place: '약국',
     restockCycle: '약 6개월마다',
     affiliateUrl: null,
-    createdAt: '2026-03-15',
+    createdAt: daysAgo(0),
   },
   {
     id: 'seed-20',
