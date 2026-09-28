@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getUpcomingNotifications } from '../state/selectors'
+import { getUpcomingNotifications, getRemainingDays, formatDday } from '../state/selectors'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
 import { Icon } from '../data/materialIcons'
 
@@ -40,7 +40,8 @@ export default function NotificationsPage() {
       ) : (
         <ul className="space-y-space-sm">
           {upcoming.map((item) => {
-            const urgent = item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
+            const remaining = getRemainingDays(item)
+            const urgent = remaining !== undefined && remaining <= 7
             return (
               <li
                 key={item.id}
@@ -58,7 +59,7 @@ export default function NotificationsPage() {
                         : 'bg-surface-container-high text-on-surface-variant'
                     }`}
                   >
-                    D-{item.daysUntilEmpty}
+                    {remaining !== undefined ? formatDday(remaining) : null}
                   </span>
                 </div>
                 <div className="mt-space-sm flex items-center gap-2">

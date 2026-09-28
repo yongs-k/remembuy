@@ -1,5 +1,5 @@
 import type { Category, Item } from '../types'
-import { getCategoryCompletion, getMissingMasterItems } from '../state/selectors'
+import { getCategoryCompletion, getMissingMasterItems, getRemainingDays, formatDday } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
 export function CategoryChecklist({
@@ -51,7 +51,8 @@ export function CategoryChecklist({
           const item = owned
             ? items.find((i) => i.categoryId === category.id && i.masterItemId === m.id)
             : undefined
-          const urgent = item?.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
+          const remaining = item ? getRemainingDays(item) : undefined
+          const urgent = remaining !== undefined && remaining <= 7
           return (
             <li
               key={m.id}
@@ -67,7 +68,7 @@ export function CategoryChecklist({
               <div className="flex min-w-0 flex-1 flex-col">
                 <span className="flex items-center gap-1.5 text-label-lg text-on-surface">
                   <span className="truncate">{m.name}</span>
-                  {item?.daysUntilEmpty !== undefined && (
+                  {remaining !== undefined && (
                     <span
                       className={`shrink-0 rounded px-1.5 py-0.5 text-label-sm ${
                         urgent
@@ -75,7 +76,7 @@ export function CategoryChecklist({
                           : 'bg-surface-container-high text-on-surface-variant'
                       }`}
                     >
-                      D-{item.daysUntilEmpty}
+                      {formatDday(remaining)}
                     </span>
                   )}
                 </span>

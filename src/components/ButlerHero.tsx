@@ -1,5 +1,6 @@
 import { Icon } from '../data/materialIcons'
 import { DUMMY_BUTLER, percentOff } from '../data/purchaseDummy'
+import { formatDday } from '../state/selectors'
 
 export function ButlerHero({
   greetingName,
@@ -32,7 +33,7 @@ export function ButlerHero({
           </span>
           <p className="mt-1 text-body-md text-on-surface">
             {greetingName}, {locationName} 도감의 {itemName} —{' '}
-            <strong className="text-primary">{daysUntilEmpty}일 뒤</strong> 바닥나요! 지금 역대 최저가
+            <strong className="text-primary">{formatDday(daysUntilEmpty)}</strong> 바닥나요! 지금 역대 최저가
             근접이라 미리 채워두는 걸 추천해요.
           </p>
         </div>
@@ -50,7 +51,7 @@ export function ButlerHero({
             </span>
           </div>
           <span className="flex shrink-0 items-center gap-0.5 rounded bg-error-container px-1.5 py-0.5 text-label-sm text-on-error-container">
-            <Icon name="alarm" className="text-[12px]" />D-{daysUntilEmpty} 소진임박
+            <Icon name="alarm" className="text-[12px]" />{formatDday(daysUntilEmpty)} 소진임박
           </span>
         </div>
 

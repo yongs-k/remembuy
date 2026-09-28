@@ -1,9 +1,11 @@
 import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
+import { getRemainingDays, formatDday } from '../state/selectors'
 
 export function ItemCard({ item, onClick }: { item: Item; onClick: () => void }) {
-  const urgent = item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
+  const remaining = getRemainingDays(item)
+  const urgent = remaining !== undefined && remaining <= 7
   return (
     <button
       type="button"
@@ -17,7 +19,7 @@ export function ItemCard({ item, onClick }: { item: Item; onClick: () => void })
         <p className="truncate text-label-lg text-on-surface">{item.name}</p>
         {item.recommendation !== undefined ? (
           <RecommendationBadge recommendation={item.recommendation} />
-        ) : item.daysUntilEmpty !== undefined ? (
+        ) : remaining !== undefined ? (
           <span
             className={`self-start rounded px-1.5 py-0.5 text-label-sm ${
               urgent
@@ -25,7 +27,7 @@ export function ItemCard({ item, onClick }: { item: Item; onClick: () => void })
                 : 'bg-surface-container-high text-on-surface-variant'
             }`}
           >
-            D-{item.daysUntilEmpty}
+            {formatDday(remaining)}
           </span>
         ) : null}
       </div>

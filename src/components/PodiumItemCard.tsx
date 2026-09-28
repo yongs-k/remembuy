@@ -2,6 +2,7 @@ import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
 import { Badge } from './Badge'
+import { getRemainingDays, formatDday } from '../state/selectors'
 
 const RANK_CHIP = [
   'bg-tertiary text-on-tertiary',
@@ -22,7 +23,8 @@ export function PodiumItemCard({
 }) {
   const isFirst = index === 0
   const compact = index >= 3
-  const urgent = item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7
+  const remaining = getRemainingDays(item)
+  const urgent = remaining !== undefined && remaining <= 7
   const chip = RANK_CHIP[index] ?? 'bg-surface-container-high text-outline'
 
   return (
@@ -55,7 +57,7 @@ export function PodiumItemCard({
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-1.5">
-            {item.daysUntilEmpty !== undefined && (
+            {remaining !== undefined && (
               <span
                 className={`flex items-center gap-0.5 rounded px-1.5 py-0.5 text-label-sm ${
                   urgent
@@ -64,7 +66,7 @@ export function PodiumItemCard({
                 }`}
               >
                 <Icon name="alarm" className="text-[12px]" />
-                D-{item.daysUntilEmpty}
+                {formatDday(remaining)}
                 {urgent ? ' 소진임박' : ''}
               </span>
             )}

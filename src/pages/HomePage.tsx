@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getLocationCompletion } from '../state/selectors'
+import { getLocationCompletion, getRemainingDays } from '../state/selectors'
 import { ItemCard } from '../components/ItemCard'
 import { HomeProfileCard } from '../components/HomeProfileCard'
 import { QuestCarousel } from '../components/QuestCarousel'
@@ -47,8 +47,10 @@ export default function HomePage() {
     if (!selectedCategoryId) return []
     return items.filter((item) => {
       if (item.categoryId !== selectedCategoryId) return false
-      if (filter === 'urgent' && !(item.daysUntilEmpty !== undefined && item.daysUntilEmpty <= 7))
-        return false
+      if (filter === 'urgent') {
+        const remaining = getRemainingDays(item)
+        if (!(remaining !== undefined && remaining <= 7)) return false
+      }
       if (filter === 'recommended' && item.recommendation !== 'recommend') return false
       return true
     })
