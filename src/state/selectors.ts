@@ -49,11 +49,25 @@ export function getRankingForCategory(items: Item[], categoryId: string): Item[]
     .sort((a, b) => recommendationRank(a) - recommendationRank(b))
 }
 
-export function getUpcomingNotifications(items: Item[], thresholdDays = 7): Item[] {
+export function getRemainingDays(item: Item, today: string = new Date().toISOString().slice(0, 10)): number | undefined {
+  if (item.daysUntilEmpty === undefined) return undefined
+  const elapsedDays = Math.round(
+    (new Date(today).getTime() - new Date(item.createdAt).getTime()) / 86_400_000
+  )
+  return item.daysUntilEmpty - elapsedDays
+}
+
+export function formatDday(days: number): string {
+  return days >= 0 ? `D-${days}` : `D+${Math.abs(days)}`
+}
+
+export function getUpcomingNotifications(items: Item[], thresholdDays = 7, today?: string): Item[] {
   return items
-    .filter((i) => i.daysUntilEmpty !== undefined && i.daysUntilEmpty <= thresholdDays)
-    .slice()
-    .sort((a, b) => (a.daysUntilEmpty as number) - (b.daysUntilEmpty as number))
+    .map((item) => ({ item, remaining: getRemainingDays(item, today) }))
+    .filter((entry): entry is { item: Item; remaining: number } => entry.remaining !== undefined)
+    .filter((entry) => entry.remaining <= thresholdDays)
+    .sort((a, b) => a.remaining - b.remaining)
+    .map((entry) => entry.item)
 }
 
 export function getLocationsRankedByItemCount(

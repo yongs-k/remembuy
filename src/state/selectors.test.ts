@@ -10,6 +10,8 @@ import {
   getCompletedPodium,
   getMasterItemCounts,
   getCompletionGain,
+  getRemainingDays,
+  formatDday,
 } from './selectors'
 import type { Category, Item, Location } from '../types'
 
@@ -123,6 +125,39 @@ describe('getRankingForCategory', () => {
   })
 })
 
+describe('getRemainingDays', () => {
+  it('returns undefined when the item has no daysUntilEmpty', () => {
+    const item = makeItem({ id: 'i1' })
+    expect(getRemainingDays(item, '2026-09-05')).toBeUndefined()
+  })
+
+  it('returns the stored value unchanged when today equals createdAt', () => {
+    const item = makeItem({ id: 'i1', daysUntilEmpty: 7, createdAt: '2026-09-01' })
+    expect(getRemainingDays(item, '2026-09-01')).toBe(7)
+  })
+
+  it('subtracts elapsed days from the stored value', () => {
+    const item = makeItem({ id: 'i1', daysUntilEmpty: 7, createdAt: '2026-09-01' })
+    expect(getRemainingDays(item, '2026-09-04')).toBe(4)
+  })
+
+  it('returns a negative number once the estimate has passed', () => {
+    const item = makeItem({ id: 'i1', daysUntilEmpty: 7, createdAt: '2026-09-01' })
+    expect(getRemainingDays(item, '2026-09-11')).toBe(-3)
+  })
+})
+
+describe('formatDday', () => {
+  it('formats zero and positive numbers as D-N', () => {
+    expect(formatDday(0)).toBe('D-0')
+    expect(formatDday(7)).toBe('D-7')
+  })
+
+  it('formats negative numbers as D+N (absolute value)', () => {
+    expect(formatDday(-3)).toBe('D+3')
+  })
+})
+
 describe('getUpcomingNotifications', () => {
   it('returns only items within the threshold, sorted ascending', () => {
     const items = [
@@ -131,8 +166,17 @@ describe('getUpcomingNotifications', () => {
       makeItem({ id: 'i3', daysUntilEmpty: 5 }),
       makeItem({ id: 'i4', recommendation: 'recommend' }),
     ]
-    const result = getUpcomingNotifications(items, 7)
+    const result = getUpcomingNotifications(items, 7, '2026-09-01')
     expect(result.map((i) => i.id)).toEqual(['i2', 'i3'])
+  })
+
+  it('includes an item whose stored value is above the threshold but whose live value has dropped into it', () => {
+    const items = [makeItem({ id: 'i1', daysUntilEmpty: 10, createdAt: '2026-09-01' })]
+    // 5 days have passed since createdAt, so the live remaining value is
+    // 10 - 5 = 5, which is within a threshold of 7 even though the
+    // stored 10 is not.
+    const result = getUpcomingNotifications(items, 7, '2026-09-06')
+    expect(result.map((i) => i.id)).toEqual(['i1'])
   })
 })
 
