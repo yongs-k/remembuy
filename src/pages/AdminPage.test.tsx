@@ -40,6 +40,26 @@ describe('AdminPage', () => {
     expect(adminApi.setAdminKey).toHaveBeenLastCalledWith('')
   })
 
+  it('shows a distinct message and keeps the typed key when the server has no ADMIN_KEY configured', async () => {
+    vi.mocked(adminApi.fetchAdminItems).mockRejectedValue(new Error('admin api 503'))
+    render(<AdminPage />)
+    fireEvent.change(screen.getByPlaceholderText('관리자 키'), { target: { value: 'maybe-right' } })
+    fireEvent.click(screen.getByRole('button', { name: '입장' }))
+    await waitFor(() =>
+      expect(screen.getByText('관리자 기능이 아직 설정되지 않았어요')).toBeInTheDocument()
+    )
+    expect(adminApi.setAdminKey).not.toHaveBeenLastCalledWith('')
+  })
+
+  it('shows a distinct message and keeps the typed key on a network/server error', async () => {
+    vi.mocked(adminApi.fetchAdminItems).mockRejectedValue(new Error('admin api 500'))
+    render(<AdminPage />)
+    fireEvent.change(screen.getByPlaceholderText('관리자 키'), { target: { value: 'maybe-right' } })
+    fireEvent.click(screen.getByRole('button', { name: '입장' }))
+    await waitFor(() => expect(screen.getByText('서버에 연결하지 못했어요')).toBeInTheDocument())
+    expect(adminApi.setAdminKey).not.toHaveBeenLastCalledWith('')
+  })
+
   it('loads and renders all three tables for the right key', async () => {
     vi.mocked(adminApi.fetchAdminItems).mockResolvedValue({ items: [ITEM] })
     render(<AdminPage />)

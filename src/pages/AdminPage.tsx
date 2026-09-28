@@ -20,6 +20,10 @@ function isUnauthorized(error: unknown): boolean {
   return error instanceof Error && error.message === 'admin api 401'
 }
 
+function isUnconfigured(error: unknown): boolean {
+  return error instanceof Error && error.message === 'admin api 503'
+}
+
 export default function AdminPage() {
   const [unlocked, setUnlocked] = useState(() => getAdminKey() !== '')
   const [keyInput, setKeyInput] = useState('')
@@ -67,9 +71,15 @@ export default function AdminPage() {
       const res = await fetchAdminItems()
       setItems(res.items)
       setUnlocked(true)
-    } catch {
-      setAdminKey('')
-      setAuthError('키가 올바르지 않습니다')
+    } catch (error) {
+      if (isUnauthorized(error)) {
+        setAdminKey('')
+        setAuthError('키가 올바르지 않습니다')
+      } else if (isUnconfigured(error)) {
+        setAuthError('관리자 기능이 아직 설정되지 않았어요')
+      } else {
+        setAuthError('서버에 연결하지 못했어요')
+      }
     }
   }
 
