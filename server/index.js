@@ -2,7 +2,7 @@ import { createServer } from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { upsertSubmission, readSubmissions, aggregateRanking } from './podium.js'
-import { analyzeLink } from './linkAnalysis.js'
+import { handleAnalyzeLinkRequest } from './analyzeLinkRoute.js'
 import { openDb } from './game/db.js'
 import { handleGameRequest } from './game/routes.js'
 import { handleAdminRequest } from './game/adminRoutes.js'
@@ -79,24 +79,7 @@ const server = createServer((req, res) => {
   }
 
   if (req.method === 'POST' && req.url === '/api/analyze-link') {
-    const chunks = []
-    req.on('data', (chunk) => {
-      chunks.push(chunk)
-    })
-    req.on('end', async () => {
-      try {
-        const body = Buffer.concat(chunks).toString('utf-8')
-        const { url, locations, categories } = JSON.parse(body)
-        if (typeof url !== 'string' || !Array.isArray(locations) || !Array.isArray(categories)) {
-          sendJson(res, 400, { error: 'invalid payload' })
-          return
-        }
-        const result = await analyzeLink(url, locations, categories)
-        sendJson(res, 200, result)
-      } catch {
-        sendJson(res, 502, { error: 'analysis failed' })
-      }
-    })
+    handleAnalyzeLinkRequest(req, res)
     return
   }
 
