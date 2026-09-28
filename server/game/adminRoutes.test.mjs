@@ -177,3 +177,17 @@ test('unknown routes return 404', async () => {
     else process.env.ADMIN_KEY = original
   }
 })
+
+test('a malformed %-escape in an item id returns 400, not 500', async () => {
+  const original = process.env.ADMIN_KEY
+  process.env.ADMIN_KEY = ADMIN_KEY
+  const { base, close } = await start()
+  try {
+    const res = await call(base, '/api/admin/items/%', { method: 'PATCH', body: { name: 'x' } })
+    assert.equal(res.status, 400)
+  } finally {
+    await close()
+    if (original === undefined) delete process.env.ADMIN_KEY
+    else process.env.ADMIN_KEY = original
+  }
+})

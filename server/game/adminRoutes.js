@@ -124,8 +124,15 @@ export async function handleAdminRequest(req, res, db) {
         sendJson(res, 400, invalid)
         return
       }
+      let itemId
       try {
-        sendJson(res, 200, adminUpdateItem(db, decodeURIComponent(itemMatch[1]), patch))
+        itemId = decodeURIComponent(itemMatch[1])
+      } catch {
+        sendJson(res, 400, invalid)
+        return
+      }
+      try {
+        sendJson(res, 200, adminUpdateItem(db, itemId, patch))
       } catch (error) {
         if (error.message === 'item not found') {
           sendJson(res, 404, { error: error.message })
@@ -156,8 +163,15 @@ export async function handleAdminRequest(req, res, db) {
         sendJson(res, 400, invalid)
         return
       }
+      let boxId
       try {
-        sendJson(res, 200, adminUpdateBox(db, decodeURIComponent(boxMatch[1]), patch))
+        boxId = decodeURIComponent(boxMatch[1])
+      } catch {
+        sendJson(res, 400, invalid)
+        return
+      }
+      try {
+        sendJson(res, 200, adminUpdateBox(db, boxId, patch))
       } catch (error) {
         if (error.message === 'box not found') {
           sendJson(res, 404, { error: error.message })
