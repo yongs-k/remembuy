@@ -17,13 +17,17 @@ const ROW_STYLE: Record<StepState, string> = {
 }
 
 export function AnalyzingOverlay({
-  url,
+  sourceLabel,
   entryNumber,
   onCancel,
+  icon = 'link',
+  dialogLabel = '링크 분석 중',
 }: {
-  url: string
+  sourceLabel: string
   entryNumber: number
   onCancel: () => void
+  icon?: string
+  dialogLabel?: string
 }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -37,7 +41,7 @@ export function AnalyzingOverlay({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="링크 분석 중"
+      aria-label={dialogLabel}
       className="fixed inset-0 z-[60] overflow-y-auto bg-surface"
     >
       <div className="mx-auto flex min-h-full w-full max-w-md flex-col gap-space-md p-margin">
@@ -73,8 +77,8 @@ export function AnalyzingOverlay({
             </span>
           </div>
           <div className="mt-space-sm flex items-center gap-2 rounded-xl bg-surface-container-lowest p-space-sm">
-            <Icon name="link" className="text-[20px] text-primary" />
-            <span className="min-w-0 truncate text-body-sm text-on-surface">{url}</span>
+            <Icon name={icon} className="text-[20px] text-primary" />
+            <span className="min-w-0 truncate text-body-sm text-on-surface">{sourceLabel}</span>
           </div>
         </div>
 

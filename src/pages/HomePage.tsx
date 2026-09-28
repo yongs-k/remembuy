@@ -7,6 +7,7 @@ import { HomeProfileCard } from '../components/HomeProfileCard'
 import { QuestCarousel } from '../components/QuestCarousel'
 import { HomeLocationTile } from '../components/HomeLocationTile'
 import { AnalyzingOverlay } from '../components/AnalyzingOverlay'
+import { resizeImageToBase64 } from '../lib/imageResize'
 import { HomeGameCard } from '../components/HomeGameCard'
 import { Icon } from '../data/materialIcons'
 import { DUMMY_QUESTS } from '../data/homeDummy'
@@ -25,6 +26,8 @@ export default function HomePage() {
   const [linkUrl, setLinkUrl] = useState('')
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
+  const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false)
+  const [photoLabel, setPhotoLabel] = useState('')
   const abortRef = useRef<AbortController | null>(null)
 
   const searchResults = useMemo(() => {
@@ -89,6 +92,33 @@ export default function HomePage() {
 
   function handleCancelAnalyze() {
     abortRef.current?.abort()
+  }
+
+  async function handlePhotoFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    const controller = new AbortController()
+    abortRef.current = controller
+    setPhotoLabel(file.name)
+    setIsAnalyzingPhoto(true)
+    setAnalyzeError(null)
+    try {
+      const { base64, mimeType } = await resizeImageToBase64(file)
+      const res = await fetch('/api/analyze-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64: base64, mimeType, locations, categories }),
+        signal: controller.signal,
+      })
+      if (!res.ok) throw new Error('analyze failed')
+      const result = await res.json()
+      navigate('/new', { state: { prefill: result } })
+    } catch {
+      if (!controller.signal.aborted) setAnalyzeError('사진을 분석하지 못했어요.')
+    } finally {
+      setIsAnalyzingPhoto(false)
+    }
   }
 
   if (searchResults !== null) {
@@ -267,22 +297,22 @@ export default function HomePage() {
                 <p className="pb-1 text-center text-body-sm text-on-surface-variant">
                   어떻게 기록할까요?
                 </p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/new')}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
-                >
+                <label className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface">
                   <Icon name="photo_camera" className="text-[20px] text-primary" />
                   <span>카메라로 촬영</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/new')}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
-                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
+                    hidden
+                    onChange={handlePhotoFile}
+                  />
+                </label>
+                <label className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface">
                   <Icon name="image" className="text-[20px] text-primary" />
                   <span>사진 선택</span>
-                </button>
+                  <input type="file" accept="image/*" hidden onChange={handlePhotoFile} />
+                </label>
                 <button
                   type="button"
                   onClick={() => setShowLinkInput(true)}
@@ -299,6 +329,20 @@ export default function HomePage() {
                   <Icon name="edit_note" className="text-[20px] text-primary" />
                   <span>직접 입력</span>
                 </button>
+                {analyzeError && (
+                  <>
+                    <p role="alert" className="text-body-sm text-primary">
+                      {analyzeError}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/new')}
+                      className="w-full pt-1 text-center text-label-md text-primary underline"
+                    >
+                      직접 입력하기
+                    </button>
+                  </>
+                )}
                 <button
                   type="button"
                   onClick={closeRecordSheet}
@@ -358,7 +402,16 @@ export default function HomePage() {
 
       {isAnalyzing && (
         <AnalyzingOverlay
-          url={linkUrl}
+          sourceLabel={linkUrl}
+          entryNumber={items.length + 1}
+          onCancel={handleCancelAnalyze}
+        />
+      )}
+      {isAnalyzingPhoto && (
+        <AnalyzingOverlay
+          sourceLabel={photoLabel}
+          icon="photo_camera"
+          dialogLabel="사진 분석 중"
           entryNumber={items.length + 1}
           onCancel={handleCancelAnalyze}
         />
