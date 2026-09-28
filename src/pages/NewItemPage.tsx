@@ -5,7 +5,8 @@ import { getCompletionGain, getRemainingDays } from '../state/selectors'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { EntryTabs } from '../components/EntryTabs'
 import { EntryPreviewCard } from '../components/EntryPreviewCard'
-import { Icon } from '../data/materialIcons'
+import { CompletionCelebration } from '../components/CompletionCelebration'
+import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 import { useGame } from '../state/GameContext'
 import type { Item } from '../types'
 
@@ -101,6 +102,14 @@ export default function NewItemPage() {
   const [newLocationName, setNewLocationName] = useState(prefill?.suggestedLocationName ?? '')
   const [newCategoryName, setNewCategoryName] = useState(prefill?.suggestedCategoryName ?? '')
   const [notice, setNotice] = useState<{ id: number } | null>(null) // added
+  const [celebration, setCelebration] = useState<{
+    itemName: string
+    icon: string
+    pointsAwarded: number
+    dexBefore: number
+    dexAfter: number
+    locationName: string
+  } | null>(null)
   const cycleInputRef = useRef<HTMLInputElement>(null) // added
 
   useEffect(() => {
@@ -134,7 +143,7 @@ export default function NewItemPage() {
     setCategoryId(created.id)
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const item: Item = {
       id: existing?.id ?? `item-${Date.now()}`,
@@ -162,12 +171,20 @@ export default function NewItemPage() {
     } else {
       addItem(item)
     }
-    if (masterItemId) void game.claim([masterItemId])
-    navigate('/')
+    const pointsAwarded = masterItemId ? await game.claim([masterItemId]) : 0
+    setCelebration({
+      itemName: item.name,
+      icon: LOCATION_MATERIAL_ICON[selectedLocation?.colorToken ?? ''] ?? 'inventory_2',
+      pointsAwarded,
+      dexBefore: gain.before,
+      dexAfter: gain.after,
+      locationName,
+    })
   }
 
   const showNotice = () => setNotice({ id: Date.now() }) // added
-  const locationName = locations.find((l) => l.id === locationId)?.name ?? '' // added
+  const selectedLocation = locations.find((l) => l.id === locationId) // added
+  const locationName = selectedLocation?.name ?? '' // added
   const categoryName = selectedCategory?.name ?? '' // added
   const gain = getCompletionGain(items, categories, locationId, categoryId, masterItemId, existing?.id) // added
   const hasGain = gain.after > gain.before // added
@@ -471,6 +488,15 @@ export default function NewItemPage() {
           </span>
         )}
       </div>
+      {celebration && (
+        <CompletionCelebration
+          {...celebration}
+          onDismiss={() => {
+            setCelebration(null)
+            navigate('/')
+          }}
+        />
+      )}
     </form>
   )
 }

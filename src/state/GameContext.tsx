@@ -17,7 +17,7 @@ type GameContextValue = {
   boxes: Box[]
   dex: DexEntry[]
   refresh: () => Promise<void>
-  claim: (slotIds: string[]) => Promise<void>
+  claim: (slotIds: string[]) => Promise<number>
   openBox: (boxId: string) => Promise<OpenBoxResult | undefined>
 }
 
@@ -53,15 +53,18 @@ export function GameProvider({ children }: { children: ReactNode }) {
     async (slotIds: string[]) => {
       if (slotIds.length === 0) {
         await refresh()
-        return
+        return 0
       }
+      let pointsAwarded = 0
       try {
         const result = await claimSlotsApi(slotIds)
         setState(result.state)
+        pointsAwarded = result.pointsAwarded
       } catch (error) {
         console.warn('game claim failed', error)
       }
       await loadCatalogState()
+      return pointsAwarded
     },
     [refresh, loadCatalogState]
   )
