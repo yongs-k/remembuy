@@ -94,19 +94,25 @@ Restructure `server/index.js`'s `/api/analyze-link` handler to match
    reports 502 — a real Gemini/fetch failure, not a client input error.
 
 No change to `analyzeLink`, `buildPrompt`, or any other function in
-`linkAnalysis.js` — this is purely a restructure of the route handler in
-`index.js`.
+`linkAnalysis.js` — this is purely a restructure of the route handler.
+
+**Correction, decided during planning:** the handler cannot stay a local
+function inside `server/index.js` as first sketched — `index.js` has
+top-level side effects (`server.listen(...)`, `openDb(...)`) that fire on
+import, so a test file cannot `import` anything from it without starting
+a real server on the real port. It instead moves into its own
+side-effect-free module, `server/analyzeLinkRoute.js`, mirroring
+`server/photoRoutes.js`'s already-proven shape. This changes only which
+file the logic lives in, not its behavior.
 
 ## Testing
 
-- Fix 1 (`AdminPage.tsx`): no test file exists for this page today
-  (confirmed absent from `src/pages/*.test.tsx`, same as `HomePage.tsx`)
-  — no new test added, consistent with this codebase's established
-  precedent of not unit-testing page-level components. Verified by
-  `npx tsc --noEmit` plus a manual trace (the plan's implementer will
-  document exercising all three branches against a locally-running
-  server: unset `ADMIN_KEY` for the 503 case, a wrong key for the 401
-  case, and the server not running at all for the network-error case).
+- Fix 1 (`AdminPage.tsx`): correction — `src/pages/AdminPage.test.tsx`
+  already exists (added in the admin-catalog plan) and already covers
+  the 401 branch. Add two new tests to that existing file covering the
+  503 (`isUnconfigured`) and generic-error branches, following its
+  established `vi.mock('../lib/adminApi')` + `mockRejectedValue`
+  pattern.
 - Fix 2 (`adminRoutes.js`): add one test to the existing
   `server/game/adminRoutes.test.mjs` — a PATCH to
   `/api/admin/items/%` (an incomplete percent-escape) with a valid admin
@@ -123,17 +129,12 @@ No change to `analyzeLink`, `buildPrompt`, or any other function in
   a literal `null` body → 400, a body missing `url`/`locations`/
   `categories` → 400. None of these reach `analyzeLink`, so no
   `GEMINI_API_KEY` or network access is required to run this file —
-  same policy as the rest of this codebase's AI-route tests. This does
-  mean extracting the route's logic out of `index.js`'s inline
-  dispatch into a standalone, testable function — the smallest version
-  of that is a local function `handleAnalyzeLinkRequest(req, res)`
-  defined in `index.js` itself (not a new file — `analyze-link` is a
-  single route, unlike the admin/game/photo route families that
-  warranted their own modules) that the test file imports directly and
-  the existing dispatch chain calls, mirroring the shape of
-  `handleGameRequest`/`handleAdminRequest`/`handlePhotoRequest` being
-  separately importable — but scoped to just this one function, not a
-  new file, since nothing else needs to reuse it.
+  same policy as the rest of this codebase's AI-route tests. This means
+  extracting the route's logic out of `index.js`'s inline dispatch into
+  `handleAnalyzeLinkRequest(req, res)` in its own module,
+  `server/analyzeLinkRoute.js` (see the correction above), which the test
+  file imports directly and `index.js`'s dispatch chain calls — the same
+  shape as `handleGameRequest`/`handleAdminRequest`/`handlePhotoRequest`.
 
 ## Out of Scope (recap)
 
