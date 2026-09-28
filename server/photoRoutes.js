@@ -43,6 +43,10 @@ export async function handlePhotoRequest(req, res) {
       sendJson(res, 400, { error: 'invalid payload' })
       return
     }
+    if (typeof body !== 'object' || body === null) {
+      sendJson(res, 400, { error: 'invalid payload' })
+      return
+    }
     const { imageBase64, mimeType, locations, categories } = body
     if (
       typeof imageBase64 !== 'string' ||

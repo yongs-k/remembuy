@@ -86,3 +86,13 @@ test('unknown routes return 404', async () => {
     await close()
   }
 })
+
+test('rejects a null JSON body with 400', async () => {
+  const { base, close } = await start()
+  try {
+    const res = await call(base, 'null')
+    assert.equal(res.status, 400)
+  } finally {
+    await close()
+  }
+})
