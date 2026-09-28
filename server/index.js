@@ -103,6 +103,6 @@ const server = createServer((req, res) => {
   sendJson(res, 404, { error: 'not found' })
 })
 
-server.listen(PORT, () => {
-  console.log(`podium server listening on http://localhost:${PORT}`)
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`podium server listening on http://localhost:${PORT} (and on your LAN IP)`)
 })
