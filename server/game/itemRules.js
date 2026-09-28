@@ -12,6 +12,6 @@ export function pickWeighted(entries, randomFn = Math.random) {
 
 export function applyFragment(existingCount, fragmentsRequired) {
   const newCount = existingCount + 1
-  const justCompleted = existingCount < fragmentsRequired && newCount >= fragmentsRequired
+  const justCompleted = newCount >= fragmentsRequired
   return { newCount, justCompleted }
 }

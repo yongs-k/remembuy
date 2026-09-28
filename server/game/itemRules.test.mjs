@@ -29,7 +29,7 @@ test('applyFragment counts up and reports completion exactly once', () => {
   assert.deepEqual(applyFragment(0, 3), { newCount: 1, justCompleted: false })
   assert.deepEqual(applyFragment(1, 3), { newCount: 2, justCompleted: false })
   assert.deepEqual(applyFragment(2, 3), { newCount: 3, justCompleted: true })
-  // already past the requirement (e.g. fragmentsRequired was lowered later): never re-flags completion
-  assert.deepEqual(applyFragment(3, 3), { newCount: 4, justCompleted: false })
-  assert.deepEqual(applyFragment(5, 2), { newCount: 6, justCompleted: false })
+  // already past the requirement (e.g. fragmentsRequired was lowered later): still reports completion
+  assert.deepEqual(applyFragment(3, 3), { newCount: 4, justCompleted: true })
+  assert.deepEqual(applyFragment(5, 2), { newCount: 6, justCompleted: true })
 })

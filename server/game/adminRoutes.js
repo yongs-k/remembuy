@@ -78,7 +78,7 @@ function parseBoxPatch(body) {
 function parseDropEntryPatch(body) {
   const patch = {}
   if (body?.weight !== undefined) {
-    if (!Number.isInteger(body.weight) || body.weight < 0) return null
+    if (!Number.isInteger(body.weight) || body.weight < 1) return null
     patch.weight = body.weight
   }
   if (body?.active !== undefined) {
