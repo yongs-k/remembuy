@@ -93,6 +93,37 @@ export default {
         'elevation-3': '0px 4px 0px #A3361E',
         'elevation-4': '0px 12px 24px -4px rgba(30,58,52,0.12), 0px 4px 0px #1E3A34',
       },
+      keyframes: {
+        'ring-glow': {
+          '0%, 100%': { transform: 'scale(0.9)', opacity: '0.6' },
+          '50%': { transform: 'scale(1.15)', opacity: '1' },
+        },
+        'icon-cycle': {
+          '0%': { opacity: '0', transform: 'scale(0.6) rotate(-8deg)' },
+          '8%': { opacity: '1', transform: 'scale(1) rotate(0deg)' },
+          '22%': { opacity: '1', transform: 'scale(1) rotate(0deg)' },
+          '30%': { opacity: '0', transform: 'scale(0.6) rotate(8deg)' },
+          '100%': { opacity: '0' },
+        },
+        'text-cycle': {
+          '0%': { opacity: '0', transform: 'translateY(6px)' },
+          '6%': { opacity: '1', transform: 'translateY(0)' },
+          '27%': { opacity: '1', transform: 'translateY(0)' },
+          '33%': { opacity: '0', transform: 'translateY(-6px)' },
+          '100%': { opacity: '0' },
+        },
+        'scan-sweep': {
+          '0%': { top: '-10%' },
+          '50%': { top: '100%' },
+          '100%': { top: '-10%' },
+        },
+      },
+      animation: {
+        'ring-glow': 'ring-glow 1.8s ease-in-out infinite',
+        'icon-cycle': 'icon-cycle 3.2s infinite',
+        'text-cycle': 'text-cycle 4.8s infinite',
+        'scan-sweep': 'scan-sweep 1.6s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

@@ -27,7 +27,6 @@ export default function HomePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analyzeError, setAnalyzeError] = useState<string | null>(null)
   const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false)
-  const [photoLabel, setPhotoLabel] = useState('')
   const abortRef = useRef<AbortController | null>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
@@ -104,7 +103,6 @@ export default function HomePage() {
     if (!file) return
     const controller = new AbortController()
     abortRef.current = controller
-    setPhotoLabel(file.name)
     setIsAnalyzingPhoto(true)
     setAnalyzeError(null)
     try {
@@ -423,20 +421,10 @@ export default function HomePage() {
       )}
 
       {isAnalyzing && (
-        <AnalyzingOverlay
-          sourceLabel={linkUrl}
-          entryNumber={items.length + 1}
-          onCancel={handleCancelAnalyze}
-        />
+        <AnalyzingOverlay dialogLabel="링크 분석 중" onCancel={handleCancelAnalyze} />
       )}
       {isAnalyzingPhoto && (
-        <AnalyzingOverlay
-          sourceLabel={photoLabel}
-          icon="photo_camera"
-          dialogLabel="사진 분석 중"
-          entryNumber={items.length + 1}
-          onCancel={handleCancelAnalyze}
-        />
+        <AnalyzingOverlay dialogLabel="사진 분석 중" onCancel={handleCancelAnalyze} />
       )}
     </div>
   )
