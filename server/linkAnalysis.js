@@ -66,7 +66,7 @@ export async function fetchPageText(url) {
 // replacement — updated to keep the endpoint actually working.
 const DEFAULT_MODEL = 'gemini-3.6-flash'
 
-const RESPONSE_SCHEMA = {
+export const RESPONSE_SCHEMA = {
   type: 'OBJECT',
   properties: {
     name: { type: 'STRING', nullable: true },
