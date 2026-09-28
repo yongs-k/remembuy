@@ -29,6 +29,8 @@ export default function HomePage() {
   const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false)
   const [photoLabel, setPhotoLabel] = useState('')
   const abortRef = useRef<AbortController | null>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const searchResults = useMemo(() => {
     if (!search) return null
@@ -297,25 +299,43 @@ export default function HomePage() {
                 <p className="pb-1 text-center text-body-sm text-on-surface-variant">
                   어떻게 기록할까요?
                 </p>
-                <label className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface">
-                  <Icon name="photo_camera" className="text-[20px] text-primary" />
-                  <span>카메라로 촬영</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    hidden
-                    onChange={handlePhotoFile}
-                  />
-                </label>
-                <label className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface">
-                  <Icon name="image" className="text-[20px] text-primary" />
-                  <span>사진 선택</span>
-                  <input type="file" accept="image/*" hidden onChange={handlePhotoFile} />
-                </label>
                 <button
                   type="button"
-                  onClick={() => setShowLinkInput(true)}
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
+                >
+                  <Icon name="photo_camera" className="text-[20px] text-primary" />
+                  <span>카메라로 촬영</span>
+                </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  ref={cameraInputRef}
+                  hidden
+                  onChange={handlePhotoFile}
+                />
+                <button
+                  type="button"
+                  onClick={() => galleryInputRef.current?.click()}
+                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
+                >
+                  <Icon name="image" className="text-[20px] text-primary" />
+                  <span>사진 선택</span>
+                </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={galleryInputRef}
+                  hidden
+                  onChange={handlePhotoFile}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLinkInput(true)
+                    setAnalyzeError(null)
+                  }}
                   className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
                 >
                   <Icon name="link" className="text-[20px] text-primary" />
