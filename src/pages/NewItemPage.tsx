@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { getCompletionGain, getRemainingDays } from '../state/selectors'
+import { searchProductImage } from '../lib/imageSearchApi'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { EntryTabs } from '../components/EntryTabs'
 import { EntryPreviewCard } from '../components/EntryPreviewCard'
@@ -67,6 +68,8 @@ export default function NewItemPage() {
       ? prefillCategory.masterItems.find((m) => m.id === prefill.masterItemId)?.id
       : undefined
 
+  const isManualEntry = !existing && !prefill
+
   const [name, setName] = useState(existing?.name ?? prefill?.name ?? '')
   const [locationId, setLocationId] = useState(
     existing?.locationId ?? prefillLocation?.id ?? locations[0].id
@@ -99,6 +102,11 @@ export default function NewItemPage() {
     existing?.affiliateUrl ?? prefill?.sourceUrl ?? ''
   )
   const [note, setNote] = useState(existing?.note ?? '')
+  const [imageUrl, setImageUrl] = useState<string | null>(existing?.imageUrl ?? null)
+  const [imageCandidate, setImageCandidate] = useState<string | null>(null)
+  const [imageSearchStatus, setImageSearchStatus] = useState<'idle' | 'loading' | 'not-found' | 'broken'>(
+    'idle'
+  )
   const [newLocationName, setNewLocationName] = useState(prefill?.suggestedLocationName ?? '')
   const [newCategoryName, setNewCategoryName] = useState(prefill?.suggestedCategoryName ?? '')
   const [notice, setNotice] = useState<{ id: number } | null>(null) // added
@@ -143,6 +151,23 @@ export default function NewItemPage() {
     setCategoryId(created.id)
   }
 
+  async function handleSearchImage() {
+    if (!name.trim()) return
+    setImageSearchStatus('loading')
+    setImageCandidate(null)
+    try {
+      const result = await searchProductImage(name, selectedCategory?.name)
+      if (result.imageUrl) {
+        setImageCandidate(result.imageUrl)
+        setImageSearchStatus('idle')
+      } else {
+        setImageSearchStatus('not-found')
+      }
+    } catch {
+      setImageSearchStatus('not-found')
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const item: Item = {
@@ -153,6 +178,7 @@ export default function NewItemPage() {
       masterItemId: masterItemId || undefined,
       place: place || undefined,
       restockCycle: restockCycle || null,
+      imageUrl,
       note: note || undefined,
       recommendation: progressMode === 'recommendation' ? recommendation : undefined,
       daysUntilEmpty:
@@ -257,6 +283,55 @@ export default function NewItemPage() {
             className={inputCls}
           />
         </label>
+
+        {isManualEntry && (
+          <div className="space-y-1.5">
+            <button
+              type="button"
+              onClick={handleSearchImage}
+              disabled={!name.trim() || imageSearchStatus === 'loading'}
+              className="flex items-center gap-1.5 rounded-lg bg-surface-container-high px-3 py-1.5 text-label-md text-on-surface disabled:opacity-40"
+            >
+              <Icon name="image_search" className="text-[16px]" />
+              {imageSearchStatus === 'loading' ? '이미지 찾는 중...' : '이미지 찾기'}
+            </button>
+            {imageSearchStatus === 'not-found' && (
+              <p className="text-body-sm text-on-surface-variant">이미지를 찾지 못했어요</p>
+            )}
+            {imageCandidate && (
+              <div className="flex items-center gap-2 rounded-xl bg-surface-container-low p-space-sm">
+                <img
+                  src={imageCandidate}
+                  alt=""
+                  className="h-16 w-16 rounded-lg object-cover"
+                  onError={() => {
+                    setImageCandidate(null)
+                    setImageSearchStatus('broken')
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImageUrl(imageCandidate)
+                    setImageCandidate(null)
+                  }}
+                  className="rounded-lg bg-primary px-3 py-1.5 text-label-md text-on-primary"
+                >
+                  이 이미지 쓰기
+                </button>
+              </div>
+            )}
+            {imageSearchStatus === 'broken' && (
+              <p className="text-body-sm text-on-surface-variant">이미지를 불러올 수 없어요</p>
+            )}
+            {imageUrl && (
+              <p className="flex items-center gap-1 text-label-sm text-secondary">
+                <Icon name="check_circle" className="text-[14px]" />
+                이미지가 선택됐어요
+              </p>
+            )}
+          </div>
+        )}
 
         <div>
           <span className={labelCls}>장소</span>

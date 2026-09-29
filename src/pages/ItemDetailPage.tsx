@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
@@ -33,6 +34,8 @@ export default function ItemDetailPage() {
     .slice(0, 4)
   const remaining = getRemainingDays(item)
   const urgent = remaining !== undefined && remaining <= 7
+  const [imageFailed, setImageFailed] = useState(false)
+  const showImage = Boolean(item.imageUrl) && !imageFailed
 
   return (
     <div className="space-y-space-md p-margin">
@@ -47,8 +50,17 @@ export default function ItemDetailPage() {
 
       <div className="rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#e1bfb8]">
         <div className="flex gap-space-md">
-          <div className="flex h-24 w-20 shrink-0 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant">
-            <Icon name="inventory_2" className="text-[36px]" />
+          <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-container-low text-on-surface-variant">
+            {showImage ? (
+              <img
+                src={item.imageUrl ?? undefined}
+                alt=""
+                className="h-full w-full object-cover"
+                onError={() => setImageFailed(true)}
+              />
+            ) : (
+              <Icon name="inventory_2" className="text-[36px]" />
+            )}
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex flex-wrap items-center gap-1.5 text-label-sm">

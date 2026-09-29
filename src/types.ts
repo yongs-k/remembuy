@@ -30,6 +30,7 @@ export type Item = {
   place?: string
   restockCycle?: string | null
   affiliateUrl?: string | null
+  imageUrl?: string | null
   createdAt: string
 }
 
