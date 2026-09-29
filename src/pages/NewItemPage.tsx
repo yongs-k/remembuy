@@ -104,6 +104,7 @@ export default function NewItemPage() {
   const [note, setNote] = useState(existing?.note ?? '')
   const [imageUrl, setImageUrl] = useState<string | null>(existing?.imageUrl ?? null)
   const [imageCandidate, setImageCandidate] = useState<string | null>(null)
+  const [imageLoaded, setImageLoaded] = useState(false)
   const [imageSearchStatus, setImageSearchStatus] = useState<'idle' | 'loading' | 'not-found' | 'broken'>(
     'idle'
   )
@@ -155,6 +156,7 @@ export default function NewItemPage() {
     if (!name.trim()) return
     setImageSearchStatus('loading')
     setImageCandidate(null)
+    setImageLoaded(false)
     try {
       const result = await searchProductImage(name, selectedCategory?.name)
       if (result.imageUrl) {
@@ -304,21 +306,26 @@ export default function NewItemPage() {
                   src={imageCandidate}
                   alt=""
                   className="h-16 w-16 rounded-lg object-cover"
+                  onLoad={() => setImageLoaded(true)}
                   onError={() => {
                     setImageCandidate(null)
+                    setImageLoaded(false)
                     setImageSearchStatus('broken')
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setImageUrl(imageCandidate)
-                    setImageCandidate(null)
-                  }}
-                  className="rounded-lg bg-primary px-3 py-1.5 text-label-md text-on-primary"
-                >
-                  이 이미지 쓰기
-                </button>
+                {imageLoaded && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageUrl(imageCandidate)
+                      setImageCandidate(null)
+                      setImageLoaded(false)
+                    }}
+                    className="rounded-lg bg-primary px-3 py-1.5 text-label-md text-on-primary"
+                  >
+                    이 이미지 쓰기
+                  </button>
+                )}
               </div>
             )}
             {imageSearchStatus === 'broken' && (

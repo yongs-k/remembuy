@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
@@ -35,6 +35,7 @@ export default function ItemDetailPage() {
   const remaining = getRemainingDays(item)
   const urgent = remaining !== undefined && remaining <= 7
   const [imageFailed, setImageFailed] = useState(false)
+  useEffect(() => setImageFailed(false), [item.id])
   const showImage = Boolean(item.imageUrl) && !imageFailed
 
   return (
