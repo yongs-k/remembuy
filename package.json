@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev:server": "node --env-file=server/.env server/index.js",
-    "test:server": "node --test server/podium.test.mjs server/linkAnalysis.test.mjs server/analyzeLinkRoute.test.mjs server/photoAnalysis.test.mjs server/photoRoutes.test.mjs server/game/db.test.mjs server/game/rules.test.mjs server/game/service.test.mjs server/game/routes.test.mjs server/game/itemRules.test.mjs server/game/itemService.test.mjs server/game/adminAuth.test.mjs server/game/adminService.test.mjs server/game/adminRoutes.test.mjs"
+    "test:server": "node --test server/podium.test.mjs server/linkAnalysis.test.mjs server/analyzeLinkRoute.test.mjs server/photoAnalysis.test.mjs server/photoRoutes.test.mjs server/imageSearch.test.mjs server/imageSearchRoute.test.mjs server/game/db.test.mjs server/game/rules.test.mjs server/game/service.test.mjs server/game/routes.test.mjs server/game/itemRules.test.mjs server/game/itemService.test.mjs server/game/adminAuth.test.mjs server/game/adminService.test.mjs server/game/adminRoutes.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

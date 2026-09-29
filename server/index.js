@@ -7,6 +7,7 @@ import { openDb } from './game/db.js'
 import { handleGameRequest } from './game/routes.js'
 import { handleAdminRequest } from './game/adminRoutes.js'
 import { handlePhotoRequest } from './photoRoutes.js'
+import { handleImageSearchRequest } from './imageSearchRoute.js'
 
 const PORT = 8787
 const db = openDb(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'game.sqlite'))
@@ -81,6 +82,11 @@ const server = createServer((req, res) => {
 
   if (req.method === 'POST' && req.url === '/api/analyze-photo') {
     handlePhotoRequest(req, res)
+    return
+  }
+
+  if (req.method === 'POST' && req.url === '/api/search-image') {
+    handleImageSearchRequest(req, res)
     return
   }
 
