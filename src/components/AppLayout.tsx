@@ -17,7 +17,7 @@ export function AppLayout() {
   const { items } = useLocker()
   const { seenIds } = useSeenNotifications()
   const unreadCount = getUpcomingNotifications(items, 7).filter(
-    (item) => !seenIds.includes(item.id)
+    (item) => !seenIds.includes(`${item.id}:${item.restockedAt ?? item.createdAt}`)
   ).length
 
   return (

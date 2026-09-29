@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getUpcomingNotifications, getSoonestRemaining, formatDday, parseRestockCycleDays } from '../state/selectors'
+import { getUpcomingNotifications, getSoonestRemaining, getRestockDueDays, formatDday } from '../state/selectors'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
 import { Icon } from '../data/materialIcons'
 
@@ -13,7 +13,7 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     if (upcoming.length > 0) {
-      markSeen(upcoming.map((item) => item.id))
+      markSeen(upcoming.map((item) => `${item.id}:${item.restockedAt ?? item.createdAt}`))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upcoming])
@@ -42,7 +42,8 @@ export default function NotificationsPage() {
           {upcoming.map((item) => {
             const remaining = getSoonestRemaining(item)
             const urgent = remaining !== undefined && remaining <= 7
-            const canRestock = parseRestockCycleDays(item.restockCycle) !== undefined
+            const due = getRestockDueDays(item)
+            const canRestock = due !== undefined && due <= 7
             return (
               <li
                 key={item.id}

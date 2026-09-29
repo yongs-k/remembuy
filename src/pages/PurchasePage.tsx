@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLocker } from '../state/LockerContext'
-import { getUpcomingNotifications, getRemainingDays } from '../state/selectors'
+import { getUpcomingNotifications, getSoonestRemaining } from '../state/selectors'
 import { ButlerHero } from '../components/ButlerHero'
 import { DealCard } from '../components/DealCard'
 import { GroupBuyCard } from '../components/GroupBuyCard'
@@ -28,7 +28,7 @@ export default function PurchasePage() {
   const heroName = urgent?.name ?? fallback.name
   const heroLocation =
     (urgent && locations.find((l) => l.id === urgent.locationId)?.name) || fallback.locationName
-  const heroDays = urgent ? (getRemainingDays(urgent) ?? fallback.daysUntilEmpty) : fallback.daysUntilEmpty
+  const heroDays = urgent ? (getSoonestRemaining(urgent) ?? fallback.daysUntilEmpty) : fallback.daysUntilEmpty
 
   const chips: Array<{ key: Filter; label: string; count: number }> = [
     { key: 'all', label: '전체 특가', count: DUMMY_DEALS.length },
