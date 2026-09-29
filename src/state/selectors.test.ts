@@ -12,6 +12,8 @@ import {
   getCompletionGain,
   getRemainingDays,
   formatDday,
+  parseRestockCycleDays,
+  getRestockDueDays,
 } from './selectors'
 import type { Category, Item, Location } from '../types'
 
@@ -158,6 +160,56 @@ describe('formatDday', () => {
   })
 })
 
+describe('parseRestockCycleDays', () => {
+  it('parses each of the three preset strings', () => {
+    expect(parseRestockCycleDays('약 45일마다')).toBe(45)
+    expect(parseRestockCycleDays('약 60일마다')).toBe(60)
+    expect(parseRestockCycleDays('약 90일마다')).toBe(90)
+  })
+
+  it('returns undefined for free-text cycles', () => {
+    expect(parseRestockCycleDays('약 2개월마다')).toBeUndefined()
+  })
+
+  it('returns undefined for null and undefined', () => {
+    expect(parseRestockCycleDays(null)).toBeUndefined()
+    expect(parseRestockCycleDays(undefined)).toBeUndefined()
+  })
+})
+
+describe('getRestockDueDays', () => {
+  it('returns undefined when restockCycle is not a known preset', () => {
+    const item = makeItem({ id: 'i1', restockCycle: '약 2개월마다' })
+    expect(getRestockDueDays(item, '2026-09-05')).toBeUndefined()
+  })
+
+  it('returns undefined when restockCycle is unset', () => {
+    const item = makeItem({ id: 'i1' })
+    expect(getRestockDueDays(item, '2026-09-05')).toBeUndefined()
+  })
+
+  it('counts down from createdAt when restockedAt is unset', () => {
+    const item = makeItem({ id: 'i1', restockCycle: '약 45일마다', createdAt: '2026-09-01' })
+    expect(getRestockDueDays(item, '2026-09-01')).toBe(45)
+    expect(getRestockDueDays(item, '2026-09-11')).toBe(35)
+  })
+
+  it('counts down from restockedAt when set, ignoring createdAt', () => {
+    const item = makeItem({
+      id: 'i1',
+      restockCycle: '약 45일마다',
+      createdAt: '2026-01-01',
+      restockedAt: '2026-09-01',
+    })
+    expect(getRestockDueDays(item, '2026-09-11')).toBe(35)
+  })
+
+  it('returns a negative number once the cycle has passed', () => {
+    const item = makeItem({ id: 'i1', restockCycle: '약 45일마다', createdAt: '2026-09-01' })
+    expect(getRestockDueDays(item, '2026-10-20')).toBe(-4)
+  })
+})
+
 describe('getUpcomingNotifications', () => {
   it('returns only items within the threshold, sorted ascending', () => {
     const items = [
@@ -176,6 +228,36 @@ describe('getUpcomingNotifications', () => {
     // 10 - 5 = 5, which is within a threshold of 7 even though the
     // stored 10 is not.
     const result = getUpcomingNotifications(items, 7, '2026-09-06')
+    expect(result.map((i) => i.id)).toEqual(['i1'])
+  })
+
+  it('includes an item whose restock cycle is due, alongside daysUntilEmpty-based items', () => {
+    const items = [
+      makeItem({ id: 'i1', daysUntilEmpty: 10, createdAt: '2026-09-01' }),
+      makeItem({ id: 'i2', restockCycle: '약 45일마다', createdAt: '2026-08-01' }),
+    ]
+    // i1's live remaining is 10 - 0 = 10 (outside threshold 7).
+    // i2's restock due is 45 - 31 = 14 (outside threshold 7).
+    const outside = getUpcomingNotifications(items, 7, '2026-09-01')
+    expect(outside.map((i) => i.id)).toEqual([])
+
+    // Move forward so i2's restock cycle (45 days from 2026-08-01) is within 7 days.
+    // i1's remaining becomes 10 - 13 = -3 (also within threshold).
+    const within = getUpcomingNotifications(items, 7, '2026-09-14')
+    expect(within.map((i) => i.id)).toEqual(['i1', 'i2'])
+  })
+
+  it('uses whichever signal is more urgent when both are present', () => {
+    const item = makeItem({
+      id: 'i1',
+      daysUntilEmpty: 3,
+      restockCycle: '약 90일마다',
+      createdAt: '2026-09-01',
+    })
+    // daysUntilEmpty-based remaining: 3 - 0 = 3 (within threshold).
+    // restock-based remaining: 90 - 0 = 90 (outside threshold).
+    // The item should surface because the more urgent signal wins.
+    const result = getUpcomingNotifications([item], 7, '2026-09-01')
     expect(result.map((i) => i.id)).toEqual(['i1'])
   })
 })

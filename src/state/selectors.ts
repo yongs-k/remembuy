@@ -61,9 +61,34 @@ export function formatDday(days: number): string {
   return days >= 0 ? `D-${days}` : `D+${Math.abs(days)}`
 }
 
+const RESTOCK_CYCLE_PRESETS = [45, 60, 90]
+
+export function parseRestockCycleDays(restockCycle: string | null | undefined): number | undefined {
+  if (!restockCycle) return undefined
+  return RESTOCK_CYCLE_PRESETS.find((d) => restockCycle === `약 ${d}일마다`)
+}
+
+export function getRestockDueDays(item: Item, today: string = new Date().toISOString().slice(0, 10)): number | undefined {
+  const cycleDays = parseRestockCycleDays(item.restockCycle)
+  if (cycleDays === undefined) return undefined
+  const anchor = item.restockedAt ?? item.createdAt
+  const elapsedDays = Math.round(
+    (new Date(today).getTime() - new Date(anchor).getTime()) / 86_400_000
+  )
+  return cycleDays - elapsedDays
+}
+
+export function getSoonestRemaining(item: Item, today?: string): number | undefined {
+  const a = getRemainingDays(item, today)
+  const b = getRestockDueDays(item, today)
+  if (a === undefined) return b
+  if (b === undefined) return a
+  return Math.min(a, b)
+}
+
 export function getUpcomingNotifications(items: Item[], thresholdDays = 7, today?: string): Item[] {
   return items
-    .map((item) => ({ item, remaining: getRemainingDays(item, today) }))
+    .map((item) => ({ item, remaining: getSoonestRemaining(item, today) }))
     .filter((entry): entry is { item: Item; remaining: number } => entry.remaining !== undefined)
     .filter((entry) => entry.remaining <= thresholdDays)
     .sort((a, b) => a.remaining - b.remaining)

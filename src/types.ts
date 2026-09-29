@@ -29,6 +29,7 @@ export type Item = {
   price?: number
   place?: string
   restockCycle?: string | null
+  restockedAt?: string | null // ISO date of the last confirmed repurchase; falls back to createdAt when unset
   affiliateUrl?: string | null
   imageUrl?: string | null
   createdAt: string
