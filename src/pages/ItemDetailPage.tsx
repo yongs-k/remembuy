@@ -11,6 +11,8 @@ export default function ItemDetailPage() {
   const navigate = useNavigate()
   const { items, locations, categories, updateItem } = useLocker()
   const item = items.find((i) => i.id === id)
+  const [imageFailed, setImageFailed] = useState(false)
+  useEffect(() => setImageFailed(false), [item?.id])
 
   if (!item) {
     return (
@@ -34,8 +36,6 @@ export default function ItemDetailPage() {
     .slice(0, 4)
   const remaining = getRemainingDays(item)
   const urgent = remaining !== undefined && remaining <= 7
-  const [imageFailed, setImageFailed] = useState(false)
-  useEffect(() => setImageFailed(false), [item.id])
   const showImage = Boolean(item.imageUrl) && !imageFailed
 
   return (
