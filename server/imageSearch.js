@@ -41,7 +41,18 @@ export async function callGeminiImageSearch(prompt) {
   return JSON.parse(text)
 }
 
+export function isHttpUrl(value) {
+  if (typeof value !== 'string') return false
+  try {
+    return ['http:', 'https:'].includes(new URL(value).protocol)
+  } catch {
+    return false
+  }
+}
+
 export async function searchProductImage(name, categoryName) {
   const prompt = buildImageSearchPrompt(name, categoryName)
-  return callGeminiImageSearch(prompt)
+  const result = await callGeminiImageSearch(prompt)
+  if (!isHttpUrl(result.imageUrl)) return { imageUrl: null }
+  return result
 }

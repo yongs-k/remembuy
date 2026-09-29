@@ -65,3 +65,13 @@ test('rejects a wrong-typed categoryName with 400', async () => {
     await close()
   }
 })
+
+test('rejects a body over the 64KB cap with 413', async () => {
+  const { base, close } = await start()
+  try {
+    const res = await call(base, { name: 'a'.repeat(65 * 1024) })
+    assert.equal(res.status, 413)
+  } finally {
+    await close()
+  }
+})
