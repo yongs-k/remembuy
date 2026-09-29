@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getUpcomingNotifications, getRemainingDays, formatDday } from '../state/selectors'
+import { getUpcomingNotifications, getSoonestRemaining, formatDday, parseRestockCycleDays } from '../state/selectors'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
 import { Icon } from '../data/materialIcons'
 
 export default function NotificationsPage() {
-  const { items } = useLocker()
+  const { items, updateItem } = useLocker()
   const navigate = useNavigate()
   const upcoming = useMemo(() => getUpcomingNotifications(items, 7), [items])
   const { markSeen } = useSeenNotifications()
@@ -40,8 +40,9 @@ export default function NotificationsPage() {
       ) : (
         <ul className="space-y-space-sm">
           {upcoming.map((item) => {
-            const remaining = getRemainingDays(item)
+            const remaining = getSoonestRemaining(item)
             const urgent = remaining !== undefined && remaining <= 7
+            const canRestock = parseRestockCycleDays(item.restockCycle) !== undefined
             return (
               <li
                 key={item.id}
@@ -70,6 +71,17 @@ export default function NotificationsPage() {
                   >
                     상세보기
                   </button>
+                  {canRestock && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })
+                      }
+                      className="rounded-lg bg-surface-container-high px-3 py-1.5 text-label-md text-on-surface"
+                    >
+                      재구매함
+                    </button>
+                  )}
                   {item.affiliateUrl ? (
                     <a
                       href={item.affiliateUrl}

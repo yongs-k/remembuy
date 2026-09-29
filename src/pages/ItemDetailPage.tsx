@@ -4,7 +4,7 @@ import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { ItemCard } from '../components/ItemCard'
 import { Icon } from '../data/materialIcons'
-import { getRemainingDays, formatDday } from '../state/selectors'
+import { getRemainingDays, formatDday, parseRestockCycleDays } from '../state/selectors'
 
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -119,9 +119,22 @@ export default function ItemDetailPage() {
             </div>
           )}
           {item.restockCycle && (
-            <div className="flex justify-between gap-2">
+            <div className="flex items-center justify-between gap-2">
               <dt className="text-on-surface-variant">재구매 주기</dt>
-              <dd className="text-on-surface">{item.restockCycle}</dd>
+              <dd className="flex items-center gap-2 text-on-surface">
+                {item.restockCycle}
+                {parseRestockCycleDays(item.restockCycle) !== undefined && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })
+                    }
+                    className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface"
+                  >
+                    재구매함
+                  </button>
+                )}
+              </dd>
             </div>
           )}
         </dl>
