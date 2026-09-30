@@ -17,13 +17,15 @@ const DEX: DexEntry[] = [
   { id: 'b', name: 'B', grade: 'COMMON', fragmentsRequired: 10, status: 'LOCKED', fragmentCount: 0 },
 ]
 
-function mockGame(state: GameState | null, dex: DexEntry[]) {
+const refreshMock = vi.fn()
+
+function mockGame(state: GameState | null, dex: DexEntry[], catalogError = false) {
   vi.mocked(GameContextModule.useGame).mockReturnValue({
     state,
     boxes: [],
     dex,
-    catalogError: false,
-    refresh: vi.fn(),
+    catalogError,
+    refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),
   })
@@ -45,6 +47,15 @@ describe('HomeGameCard', () => {
     mockGame(STATE, [])
     render(<HomeGameCard />)
     expect(screen.getByText('도감을 채워보세요')).toBeInTheDocument()
+  })
+
+  it('says the game is unavailable instead of showing 0P when the catalog fails', () => {
+    mockGame(null, [], true)
+    render(<HomeGameCard />)
+    expect(screen.queryByText('0P')).not.toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('게임 정보를 불러오지 못했어요')
+    fireEvent.click(screen.getByText('다시 시도'))
+    expect(refreshMock).toHaveBeenCalled()
   })
 
   it('navigates to /store and /dex from its two buttons', () => {

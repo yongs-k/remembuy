@@ -39,6 +39,9 @@ export function CompletionCelebration({
       aria-modal="true"
       aria-label="등록 완료"
       onClick={onDismiss}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onDismiss()
+      }}
       className="fixed inset-0 z-[60] cursor-pointer overflow-y-auto bg-[#1e1512] text-white"
     >
       <div className="relative mx-auto flex min-h-full w-full max-w-sm flex-col items-center justify-center gap-space-sm p-margin">
@@ -87,7 +90,14 @@ export function CompletionCelebration({
           </div>
         )}
 
-        <p className="mt-space-md text-label-sm text-outline">화면을 탭해서 닫기</p>
+        <button
+          type="button"
+          autoFocus
+          onClick={onDismiss}
+          className="mt-space-lg min-h-11 rounded-xl border border-white/25 px-space-xl text-label-lg text-white transition-colors hover:bg-white/10"
+        >
+          확인
+        </button>
       </div>
     </div>
   )

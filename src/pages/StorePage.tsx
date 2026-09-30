@@ -7,7 +7,7 @@ import { Icon } from '../data/materialIcons'
 import type { OpenBoxResult } from '../lib/gameApi'
 
 export default function StorePage() {
-  const { boxes, state, openBox } = useGame()
+  const { boxes, state, openBox, catalogError } = useGame()
   const navigate = useNavigate()
   const [opening, setOpening] = useState<string | null>(null)
   const [result, setResult] = useState<OpenBoxResult | null>(null)
@@ -30,10 +30,12 @@ export default function StorePage() {
     <div className="space-y-4 p-4">
       <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
         <h1 className="font-heading text-display-sm">선물상자 상점</h1>
-        <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
-          <Icon name="monetization_on" className="text-[16px]" />
-          <span>{points}P</span>
-        </span>
+        {!catalogError && (
+          <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
+            <Icon name="monetization_on" className="text-[20px]" />
+            <span>{points}P</span>
+          </span>
+        )}
       </div>
 
       {boxes.length === 0 ? (

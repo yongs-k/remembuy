@@ -91,8 +91,9 @@ export default function NewItemPage() {
   const [progressMode, setProgressMode] = useState<ProgressMode>(
     existing?.daysUntilEmpty !== undefined ? 'daysUntilEmpty' : 'recommendation'
   )
-  const [recommendation, setRecommendation] = useState<'recommend' | 'notRecommend'>(
-    existing?.recommendation ?? 'recommend'
+  // Unset until the user taps one: a default would record opinions nobody gave.
+  const [recommendation, setRecommendation] = useState<'recommend' | 'notRecommend' | undefined>(
+    existing?.recommendation
   )
   const [daysUntilEmpty, setDaysUntilEmpty] = useState(
     existing ? Math.max(0, getRemainingDays(existing) ?? 30) : 30
