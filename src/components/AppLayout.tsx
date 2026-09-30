@@ -7,7 +7,7 @@ import { Icon } from '../data/materialIcons'
 const TABS = [
   { to: '/', label: '홈', icon: 'cottage' },
   { to: '/ranking', label: '랭킹', icon: 'leaderboard' },
-  { to: '/purchase', label: '구매', icon: 'local_fire_department' },
+  { to: '/purchase', label: '구매', icon: 'shopping_cart' },
   { to: '/family', label: '가족', icon: 'groups_2' },
   { to: '/collection', label: '컬렉션', icon: 'menu_book' },
 ]
