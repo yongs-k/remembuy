@@ -73,7 +73,8 @@ export default {
         'body-sm': ['12px', { lineHeight: '18px', letterSpacing: '0em', fontWeight: '400' }],
         'label-lg': ['14px', { lineHeight: '18px', letterSpacing: '0.01em', fontWeight: '700' }],
         'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.02em', fontWeight: '700' }],
-        'label-sm': ['10px', { lineHeight: '14px', letterSpacing: '0.04em', fontWeight: '800' }],
+        // 11px floor: Hangul below this stops being legible on phones.
+        'label-sm': ['11px', { lineHeight: '15px', letterSpacing: '0.02em', fontWeight: '700' }],
         'stat-counter': ['24px', { lineHeight: '28px', letterSpacing: '-0.02em', fontWeight: '800' }],
       },
       spacing: {
@@ -123,9 +124,8 @@ export default {
           '100%': { transform: 'scale(1)', opacity: '0.8' },
         },
         'badge-bounce': {
-          '0%': { transform: 'scale(0) rotate(-20deg)' },
-          '60%': { transform: 'scale(1.2) rotate(8deg)' },
-          '100%': { transform: 'scale(1) rotate(0deg)' },
+          '0%': { opacity: '0', transform: 'scale(0.6) rotate(-12deg)' },
+          '100%': { opacity: '1', transform: 'scale(1) rotate(0deg)' },
         },
         'point-in': {
           '0%': { opacity: '0', transform: 'translateY(8px)' },
@@ -144,7 +144,7 @@ export default {
         'text-cycle': 'text-cycle 4.8s infinite',
         'scan-sweep': 'scan-sweep 1.6s ease-in-out infinite',
         'burst-pop': 'burst-pop 0.6s ease-out both',
-        'badge-bounce': 'badge-bounce 0.7s cubic-bezier(0.34,1.56,0.64,1) both',
+        'badge-bounce': 'badge-bounce 0.6s cubic-bezier(0.16,1,0.3,1) both',
         'point-in': 'point-in 0.5s 0.4s ease-out both',
         'confetti-fall': 'confetti-fall 2.2s ease-in infinite',
       },

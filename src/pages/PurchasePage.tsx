@@ -104,7 +104,7 @@ export default function PurchasePage() {
         ))}
       </section>
 
-      <section className="flex items-center justify-between gap-space-sm rounded-2xl bg-gradient-to-r from-tertiary to-primary p-space-md text-on-primary shadow-[0_4px_0px_#8b1901]">
+      <section className="flex items-center justify-between gap-space-sm rounded-2xl bg-primary p-space-md text-on-primary shadow-[0_4px_0px_#8b1901]">
         <div className="flex min-w-0 flex-col">
           <span className="text-label-sm">원하는 물품이 없나요?</span>
           <span className="font-heading text-headline-md">내가 직접 공구 파티 열기</span>

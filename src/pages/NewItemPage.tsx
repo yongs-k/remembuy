@@ -216,7 +216,6 @@ export default function NewItemPage() {
   const categoryName = selectedCategory?.name ?? '' // added
   const gain = getCompletionGain(items, categories, locationId, categoryId, masterItemId, existing?.id) // added
   const hasGain = gain.after > gain.before // added
-  const entryNumber = existing ? items.findIndex((i) => i.id === existing.id) + 1 : items.length + 1 // added
   const isPresetCycle = CYCLE_PRESETS.some((d) => restockCycle === `약 ${d}일마다`) // added
 
   return (
@@ -226,16 +225,13 @@ export default function NewItemPage() {
           type="button"
           onClick={() => navigate(-1)}
           aria-label="뒤로가기"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-container text-on-surface"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-on-surface transition-colors hover:bg-surface-container-high"
         >
           <Icon name="arrow_back" className="text-[20px]" />
         </button>
-        <div className="flex min-w-0 flex-col">
-          <h1 className="font-heading text-headline-lg text-on-surface">
-            {existing ? '메모 수정하기' : '새로 기록하기'}
-          </h1>
-          <span className="text-label-sm text-primary">NEW DEX ENTRY #{entryNumber}</span>
-        </div>
+        <h1 className="min-w-0 font-heading text-headline-lg text-on-surface">
+          {existing ? '메모 수정하기' : '새로 기록하기'}
+        </h1>
       </div>
 
       <EntryTabs onSoon={showNotice} />

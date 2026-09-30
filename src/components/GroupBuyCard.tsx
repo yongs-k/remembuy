@@ -87,7 +87,7 @@ export function GroupBuyCard({
               return (
                 <span
                   key={i}
-                  className={`flex h-7 w-7 items-center justify-center rounded-full border-2 border-surface-container-lowest text-[9px] font-bold ${
+                  className={`flex h-7 w-7 items-center justify-center rounded-full border-2 border-surface-container-lowest text-label-sm ${
                     filled
                       ? 'bg-secondary-container text-on-secondary-container'
                       : 'bg-surface-container-high text-outline'

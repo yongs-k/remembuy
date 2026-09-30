@@ -78,7 +78,7 @@ export function ButlerHero({
           <span className="text-body-sm text-on-surface-variant line-through">
             {B.originalPrice.toLocaleString()}원
           </span>
-          <span className="ml-auto flex items-center gap-0.5 text-label-sm text-secondary">
+          <span className="flex basis-full items-center gap-0.5 text-label-sm text-secondary">
             <Icon name="verified" className="text-[14px]" />
             {B.lowestNote}
           </span>

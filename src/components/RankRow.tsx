@@ -46,9 +46,6 @@ export function RankRow({
           <Icon name={icon} className="text-[24px]" />
         </div>
         <div className="flex min-w-0 flex-col">
-          {hero && (
-            <span className="text-label-sm uppercase tracking-wider text-tertiary">GOLD DEX</span>
-          )}
           <span className="truncate font-heading text-headline-md text-on-surface">{title}</span>
           <span className="text-body-sm text-on-surface-variant">{subtitle}</span>
         </div>

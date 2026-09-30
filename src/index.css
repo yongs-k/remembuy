@@ -8,4 +8,27 @@ body {
 
 h1, h2, h3 {
   @apply font-heading;
+  text-wrap: balance;
+}
+
+::selection {
+  @apply bg-primary-fixed text-on-primary-fixed;
+}
+
+:focus-visible {
+  @apply outline outline-2 outline-offset-2 outline-primary;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: theme('colors.outline-variant') transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

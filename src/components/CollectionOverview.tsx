@@ -60,13 +60,12 @@ export function CollectionOverview({
   return (
     <div className="space-y-space-lg p-margin">
       <section className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#e1bfb8]">
-        <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full bg-primary-fixed-dim/20 blur-2xl" />
         <div className="relative mb-space-md flex items-center gap-space-sm">
           <div className="relative">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container shadow-[0_2px_0px_#aecdc4]">
               <Icon name="auto_stories" className="text-[26px]" />
             </div>
-            <span className="absolute -bottom-1 -right-1 rounded-full bg-tertiary-container px-1 text-[9px] font-bold text-on-tertiary-container shadow-sm">
+            <span className="absolute -bottom-1 -right-1 rounded-full bg-tertiary-container px-1 text-label-sm text-on-tertiary-container shadow-sm">
               {P.levelLabel}
             </span>
           </div>
@@ -97,7 +96,7 @@ export function CollectionOverview({
               {overallPercent}
               <span className="text-label-sm">%</span>
             </span>
-            <span className="text-[11px] text-on-surface-variant">
+            <span className="text-label-sm font-normal text-on-surface-variant">
               {overall.owned} / {overall.total}개
             </span>
           </div>
@@ -107,7 +106,7 @@ export function CollectionOverview({
               {P.badges.owned}
               <span className="text-label-sm text-on-surface-variant"> / {P.badges.total}</span>
             </span>
-            <span className="text-[11px] font-bold text-tertiary">+{P.badges.unlockable} 해금 가능</span>
+            <span className="text-label-sm text-tertiary">+{P.badges.unlockable} 해금 가능</span>
           </div>
           <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center shadow-[0_2px_0px_#f0e6e4]">
             <span className="mb-0.5 text-label-sm text-on-surface-variant">누적 절약액</span>
@@ -115,7 +114,7 @@ export function CollectionOverview({
               {P.savedLabel}
               <span className="text-label-sm">원</span>
             </span>
-            <span className="text-[11px] text-secondary">알뜰 소비중</span>
+            <span className="text-label-sm font-normal text-secondary">알뜰 소비중</span>
           </div>
         </div>
       </section>
@@ -138,8 +137,8 @@ export function CollectionOverview({
                   <Icon name={badge.icon} className="text-[24px]" />
                 </div>
                 <span className="w-full truncate text-label-sm text-on-surface">{badge.name}</span>
-                <span className="mt-1 flex items-center gap-0.5 rounded bg-secondary-container px-1.5 py-0.5 text-[10px] font-bold text-on-secondary-container">
-                  <Icon name="check" className="text-[11px]" />
+                <span className="mt-1 flex items-center gap-0.5 rounded bg-secondary-container px-1.5 py-0.5 text-label-sm text-on-secondary-container">
+                  <Icon name="check" className="text-label-sm font-normal" />
                   {badge.tag}
                 </span>
               </div>
@@ -157,13 +156,13 @@ export function CollectionOverview({
                 <span className="w-full truncate text-label-sm text-on-surface-variant">{badge.name}</span>
                 {badge.progress !== undefined ? (
                   <div className="mt-1 flex w-full flex-col items-center">
-                    <span className="text-[10px] font-bold text-on-surface-variant">{badge.progress}% 진행</span>
+                    <span className="text-label-sm text-on-surface-variant">{badge.progress}% 진행</span>
                     <div className="mt-0.5 h-1 w-14 overflow-hidden rounded-full bg-surface-variant">
                       <div className="h-full rounded-full bg-tertiary" style={{ width: `${badge.progress}%` }} />
                     </div>
                   </div>
                 ) : (
-                  <span className="mt-1 text-[10px] text-on-surface-variant">{badge.hint}</span>
+                  <span className="mt-1 text-label-sm font-normal text-on-surface-variant">{badge.hint}</span>
                 )}
               </div>
             )
@@ -247,10 +246,11 @@ export function CollectionOverview({
       <button
         type="button"
         disabled
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] disabled:opacity-60"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-100"
       >
         <Icon name="barcode_scanner" className="text-[20px]" />
         바코드 찍고 새 아이템 도감 등록하기
+          <span className="text-label-sm font-normal">준비 중</span>
       </button>
     </div>
   )

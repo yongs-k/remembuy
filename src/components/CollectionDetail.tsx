@@ -43,7 +43,7 @@ export function CollectionDetail({
           <button
             type="button"
             onClick={onBack}
-            className="flex shrink-0 items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+            className="flex shrink-0 items-center gap-1 relative rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high before:absolute before:inset-x-0 before:-inset-y-2 before:content-['']"
           >
             <Icon name="arrow_back" className="text-[16px]" />
             도감 목록
@@ -135,10 +135,11 @@ export function CollectionDetail({
         <button
           type="button"
           disabled
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] disabled:opacity-60"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-100"
         >
           <Icon name="barcode_scanner" className="text-[20px]" />
           바코드 찍고 채우기
+          <span className="text-label-sm font-normal">준비 중</span>
         </button>
       </div>
     </div>

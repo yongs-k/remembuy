@@ -65,7 +65,7 @@ export function CompletionCelebration({
         <p className="text-body-sm text-outline-variant">{itemName}</p>
 
         {pointsAwarded > 0 && (
-          <p className="mt-1 animate-point-in bg-gradient-to-r from-tertiary-fixed-dim to-primary-container bg-clip-text text-headline-md font-extrabold text-transparent opacity-0">
+          <p className="mt-1 animate-point-in text-headline-md font-extrabold text-tertiary-fixed-dim opacity-0">
             +{pointsAwarded}P 획득
           </p>
         )}

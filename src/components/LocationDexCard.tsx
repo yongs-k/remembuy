@@ -39,7 +39,7 @@ export function LocationDexCard({
             style={{ backgroundColor: `${color}33`, color }}
           >
             <Icon name={icon} className="text-[28px]" />
-            <span className="absolute left-1 top-1 rounded bg-inverse-surface/80 px-1 text-[9px] font-bold text-inverse-on-surface">
+            <span className="absolute left-1 top-1 rounded bg-inverse-surface/80 px-1 text-label-sm text-inverse-on-surface">
               #{String(rank).padStart(2, '0')}
             </span>
           </div>
@@ -57,15 +57,10 @@ export function LocationDexCard({
             </span>
           </div>
         </div>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-label-sm text-on-surface">
-          {percent}%
-        </div>
+        <Icon name="chevron_right" className="self-center text-[20px] text-on-surface-variant" />
       </div>
       <div className="mt-space-sm h-2 w-full overflow-hidden rounded-full bg-surface-container">
         <div className="h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
-      </div>
-      <div className="mt-space-sm flex items-center justify-end text-on-surface-variant">
-        <Icon name="chevron_right" className="text-[18px]" />
       </div>
     </button>
   )

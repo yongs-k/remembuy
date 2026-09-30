@@ -217,7 +217,7 @@ export default function HomePage() {
         <button
           type="button"
           onClick={handleBack}
-          className="inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant"
+          className="inline-flex items-center gap-1 relative rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high before:absolute before:inset-x-0 before:-inset-y-2 before:content-['']"
         >
           <Icon name="arrow_back" className="text-[16px]" />
           뒤로
