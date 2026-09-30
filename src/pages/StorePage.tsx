@@ -28,15 +28,6 @@ export default function StorePage() {
 
   return (
     <div className="space-y-4 p-4">
-      <button
-        type="button"
-        onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-1 relative rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high before:absolute before:inset-x-0 before:-inset-y-2 before:content-['']"
-      >
-        <Icon name="arrow_back" className="text-[16px]" />
-        뒤로
-      </button>
-
       <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
         <h1 className="font-heading text-display-sm">선물상자 상점</h1>
         <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
