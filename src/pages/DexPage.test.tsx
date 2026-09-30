@@ -17,12 +17,15 @@ const ENTRIES: DexEntry[] = [
   { id: 'rare-1', name: '레어템', grade: 'RARE', fragmentsRequired: 20, status: 'COMPLETE', fragmentCount: 20 },
 ]
 
-function mockGame(dex: DexEntry[]) {
+const refreshMock = vi.fn()
+
+function mockGame(dex: DexEntry[], catalogError = false) {
   vi.mocked(GameContextModule.useGame).mockReturnValue({
     state: null,
     boxes: [],
     dex,
-    refresh: vi.fn(),
+    catalogError,
+    refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),
   })
@@ -33,6 +36,14 @@ describe('DexPage', () => {
     mockGame([])
     render(<DexPage />)
     expect(screen.getByText('도감 정보를 불러오는 중...')).toBeInTheDocument()
+  })
+
+  it('shows an error with a retry instead of loading forever when the catalog fails', () => {
+    mockGame([], true)
+    render(<DexPage />)
+    expect(screen.queryByText('도감 정보를 불러오는 중...')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '다시 시도' }))
+    expect(refreshMock).toHaveBeenCalled()
   })
 
   it('groups entries under fixed COMMON/ADVANCED/RARE/LEGENDARY headers regardless of input order, skipping empty grades', () => {

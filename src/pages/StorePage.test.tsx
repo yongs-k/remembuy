@@ -23,6 +23,7 @@ function mockGame(overrides: {
     state: overrides.state ?? STATE,
     boxes: overrides.boxes ?? [BOX],
     dex: [],
+    catalogError: false,
     refresh: vi.fn(),
     claim: vi.fn(),
     openBox: overrides.openBox ?? vi.fn(),

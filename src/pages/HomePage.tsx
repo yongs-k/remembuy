@@ -131,7 +131,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 p-4 pb-24">
       <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest px-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
         <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
           <Icon name="search" className="text-[20px]" />

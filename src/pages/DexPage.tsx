@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { DexItemCard } from '../components/DexItemCard'
+import { GameCatalogStatus } from '../components/GameCatalogStatus'
 import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeLabel } from '../data/gradeColors'
 import type { DexEntry } from '../lib/gameApi'
@@ -25,7 +26,7 @@ export default function DexPage() {
       <h1 className="font-heading text-headline-lg text-on-surface">가상 아이템 도감</h1>
 
       {dex.length === 0 ? (
-        <p className="text-body-sm text-on-surface-variant">도감 정보를 불러오는 중...</p>
+        <GameCatalogStatus label="도감 정보를" />
       ) : (
         GRADE_ORDER.map((grade) => {
           const entries = dex.filter((entry) => entry.grade === grade)

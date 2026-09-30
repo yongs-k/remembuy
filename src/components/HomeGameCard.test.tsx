@@ -22,6 +22,7 @@ function mockGame(state: GameState | null, dex: DexEntry[]) {
     state,
     boxes: [],
     dex,
+    catalogError: false,
     refresh: vi.fn(),
     claim: vi.fn(),
     openBox: vi.fn(),

@@ -16,6 +16,7 @@ type GameContextValue = {
   state: GameState | null
   boxes: Box[]
   dex: DexEntry[]
+  catalogError: boolean
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<number>
   openBox: (boxId: string) => Promise<OpenBoxResult | undefined>
@@ -28,6 +29,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GameState | null>(null)
   const [boxes, setBoxes] = useState<Box[]>([])
   const [dex, setDex] = useState<DexEntry[]>([])
+  const [catalogError, setCatalogError] = useState(false)
   const reconciled = useRef(false)
 
   const loadCatalogState = useCallback(async () => {
@@ -35,8 +37,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const [boxList, dexList] = await Promise.all([fetchBoxes(), fetchDex()])
       setBoxes(boxList.boxes)
       setDex(dexList.items)
+      setCatalogError(false)
     } catch (error) {
       console.warn('game catalog unavailable', error)
+      setCatalogError(true)
     }
   }, [])
 
@@ -98,7 +102,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, refresh, claim, openBox }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, catalogError, refresh, claim, openBox }}>{children}</GameContext.Provider>
   )
 }
 

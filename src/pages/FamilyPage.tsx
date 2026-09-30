@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { FAMILY_MEMBERS } from '../data/familyData'
 import { Icon } from '../data/materialIcons'
+import { SampleTag } from '../components/Badge'
 
 export default function FamilyPage() {
   const [invited, setInvited] = useState(false)
@@ -10,7 +11,11 @@ export default function FamilyPage() {
       <h1 className="flex items-center gap-1.5 font-heading text-headline-lg text-on-surface">
         <Icon name="groups_2" className="text-[24px] text-secondary" />
         가족 케어
+        <SampleTag />
       </h1>
+      <p className="text-body-sm text-on-surface-variant">
+        가족 공유는 준비 중이에요. 아래는 완성되면 보게 될 화면의 예시예요.
+      </p>
 
       <ul className="space-y-space-sm">
         {FAMILY_MEMBERS.map((member) => (

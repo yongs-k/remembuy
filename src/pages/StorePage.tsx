@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { BoxOpenResultModal } from '../components/BoxOpenResultModal'
+import { GameCatalogStatus } from '../components/GameCatalogStatus'
 import { Icon } from '../data/materialIcons'
 import type { OpenBoxResult } from '../lib/gameApi'
 
@@ -45,7 +46,7 @@ export default function StorePage() {
       </div>
 
       {boxes.length === 0 ? (
-        <p className="text-body-sm text-on-surface-variant">상자 정보를 불러오는 중...</p>
+        <GameCatalogStatus label="상자 정보를" />
       ) : (
         boxes.map((box) => {
           const affordable = points >= box.costPoints

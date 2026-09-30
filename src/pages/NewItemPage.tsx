@@ -245,18 +245,15 @@ export default function NewItemPage() {
       />
 
       <div className="rounded-2xl bg-secondary-container/40 p-space-md">
-        <div className="flex items-center justify-between gap-space-sm">
-          <div className="flex min-w-0 flex-col">
-            <span className="font-heading text-label-lg text-on-surface">도감 등록 보상 예정</span>
-            <span className="text-body-sm text-on-surface-variant">
-              {hasGain
-                ? `${locationName}도감 수집률 ${gain.before}% → ${gain.after}% UP!`
-                : masterItemId
-                  ? '이번 등록으로는 수집률이 그대로예요'
-                  : '표준 품목을 연결하면 수집률이 올라가요'}
-            </span>
-          </div>
-          <span className="shrink-0 font-heading text-headline-md text-tertiary">+20P</span>
+        <div className="flex min-w-0 flex-col">
+          <span className="font-heading text-label-lg text-on-surface">도감 수집률</span>
+          <span className="text-body-sm text-on-surface-variant">
+            {hasGain
+              ? `${locationName}도감 수집률 ${gain.before}% → ${gain.after}% UP!`
+              : masterItemId
+                ? '이번 등록으로는 수집률이 그대로예요'
+                : '표준 품목을 연결하면 수집률이 올라가요'}
+          </span>
         </div>
         <div className="mt-space-sm h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
           <div
