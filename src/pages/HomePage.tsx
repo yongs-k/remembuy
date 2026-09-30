@@ -1,14 +1,9 @@
 import { useMemo, useRef, useState } from 'react'
-import { DdayLabel } from '../components/Badge'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import {
-  getLocationCompletion,
-  getRemainingDays,
-  getSoonestRemaining,
-  getUpcomingNotifications
-} from '../state/selectors'
+import { getLocationCompletion, getRemainingDays, getUpcomingNotifications } from '../state/selectors'
 import { ItemCard } from '../components/ItemCard'
+import { RestockCard } from '../components/RestockCard'
 import { HomeLocationTile } from '../components/HomeLocationTile'
 import { AnalyzingOverlay } from '../components/AnalyzingOverlay'
 import { resizeImageToBase64 } from '../lib/imageResize'
@@ -22,7 +17,6 @@ const RESTOCK_PREVIEW = 3
 export default function HomePage() {
   const { items, locations, categories } = useLocker()
   const navigate = useNavigate()
-  const [search, setSearch] = useState('')
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null)
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [filter, setFilter] = useState<HomeFilter>('all')
@@ -35,12 +29,6 @@ export default function HomePage() {
   const abortRef = useRef<AbortController | null>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
-
-  const searchResults = useMemo(() => {
-    if (!search) return null
-    const term = search.toLowerCase()
-    return items.filter((item) => item.name.toLowerCase().includes(term))
-  }, [items, search])
 
   const upcoming = useMemo(() => getUpcomingNotifications(items, 7), [items])
 
@@ -131,80 +119,37 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-4 p-4 pb-24">
-      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest px-1.5 border border-hairline shadow-card focus-within:ring-2 focus-within:ring-primary">
-        <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
-          <Icon name="search" className="text-[20px]" />
-        </div>
-        <input
-          type="search"
-          aria-label="상품 검색"
-          placeholder="상품 검색"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="min-w-0 w-full bg-transparent py-3 text-body-lg font-normal text-on-surface placeholder:text-on-surface-variant focus:outline-none"
-        />
-      </div>
-
-      {searchResults === null && !selectedLocationId && (
-        <section aria-labelledby="restock-title" className="space-y-space-sm">
+    <div className="space-y-space-lg p-4 pb-24">
+      {!selectedLocationId && (
+        <section aria-labelledby="restock-title" className="space-y-space-sm pt-space-xs">
           <div className="flex items-baseline justify-between gap-space-sm">
-            <h2 id="restock-title" className="font-heading text-headline-md text-on-surface">
+            <h1 id="restock-title" className="font-heading text-display-sm text-on-surface">
               곧 떨어질 상품
-            </h2>
+            </h1>
             {upcoming.length > RESTOCK_PREVIEW && (
               <button
                 type="button"
                 onClick={() => navigate('/notifications')}
-                className="-my-2 py-2 text-label-md text-primary"
+                className="-my-2 shrink-0 py-2 text-label-md text-primary"
               >
                 {upcoming.length}개 모두 보기
               </button>
             )}
           </div>
           {upcoming.length === 0 ? (
-            <p className="rounded-xl bg-surface-container-low px-space-md py-space-md text-body-md text-on-surface-variant">
+            <p className="rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg text-body-md text-on-surface-variant">
               7일 안에 떨어질 상품이 없어요.
             </p>
           ) : (
-            <ul className="divide-y divide-surface-container overflow-hidden rounded-xl bg-surface-container-lowest border border-hairline shadow-card">
-              {upcoming.slice(0, RESTOCK_PREVIEW).map((item) => {
-                const days = getSoonestRemaining(item)
-                return (
-                  <li key={item.id}>
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/item/${item.id}`)}
-                      className="flex w-full items-center gap-space-sm px-space-md py-3 text-left transition-colors hover:bg-surface-container-low"
-                    >
-                      <span className="min-w-0 flex-1 truncate text-label-lg text-on-surface">
-                        {item.name}
-                      </span>
-                      {days !== undefined && (
-                        <DdayLabel days={days} urgentAt={3} />
-                      )}
-                      <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
-                    </button>
-                  </li>
-                )
-              })}
+            <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
+              {upcoming.slice(0, RESTOCK_PREVIEW).map((item) => (
+                <RestockCard key={item.id} item={item} />
+              ))}
             </ul>
           )}
         </section>
       )}
 
-      {searchResults !== null ? (
-        <div className="space-y-2">
-          {searchResults.length === 0 ? (
-            <p className="text-body-sm text-on-surface-variant">검색 결과가 없습니다.</p>
-          ) : (
-            searchResults.map((item) => (
-              <ItemCard key={item.id} item={item} onClick={() => navigate(`/item/${item.id}`)} />
-            ))
-          )}
-        </div>
-      ) : (
-      <>
       {(selectedLocationId || selectedCategoryId) && (
         <button
           type="button"
@@ -218,14 +163,14 @@ export default function HomePage() {
 
       {!selectedLocationId && (
         <>
-          <section aria-labelledby="locations-title" className="space-y-space-sm pt-space-sm">
+          <section aria-labelledby="locations-title" className="space-y-space-sm">
             <div className="flex items-baseline justify-between gap-space-sm">
               <h2 id="locations-title" className="font-heading text-headline-md text-on-surface">
                 장소별 보관함
               </h2>
               <span className="text-body-sm text-on-surface-variant">기록 상품 {items.length}개</span>
             </div>
-            <div className="grid grid-cols-2 gap-space-sm sm:grid-cols-3">
+            <div className="grid grid-cols-3 gap-space-sm sm:grid-cols-5">
               {locations.map((location) => (
                 <HomeLocationTile
                   key={location.id}
@@ -241,9 +186,7 @@ export default function HomePage() {
               ))}
             </div>
           </section>
-          <div className="pt-space-sm">
-            <HomeGameCard />
-          </div>
+          <HomeGameCard />
         </>
       )}
 
@@ -301,8 +244,6 @@ export default function HomePage() {
             )}
           </div>
         </>
-      )}
-      </>
       )}
 
       <button

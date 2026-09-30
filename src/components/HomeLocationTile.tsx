@@ -2,6 +2,9 @@ import type { Location } from '../types'
 import { LOCATION_COLOR_HEX } from '../data/locationColors'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 
+const RING_PATH = 'M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
+
+/** Compact room tile: the collection-rate ring wraps the room icon. */
 export function HomeLocationTile({
   location,
   percent,
@@ -21,44 +24,27 @@ export function HomeLocationTile({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[126px] flex-col justify-between rounded-xl bg-surface-container-lowest p-space-md text-left border border-hairline shadow-card transition-colors hover:border-outline-variant"
+      aria-label={`${location.name}, ${count}개 등록, 수집률 ${clamped}%`}
+      className="flex flex-col items-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest px-1 py-space-md text-center shadow-card transition-colors hover:border-outline-variant"
     >
-      <div className="flex items-start justify-between">
-        <div
-          className="flex h-9 w-9 items-center justify-center rounded-lg"
-          style={{ backgroundColor: `${color}33`, color }}
-        >
-          <Icon name={icon} className="text-[20px]" />
-        </div>
-        <div className="relative flex h-8 w-8 items-center justify-center">
-          <svg className="h-8 w-8 -rotate-90" viewBox="0 0 36 36">
-            <path
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              fill="none"
-              stroke="#e7e2db"
-              strokeWidth="4"
-            />
-            <path
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              fill="none"
-              stroke={color}
-              strokeDasharray={`${clamped}, 100`}
-              strokeLinecap="round"
-              strokeWidth="4"
-            />
-          </svg>
-          <span className="absolute text-label-sm font-extrabold text-on-surface">{clamped}%</span>
-        </div>
-      </div>
-      <div className="mt-2 flex flex-col">
-        <span className="truncate font-heading text-headline-md font-bold text-on-surface">
-          {location.name}
-        </span>
-        <span className="flex items-center gap-1 text-body-sm text-on-surface-variant">
-          <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-          {count}개 등록
-        </span>
-      </div>
+      <span className="relative flex h-11 w-11 items-center justify-center" style={{ color }}>
+        <svg aria-hidden className="absolute inset-0 h-11 w-11 -rotate-90" viewBox="0 0 36 36">
+          <path d={RING_PATH} fill="none" stroke="#e7e2db" strokeWidth="2.5" />
+          <path
+            d={RING_PATH}
+            fill="none"
+            stroke={color}
+            strokeDasharray={`${clamped}, 100`}
+            strokeLinecap="round"
+            strokeWidth="2.5"
+          />
+        </svg>
+        <Icon name={icon} className="text-[20px]" />
+      </span>
+      <span className="w-full truncate text-label-md text-on-surface">{location.name}</span>
+      <span className="text-label-sm font-medium tabular-nums text-on-surface-variant">
+        {count}개 · {clamped}%
+      </span>
     </button>
   )
 }
