@@ -24,7 +24,7 @@ export default function DexPage() {
       </button>
 
       <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
-        <h1 className="font-heading text-display-sm">가상 아이템 도감</h1>
+        <h1 className="font-heading text-display-sm">아이템 수집함</h1>
         {dex.length > 0 && (
           <span className="shrink-0 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
             {dex.filter((entry) => entry.status === 'COMPLETE').length}/{dex.length}
@@ -33,7 +33,7 @@ export default function DexPage() {
       </div>
 
       {dex.length === 0 ? (
-        <GameCatalogStatus label="도감 정보를" />
+        <GameCatalogStatus label="수집함 정보를" />
       ) : (
         GRADE_ORDER.map((grade) => {
           const entries = dex.filter((entry) => entry.grade === grade)

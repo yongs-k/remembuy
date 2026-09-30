@@ -31,7 +31,7 @@ export function BoxOpenResultModal({
 
         <div className="space-y-1 text-center">
           <p className="font-heading text-headline-md text-on-surface">
-            {completed ? '도감을 완성했어요!' : '조각을 획득했어요!'}
+            {completed ? '아이템을 완성했어요!' : '조각을 획득했어요!'}
           </p>
           <p className="text-body-md text-on-surface-variant">{result.result.itemName}</p>
         </div>
@@ -60,7 +60,7 @@ export function BoxOpenResultModal({
             onClick={onViewDex}
             className="flex-1 rounded-xl bg-primary px-space-md py-2.5 text-label-lg text-on-primary active:scale-[0.98]"
           >
-            도감으로 이동
+            수집함으로 이동
           </button>
         </div>
       </div>

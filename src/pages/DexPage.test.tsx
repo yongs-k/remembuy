@@ -35,13 +35,13 @@ describe('DexPage', () => {
   it('shows a loading line when the dex has not loaded yet', () => {
     mockGame([])
     render(<DexPage />)
-    expect(screen.getByText('도감 정보를 불러오는 중...')).toBeInTheDocument()
+    expect(screen.getByText('수집함 정보를 불러오는 중...')).toBeInTheDocument()
   })
 
   it('shows an error with a retry instead of loading forever when the catalog fails', () => {
     mockGame([], true)
     render(<DexPage />)
-    expect(screen.queryByText('도감 정보를 불러오는 중...')).not.toBeInTheDocument()
+    expect(screen.queryByText('수집함 정보를 불러오는 중...')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '다시 시도' }))
     expect(refreshMock).toHaveBeenCalled()
   })

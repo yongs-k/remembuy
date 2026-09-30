@@ -17,7 +17,7 @@ export function HomeGameCard() {
             {catalogError
               ? '게임 정보를 불러오지 못했어요'
               : dex.length === 0
-                ? '도감을 채워보세요'
+                ? '상자를 열어 아이템을 모아보세요'
                 : `${completed}/${dex.length} 완성`}
           </p>
         </div>
@@ -41,7 +41,7 @@ export function HomeGameCard() {
           onClick={() => navigate('/dex')}
           className="min-h-11 flex-1 rounded-xl border border-inverse-on-surface/20 text-label-lg text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/10"
         >
-          도감 보기
+          수집함 보기
         </button>
       </div>
     </div>

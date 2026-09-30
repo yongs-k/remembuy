@@ -31,23 +31,23 @@ describe('BoxOpenResultModal', () => {
 
   it('shows the completion headline for a FRAGMENT result that just completed the item', () => {
     render(<BoxOpenResultModal result={COMPLETING_FRAGMENT_RESULT} onClose={() => {}} onViewDex={() => {}} />)
-    expect(screen.getByText('도감을 완성했어요!')).toBeInTheDocument()
+    expect(screen.getByText('아이템을 완성했어요!')).toBeInTheDocument()
     expect(screen.queryByText(/\/ 10 조각/)).not.toBeInTheDocument()
   })
 
   it('shows the completion headline for a FULL_ITEM result', () => {
     render(<BoxOpenResultModal result={FULL_ITEM_RESULT} onClose={() => {}} onViewDex={() => {}} />)
-    expect(screen.getByText('도감을 완성했어요!')).toBeInTheDocument()
+    expect(screen.getByText('아이템을 완성했어요!')).toBeInTheDocument()
     expect(screen.getByText('골드 거울')).toBeInTheDocument()
   })
 
-  it('calls onClose from the backdrop and the 닫기 button, and onViewDex from 도감으로 이동', () => {
+  it('calls onClose from the backdrop and the 닫기 button, and onViewDex from 수집함으로 이동', () => {
     const onClose = vi.fn()
     const onViewDex = vi.fn()
     render(<BoxOpenResultModal result={FRAGMENT_RESULT} onClose={onClose} onViewDex={onViewDex} />)
     screen.getByText('닫기').click()
     expect(onClose).toHaveBeenCalledTimes(1)
-    screen.getByText('도감으로 이동').click()
+    screen.getByText('수집함으로 이동').click()
     expect(onViewDex).toHaveBeenCalledTimes(1)
   })
 })

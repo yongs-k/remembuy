@@ -46,7 +46,7 @@ describe('HomeGameCard', () => {
   it('shows a placeholder line while the dex has not loaded', () => {
     mockGame(STATE, [])
     render(<HomeGameCard />)
-    expect(screen.getByText('도감을 채워보세요')).toBeInTheDocument()
+    expect(screen.getByText('상자를 열어 아이템을 모아보세요')).toBeInTheDocument()
   })
 
   it('says the game is unavailable instead of showing 0P when the catalog fails', () => {
@@ -63,7 +63,7 @@ describe('HomeGameCard', () => {
     render(<HomeGameCard />)
     fireEvent.click(screen.getByText('상자 열기'))
     expect(navigateMock).toHaveBeenCalledWith('/store')
-    fireEvent.click(screen.getByText('도감 보기'))
+    fireEvent.click(screen.getByText('수집함 보기'))
     expect(navigateMock).toHaveBeenCalledWith('/dex')
   })
 })

@@ -25,6 +25,11 @@ The act of recording is the game, and the records feed the AI. Logging items pow
 - Current routes: 홈 `/`, item detail `/item/:id`, 랭킹 `/ranking`, 알림 `/notifications`, 구매 `/purchase`, 새로 기록 `/new`, 컬렉션 `/collection`, 상점 `/store`, 도감 `/dex`, admin `/admin`.
 - Restock loop: restock-cycle due dates merge into 알림, the 재구매함 reset lives on 알림 and item detail, and adding an item can use Gemini-backed product image search.
 
+## Terminology
+
+- **도감** always means the real-consumable collection: standard items per room/category, its 수집률, and the 컬렉션 tab.
+- **아이템 수집함** (`/dex`) is the game's virtual-item collection filled by box fragments. Never call it 도감 in the UI.
+
 ## Capabilities and Constraints
 
 - **Registration pays no reward.** Points come only from slot claims. Never build a registration-reward path.
