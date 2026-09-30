@@ -37,9 +37,9 @@ export default function StorePage() {
         뒤로
       </button>
 
-      <div className="flex items-center justify-between">
-        <h1 className="font-heading text-headline-lg text-on-surface">선물상자 상점</h1>
-        <span className="flex items-center gap-1 rounded-full bg-surface-container-high px-space-sm py-1 text-label-md font-bold text-tertiary">
+      <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
+        <h1 className="font-heading text-display-sm">선물상자 상점</h1>
+        <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
           <Icon name="monetization_on" className="text-[16px]" />
           <span>{points}P</span>
         </span>
@@ -53,7 +53,7 @@ export default function StorePage() {
           return (
             <div
               key={box.id}
-              className="space-y-3 rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#eae0de]"
+              className="space-y-3 rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card"
             >
               <div className="flex items-center justify-between">
                 <span className="font-heading text-headline-md text-on-surface">{box.name}</span>
@@ -66,7 +66,7 @@ export default function StorePage() {
                 type="button"
                 disabled={!affordable || opening === box.id}
                 onClick={() => handleOpen(box.id)}
-                className="w-full rounded-xl bg-primary py-2.5 text-label-lg text-on-primary shadow-[0_3px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901] disabled:opacity-40 disabled:active:translate-y-0 disabled:active:shadow-[0_3px_0px_#8b1901]"
+                className="w-full rounded-xl bg-primary py-2.5 text-label-lg text-on-primary active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
               >
                 {opening === box.id ? '여는 중...' : '1개 열기'}
               </button>

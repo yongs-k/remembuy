@@ -1,8 +1,8 @@
 import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
-import { Badge } from './Badge'
-import { getRemainingDays, formatDday } from '../state/selectors'
+import { Badge, DdayLabel } from './Badge'
+import { getRemainingDays } from '../state/selectors'
 
 const RANK_CHIP = [
   'bg-tertiary text-on-tertiary',
@@ -24,7 +24,6 @@ export function PodiumItemCard({
   const isFirst = index === 0
   const compact = index >= 3
   const remaining = getRemainingDays(item)
-  const urgent = remaining !== undefined && remaining <= 7
   const chip = RANK_CHIP[index] ?? 'bg-surface-container-high text-outline'
 
   return (
@@ -32,8 +31,8 @@ export function PodiumItemCard({
       onClick={onOpen}
       className={`cursor-pointer overflow-hidden rounded-xl bg-surface-container-lowest ${
         isFirst
-          ? 'border-2 border-primary/20 shadow-[0_4px_12px_rgba(170,48,21,0.08),0_3px_0px_rgba(43,38,37,0.1)]'
-          : 'shadow-[0_3px_0px_rgba(43,38,37,0.08)]'
+          ? 'border border-primary/30 shadow-card'
+          : 'border border-hairline shadow-card'
       }`}
     >
       {isFirst && (
@@ -58,17 +57,7 @@ export function PodiumItemCard({
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-1.5">
             {remaining !== undefined && (
-              <span
-                className={`flex items-center gap-0.5 rounded px-1.5 py-0.5 text-label-sm ${
-                  urgent
-                    ? 'bg-error-container text-on-error-container'
-                    : 'bg-surface-container-high text-on-surface-variant'
-                }`}
-              >
-                <Icon name="alarm" className="text-[12px]" />
-                {formatDday(remaining)}
-                {urgent ? ' 소진임박' : ''}
-              </span>
+              <DdayLabel days={remaining} />
             )}
             {item.podiumRank === 1 && <Badge>다시 살래요</Badge>}
           </div>
@@ -106,7 +95,7 @@ export function PodiumItemCard({
                 }}
                 className={`flex h-7 w-7 items-center justify-center rounded-full text-label-md ${
                   isAssigned
-                    ? 'bg-tertiary-fixed text-tertiary shadow-[0_2px_0px_#a36700]'
+                    ? 'bg-tertiary-fixed text-tertiary'
                     : 'bg-surface-container-high text-outline'
                 }`}
                 aria-label={`${rank}등으로 지정`}

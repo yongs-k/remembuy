@@ -23,7 +23,14 @@ export default function DexPage() {
         뒤로
       </button>
 
-      <h1 className="font-heading text-headline-lg text-on-surface">가상 아이템 도감</h1>
+      <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
+        <h1 className="font-heading text-display-sm">가상 아이템 도감</h1>
+        {dex.length > 0 && (
+          <span className="shrink-0 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
+            {dex.filter((entry) => entry.status === 'COMPLETE').length}/{dex.length}
+          </span>
+        )}
+      </div>
 
       {dex.length === 0 ? (
         <GameCatalogStatus label="도감 정보를" />

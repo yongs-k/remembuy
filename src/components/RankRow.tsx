@@ -1,9 +1,9 @@
 import { Icon } from '../data/materialIcons'
 
 const CHIP: Record<number, string> = {
-  1: 'bg-tertiary-fixed text-tertiary shadow-[0_2px_0px_#a36700]',
-  2: 'bg-surface-container-high text-outline shadow-[0_2px_0px_#8d716a]',
-  3: 'bg-tertiary-fixed/40 text-tertiary shadow-[0_2px_0px_#a36700]',
+  1: 'bg-tertiary-fixed text-tertiary',
+  2: 'bg-surface-container-high text-outline',
+  3: 'bg-tertiary-fixed/40 text-tertiary',
 }
 
 export function RankRow({
@@ -28,8 +28,8 @@ export function RankRow({
       onClick={onClick}
       className={`flex w-full items-center justify-between gap-space-sm rounded-xl bg-surface-container-lowest text-left ${
         hero
-          ? 'border-2 border-tertiary/30 p-space-lg shadow-[0_4px_12px_rgba(130,81,0,0.12),0_3px_0px_#eae0de]'
-          : 'p-space-md shadow-[0_3px_0px_#eae0de]'
+          ? 'border border-tertiary/40 p-space-lg shadow-card'
+          : 'p-space-md border border-hairline shadow-card'
       }`}
     >
       <div className="flex min-w-0 items-center gap-3">

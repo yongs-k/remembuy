@@ -14,7 +14,7 @@ export function EntryPreviewCard({
   restockCycle: string
 }) {
   return (
-    <div className="rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_3px_0px_#eae0de]">
+    <div className="rounded-2xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
       <div className="flex flex-wrap items-center gap-1.5 text-label-sm">
         {locationName && (
           <span className="rounded bg-secondary-container px-1.5 py-0.5 text-on-secondary-container">

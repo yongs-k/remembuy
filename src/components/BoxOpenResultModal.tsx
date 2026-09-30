@@ -58,7 +58,7 @@ export function BoxOpenResultModal({
           <button
             type="button"
             onClick={onViewDex}
-            className="flex-1 rounded-xl bg-primary px-space-md py-2.5 text-label-lg text-on-primary shadow-[0_3px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
+            className="flex-1 rounded-xl bg-primary px-space-md py-2.5 text-label-lg text-on-primary active:scale-[0.98]"
           >
             도감으로 이동
           </button>

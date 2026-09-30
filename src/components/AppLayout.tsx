@@ -22,10 +22,10 @@ export function AppLayout() {
 
   return (
     <div className="h-dvh bg-surface-container-low">
-      <div className="relative mx-auto flex h-full max-w-3xl flex-col bg-surface text-on-surface md:border-x-2 md:border-ink">
-        <header className="flex items-center justify-between border-b-2 border-ink bg-surface-container-lowest px-4 py-3">
+      <div className="relative mx-auto flex h-full max-w-3xl flex-col bg-surface text-on-surface md:border-x md:border-hairline">
+        <header className="flex items-center justify-between border-b border-hairline bg-surface-container-lowest px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-[0_3px_0px_#8b1901]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container">
               <Icon name="token" className="text-[20px]" />
             </div>
             <span className="font-heading text-lg text-primary">REMEMBUY</span>
@@ -46,7 +46,7 @@ export function AppLayout() {
           <Outlet />
         </main>
 
-        <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto grid max-w-3xl grid-cols-5 border-t-2 border-ink bg-surface-container-lowest pb-[env(safe-area-inset-bottom)] md:border-x-2">
+        <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto grid max-w-3xl grid-cols-5 border-t border-hairline bg-surface-container-lowest pb-[env(safe-area-inset-bottom)] md:border-x">
           {TABS.map((tab) => (
             <NavLink
               key={tab.to}

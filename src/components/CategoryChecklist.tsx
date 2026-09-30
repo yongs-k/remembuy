@@ -1,5 +1,6 @@
 import type { Category, Item } from '../types'
-import { getCategoryCompletion, getMissingMasterItems, getRemainingDays, formatDday } from '../state/selectors'
+import { DdayLabel } from './Badge'
+import { getCategoryCompletion, getMissingMasterItems, getRemainingDays } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
 export function CategoryChecklist({
@@ -22,7 +23,7 @@ export function CategoryChecklist({
   const ownedCount = category.masterItems.length - missingIds.size
 
   return (
-    <section className="rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_3px_0px_#eae0de]">
+    <section className="rounded-2xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
       <div className="flex items-center justify-between gap-space-sm">
         <div className="flex min-w-0 items-center gap-2">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary-container text-secondary">
@@ -52,7 +53,6 @@ export function CategoryChecklist({
             ? items.find((i) => i.categoryId === category.id && i.masterItemId === m.id)
             : undefined
           const remaining = item ? getRemainingDays(item) : undefined
-          const urgent = remaining !== undefined && remaining <= 7
           return (
             <li
               key={m.id}
@@ -69,15 +69,7 @@ export function CategoryChecklist({
                 <span className="flex items-center gap-1.5 text-label-lg text-on-surface">
                   <span className="truncate">{m.name}</span>
                   {remaining !== undefined && (
-                    <span
-                      className={`shrink-0 rounded px-1.5 py-0.5 text-label-sm ${
-                        urgent
-                          ? 'bg-error-container text-on-error-container'
-                          : 'bg-surface-container-high text-on-surface-variant'
-                      }`}
-                    >
-                      {formatDday(remaining)}
-                    </span>
+                    <DdayLabel days={remaining} />
                   )}
                 </span>
                 <span className="truncate text-body-sm text-on-surface-variant">

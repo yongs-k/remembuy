@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { FAMILY_MEMBERS } from '../data/familyData'
 import { Icon } from '../data/materialIcons'
-import { SampleTag } from '../components/Badge'
+import { SampleTag, DdayLabel } from '../components/Badge'
 
 export default function FamilyPage() {
   const [invited, setInvited] = useState(false)
 
   return (
     <div className="space-y-space-md p-margin">
-      <h1 className="flex items-center gap-1.5 font-heading text-headline-lg text-on-surface">
-        <Icon name="groups_2" className="text-[24px] text-secondary" />
+      <h1 className="flex items-center gap-2 font-heading text-display-sm text-on-surface">
         가족 케어
         <SampleTag />
       </h1>
@@ -21,10 +20,10 @@ export default function FamilyPage() {
         {FAMILY_MEMBERS.map((member) => (
           <li
             key={member.id}
-            className="rounded-xl bg-surface-container-lowest p-space-md shadow-[0_3px_0px_#eae0de]"
+            className="rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card"
           >
             <div className="flex items-center gap-space-sm">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary shadow-[0_2px_0px_#304c46]">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
                 {member.name.slice(0, 1)}
               </div>
               <div className="flex min-w-0 flex-col">
@@ -39,15 +38,7 @@ export default function FamilyPage() {
                   className="flex items-center justify-between gap-2 rounded-lg bg-surface-container-low px-space-sm py-2"
                 >
                   <span className="min-w-0 truncate text-body-sm text-on-surface">{item.itemName}</span>
-                  <span
-                    className={`shrink-0 rounded px-1.5 py-0.5 text-label-sm ${
-                      item.daysUntilEmpty <= 7
-                        ? 'bg-error-container text-on-error-container'
-                        : 'bg-surface-container-high text-on-surface-variant'
-                    }`}
-                  >
-                    D-{item.daysUntilEmpty}
-                  </span>
+                  <DdayLabel days={item.daysUntilEmpty} />
                 </li>
               ))}
             </ul>
@@ -58,7 +49,7 @@ export default function FamilyPage() {
       <button
         type="button"
         onClick={() => setInvited(true)}
-        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
+        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary active:scale-[0.98]"
       >
         <Icon name="person_add" className="text-[18px]" />
         가족 초대하기

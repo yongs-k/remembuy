@@ -21,7 +21,7 @@ export function HomeLocationTile({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[126px] flex-col justify-between rounded-xl bg-surface-container-lowest p-space-md text-left shadow-[0_3px_0px_#eae0de] transition-shadow hover:shadow-[0_4px_0px_#eae0de]"
+      className="flex h-[126px] flex-col justify-between rounded-xl bg-surface-container-lowest p-space-md text-left border border-hairline shadow-card transition-shadow hover:border border-hairline shadow-card"
     >
       <div className="flex items-start justify-between">
         <div

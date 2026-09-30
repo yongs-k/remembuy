@@ -11,6 +11,10 @@ h1, h2, h3 {
   text-wrap: balance;
 }
 
+::placeholder {
+  @apply text-outline opacity-100;
+}
+
 ::selection {
   @apply bg-primary-fixed text-on-primary-fixed;
 }

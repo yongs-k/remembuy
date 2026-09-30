@@ -20,19 +20,18 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-space-md p-margin">
       <div className="flex items-center justify-between gap-space-sm">
-        <h1 className="flex items-center gap-1.5 font-heading text-headline-lg text-on-surface">
-          <Icon name="notifications" className="text-[24px] text-primary" />
+        <h1 className="font-heading text-display-sm text-on-surface">
           알림
         </h1>
         {upcoming.length > 0 && (
-          <span className="rounded-full bg-error-container px-2 py-0.5 text-label-sm text-on-error-container">
+          <span className="text-label-md tabular-nums text-primary">
             소진 임박 {upcoming.length}건
           </span>
         )}
       </div>
 
       {upcoming.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-2xl bg-surface-container-lowest p-space-xl text-center shadow-[0_3px_0px_#eae0de]">
+        <div className="flex flex-col items-center gap-2 rounded-2xl bg-surface-container-lowest p-space-xl text-center border border-hairline shadow-card">
           <Icon name="notifications_off" className="text-[32px] text-on-surface-variant" />
           <p className="text-body-sm text-on-surface-variant">임박한 소모품이 없습니다.</p>
         </div>

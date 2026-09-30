@@ -88,7 +88,7 @@ export function AnalyzingOverlay({
           type="button"
           autoFocus
           onClick={onCancel}
-          className="mt-space-sm flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white/10 px-5 py-2.5 text-label-lg text-outline-variant active:translate-y-0.5"
+          className="mt-space-sm flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white/10 px-5 py-2.5 text-label-lg text-outline-variant active:scale-[0.98]"
         >
           <Icon name="close" className="text-[18px]" />
           분석 중단 및 취소

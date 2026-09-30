@@ -77,7 +77,7 @@ export function CollectionDetail({
               onClick={() => onSelectLocation(l.id)}
               className={`shrink-0 rounded-full px-3 py-1.5 text-label-md ${
                 active
-                  ? 'bg-primary text-on-primary shadow-[0_2px_0px_#8b1901]'
+                  ? 'bg-primary text-on-primary'
                   : 'bg-surface-container text-on-surface-variant'
               }`}
             >
@@ -87,7 +87,7 @@ export function CollectionDetail({
         })}
       </div>
 
-      <div className="rounded-xl bg-surface-container-lowest p-space-md shadow-[0_3px_0px_#eae0de]">
+      <div className="rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
         <div className="flex items-center justify-between gap-space-sm">
           <div className="flex min-w-0 flex-col">
             <span className="font-heading text-headline-md text-on-surface">도감 마스터리</span>
@@ -130,7 +130,7 @@ export function CollectionDetail({
         <button
           type="button"
           onClick={onRecord}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-float active:scale-[0.98]"
         >
           <Icon name="add_box" className="text-[20px]" />
           아이템 직접등록

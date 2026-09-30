@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
+import { DdayLabel } from '../components/Badge'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { ItemCard } from '../components/ItemCard'
 import { Icon } from '../data/materialIcons'
-import { getRemainingDays, formatDday, parseRestockCycleDays } from '../state/selectors'
+import { getRemainingDays, parseRestockCycleDays } from '../state/selectors'
 
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -35,7 +36,6 @@ export default function ItemDetailPage() {
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
   const remaining = getRemainingDays(item)
-  const urgent = remaining !== undefined && remaining <= 7
   const showImage = Boolean(item.imageUrl) && !imageFailed
 
   return (
@@ -49,7 +49,7 @@ export default function ItemDetailPage() {
         뒤로
       </button>
 
-      <div className="rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#e1bfb8]">
+      <div className="rounded-2xl bg-surface-container-lowest p-space-md">
         <div className="flex gap-space-md">
           <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-container-low text-on-surface-variant">
             {showImage ? (
@@ -83,15 +83,7 @@ export default function ItemDetailPage() {
               </span>
             )}
             {remaining !== undefined && (
-              <span
-                className={`self-start rounded px-1.5 py-0.5 text-label-sm ${
-                  urgent
-                    ? 'bg-error-container text-on-error-container'
-                    : 'bg-surface-container-high text-on-surface-variant'
-                }`}
-              >
-                {formatDday(remaining)}
-              </span>
+              <DdayLabel days={remaining} />
             )}
           </div>
         </div>
@@ -105,7 +97,7 @@ export default function ItemDetailPage() {
       )}
 
       {item.note && (
-        <p className="rounded-xl bg-surface-container-lowest p-space-md text-body-sm text-on-surface shadow-[0_3px_0px_#eae0de]">
+        <p className="rounded-xl bg-surface-container-lowest p-space-md text-body-sm text-on-surface border border-hairline shadow-card">
           {item.note}
         </p>
       )}
@@ -144,7 +136,7 @@ export default function ItemDetailPage() {
         {item.affiliateUrl ? (
           <a
             href={item.affiliateUrl}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] active:translate-y-0.5"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary active:scale-[0.98]"
           >
             <Icon name="shopping_cart" className="text-[18px]" />
             구매하기
@@ -161,7 +153,7 @@ export default function ItemDetailPage() {
         <button
           type="button"
           onClick={() => navigate(`/new?editId=${item.id}`)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-surface-container-lowest p-3 text-label-lg text-on-surface shadow-[0_3px_0px_#e1bfb8] active:translate-y-0.5"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-surface-container-lowest p-3 text-label-lg text-on-surface active:scale-[0.98]"
         >
           <Icon name="edit_note" className="text-[18px]" />
           메모 수정하기

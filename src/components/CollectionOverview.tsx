@@ -45,9 +45,9 @@ export function CollectionOverview({
 
   return (
     <div className="space-y-space-lg p-margin">
-      <section className="rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#e1bfb8]">
+      <section className="rounded-xl bg-surface-container-lowest p-space-md">
         <div className="mb-space-sm flex items-center gap-space-sm">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container shadow-[0_2px_0px_#aecdc4]">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container">
             <Icon name="auto_stories" className="text-[26px]" />
           </div>
           <div className="flex min-w-0 flex-col">
@@ -61,21 +61,21 @@ export function CollectionOverview({
           <div className="h-full rounded-full bg-primary-container" style={{ width: `${overallPercent}%` }} />
         </div>
         <div className="grid grid-cols-3 gap-space-xs">
-          <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center shadow-[0_2px_0px_#f0e6e4]">
+          <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center">
             <span className="mb-0.5 text-label-sm text-on-surface-variant">전체 수집률</span>
             <span className="font-heading text-stat-counter text-primary">
               {overallPercent}
               <span className="text-label-sm">%</span>
             </span>
           </div>
-          <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center shadow-[0_2px_0px_#f0e6e4]">
+          <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center">
             <span className="mb-0.5 text-label-sm text-on-surface-variant">등록 상품</span>
             <span className="font-heading text-stat-counter text-tertiary">
               {items.length}
               <span className="text-label-sm">개</span>
             </span>
           </div>
-          <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center shadow-[0_2px_0px_#f0e6e4]">
+          <div className="flex flex-col items-center rounded-lg bg-surface-container-low p-2.5 text-center">
             <span className="mb-0.5 text-label-sm text-on-surface-variant">완성한 공간</span>
             <span className="font-heading text-stat-counter text-secondary">
               {completedCount}
@@ -104,8 +104,8 @@ export function CollectionOverview({
                 onClick={() => setFilter(chip.key)}
                 className={`shrink-0 rounded-full px-3 py-1.5 text-label-md ${
                   active
-                    ? 'bg-primary text-on-primary shadow-[0_2px_0px_#8b1901]'
-                    : 'bg-surface-container text-on-surface-variant shadow-[0_2px_0px_#e1bfb8]'
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-surface-container text-on-surface-variant'
                 }`}
               >
                 {chip.label} ({count})
@@ -134,7 +134,7 @@ export function CollectionOverview({
       <button
         type="button"
         disabled
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-100"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary p-3 text-label-lg text-on-primary disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-100"
       >
         <Icon name="barcode_scanner" className="text-[20px]" />
         바코드 찍고 새 아이템 도감 등록하기

@@ -86,11 +86,7 @@ export default function RankingPage() {
     const totalItems = ranked.reduce((sum, r) => sum + r.itemCount, 0)
     return (
       <div className="space-y-space-md p-margin">
-        <div className="flex items-center justify-between">
-          <span className="flex items-center gap-1.5 rounded-full bg-error-container px-2.5 py-1 text-label-sm text-on-error-container">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            실시간 집계중
-          </span>
+        <div className="flex items-center justify-end">
           <span className="flex items-center gap-1 text-label-sm text-on-surface-variant">
             <Icon name="schedule" className="text-[14px]" />
             매주 월요일 00:00 갱신
@@ -98,9 +94,8 @@ export default function RankingPage() {
           </span>
         </div>
         <div>
-          <h1 className="flex items-center gap-1.5 font-heading text-headline-lg text-on-surface">
-            명예의 전당 · 도감 랭킹
-            <Icon name="workspace_premium" className="text-[22px] text-tertiary" />
+          <h1 className="font-heading text-display-sm text-on-surface">
+            도감 랭킹
           </h1>
           <p className="mt-1 text-body-sm text-on-surface-variant">
             공간별로 가장 많이 채운 도감 순위예요. 총 {totalItems}개 등록됨
@@ -122,7 +117,7 @@ export default function RankingPage() {
         </ul>
         <div className="rounded-2xl bg-surface-container p-space-md">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-tertiary-container text-on-tertiary-container shadow-[0_3px_0px_#653e00]">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-tertiary-container text-on-tertiary-container">
               <Icon name="verified" className="text-[26px]" />
             </div>
             <div className="flex flex-col">
@@ -230,7 +225,7 @@ export default function RankingPage() {
         </button>
       </div>
 
-      <div className="space-y-space-sm rounded-xl bg-surface-container-lowest p-space-md shadow-[0_3px_0px_#eae0de]">
+      <div className="space-y-space-sm rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
         <h2 className="flex items-center gap-1.5 font-heading text-label-lg text-on-surface">
           <Icon name="public" className="text-[18px] text-secondary" />
           전체 유저 인기 랭킹
@@ -269,7 +264,7 @@ export default function RankingPage() {
         <button
           type="button"
           onClick={() => navigate('/new')}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-float active:scale-[0.98]"
         >
           <Icon name="add_box" className="text-[20px]" />
           아이템 직접등록

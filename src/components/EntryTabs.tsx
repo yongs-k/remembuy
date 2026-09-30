@@ -15,7 +15,7 @@ export function EntryTabs({ onSoon }: { onSoon: () => void }) {
       <button
         type="button"
         aria-current="true"
-        className={`${base} bg-surface-container-lowest text-primary shadow-[0_2px_0px_#e1bfb8]`}
+        className={`${base} bg-surface-container-lowest text-primary`}
       >
         <Icon name="edit_note" className="text-[18px]" />
         직접 입력

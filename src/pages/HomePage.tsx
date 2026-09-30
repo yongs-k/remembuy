@@ -1,12 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
+import { DdayLabel } from '../components/Badge'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import {
-  formatDday,
   getLocationCompletion,
   getRemainingDays,
   getSoonestRemaining,
-  getUpcomingNotifications,
+  getUpcomingNotifications
 } from '../state/selectors'
 import { ItemCard } from '../components/ItemCard'
 import { HomeLocationTile } from '../components/HomeLocationTile'
@@ -132,7 +132,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-4 p-4 pb-24">
-      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest px-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
+      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest px-1.5 border border-hairline shadow-card focus-within:ring-2 focus-within:ring-primary">
         <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
           <Icon name="search" className="text-[20px]" />
         </div>
@@ -167,7 +167,7 @@ export default function HomePage() {
               7일 안에 떨어질 상품이 없어요.
             </p>
           ) : (
-            <ul className="divide-y divide-surface-container overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0_3px_0px_#eae0de]">
+            <ul className="divide-y divide-surface-container overflow-hidden rounded-xl bg-surface-container-lowest border border-hairline shadow-card">
               {upcoming.slice(0, RESTOCK_PREVIEW).map((item) => {
                 const days = getSoonestRemaining(item)
                 return (
@@ -181,15 +181,7 @@ export default function HomePage() {
                         {item.name}
                       </span>
                       {days !== undefined && (
-                        <span
-                          className={`shrink-0 rounded px-1.5 py-0.5 text-label-md tabular-nums ${
-                            days <= 3
-                              ? 'bg-error-container text-on-error-container'
-                              : 'bg-surface-container-high text-on-surface-variant'
-                          }`}
-                        >
-                          {formatDday(days)}
-                        </span>
+                        <DdayLabel days={days} urgentAt={3} />
                       )}
                       <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
                     </button>
@@ -264,7 +256,7 @@ export default function HomePage() {
                 key={category.id}
                 type="button"
                 onClick={() => setSelectedCategoryId(category.id)}
-                className="rounded-xl bg-surface-container-lowest p-space-md text-left shadow-[0_3px_0px_#eae0de]"
+                className="rounded-xl bg-surface-container-lowest p-space-md text-left border border-hairline shadow-card"
               >
                 <p className="text-label-lg text-on-surface">{category.name}</p>
                 <p className="text-body-sm text-on-surface-variant">{count}개 보유</p>
@@ -291,8 +283,8 @@ export default function HomePage() {
                 onClick={() => setFilter(key)}
                 className={`rounded-full px-3 py-1.5 text-label-md ${
                   filter === key
-                    ? 'bg-primary text-on-primary shadow-[0_2px_0px_#8b1901]'
-                    : 'bg-surface-container text-on-surface-variant shadow-[0_2px_0px_#e1bfb8]'
+                    ? 'bg-primary text-on-primary'
+                    : 'bg-surface-container text-on-surface-variant'
                 }`}
               >
                 {label}
@@ -316,7 +308,7 @@ export default function HomePage() {
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-[0_6px_16px_rgba(170,48,21,0.35),0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-1 active:shadow-[0_2px_0px_#8b1901] md:right-[max(1rem,calc(50%-384px+1rem))]"
+        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-float transition-all hover:bg-primary-container active:scale-[0.98] md:right-[max(1rem,calc(50%-384px+1rem))]"
         aria-label="새로 기록하기"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
@@ -352,7 +344,7 @@ export default function HomePage() {
                   type="button"
                   autoFocus
                   onClick={() => cameraInputRef.current?.click()}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
+                  className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
                   <Icon name="photo_camera" className="text-[20px] text-primary" />
                   <span>카메라로 촬영</span>
@@ -368,7 +360,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => galleryInputRef.current?.click()}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
+                  className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
                   <Icon name="image" className="text-[20px] text-primary" />
                   <span>사진 선택</span>
@@ -386,7 +378,7 @@ export default function HomePage() {
                     setShowLinkInput(true)
                     setAnalyzeError(null)
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
+                  className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
                   <Icon name="link" className="text-[20px] text-primary" />
                   <span>링크로 가져오기</span>
@@ -394,7 +386,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={() => navigate('/new')}
-                  className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
+                  className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
                   <Icon name="edit_note" className="text-[20px] text-primary" />
                   <span>직접 입력</span>
@@ -448,7 +440,7 @@ export default function HomePage() {
                   type="button"
                   onClick={handleAnalyzeLink}
                   disabled={isAnalyzing || !linkUrl.trim()}
-                  className="w-full rounded-xl bg-primary py-2.5 text-label-lg text-on-primary shadow-[0_3px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901] disabled:opacity-40 disabled:active:translate-y-0 disabled:active:shadow-[0_3px_0px_#8b1901]"
+                  className="w-full rounded-xl bg-primary py-2.5 text-label-lg text-on-primary active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
                 >
                   {isAnalyzing ? '분석 중...' : '분석하기'}
                 </button>

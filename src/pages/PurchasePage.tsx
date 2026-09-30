@@ -15,8 +15,7 @@ export default function PurchasePage() {
   return (
     <div className="space-y-space-md p-margin">
       <div>
-        <h1 className="flex items-center gap-1.5 font-heading text-headline-lg text-on-surface">
-          <Icon name="shopping_cart" className="text-[24px] text-primary" />
+        <h1 className="font-heading text-display-sm text-on-surface">
           다시 살 상품
         </h1>
         <p className="mt-1 text-body-sm text-on-surface-variant">
@@ -25,7 +24,7 @@ export default function PurchasePage() {
       </div>
 
       {upcoming.length === 0 ? (
-        <div className="flex flex-col items-center gap-space-sm rounded-2xl bg-surface-container-lowest p-space-xl text-center shadow-[0_3px_0px_#eae0de]">
+        <div className="flex flex-col items-center gap-space-sm rounded-2xl bg-surface-container-lowest p-space-xl text-center border border-hairline shadow-card">
           <Icon name="task_alt" className="text-[32px] text-secondary" />
           <p className="text-body-sm text-on-surface-variant">
             {WINDOW_DAYS}일 안에 다시 살 상품이 없어요.
@@ -35,7 +34,7 @@ export default function PurchasePage() {
           <button
             type="button"
             onClick={() => navigate('/new')}
-            className="rounded-lg bg-primary px-4 py-2 text-label-md text-on-primary shadow-[0_2px_0px_#8b1901] active:translate-y-0.5"
+            className="rounded-lg bg-primary px-4 py-2 text-label-md text-on-primary active:scale-[0.98]"
           >
             상품 기록하기
           </button>

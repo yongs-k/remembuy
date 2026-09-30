@@ -28,18 +28,18 @@ type RecordPrefill = {
 
 const CYCLE_PRESETS = [45, 60, 90]
 
-const cardCls = 'space-y-space-sm rounded-2xl bg-surface-container-lowest p-space-md shadow-[0_3px_0px_#eae0de]'
+const cardCls = 'space-y-space-sm rounded-2xl bg-surface-container-lowest p-space-md border border-hairline shadow-card'
 const inputCls =
   'mt-1 w-full rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 text-body-md text-on-surface focus:border-primary focus:outline-none'
 const labelCls = 'block text-label-md text-on-surface-variant'
 const smallBtnCls =
-  'shrink-0 rounded-lg bg-surface-container-high px-3 text-label-md text-on-surface active:translate-y-0.5'
+  'shrink-0 rounded-lg bg-surface-container-high px-3 text-label-md text-on-surface active:scale-[0.98]'
 
 function chipCls(active: boolean) {
   return `rounded-full px-3 py-1.5 text-label-md ${
     active
-      ? 'bg-primary text-on-primary shadow-[0_2px_0px_#8b1901]'
-      : 'bg-surface-container text-on-surface-variant shadow-[0_2px_0px_#e1bfb8]'
+      ? 'bg-primary text-on-primary'
+      : 'bg-surface-container text-on-surface-variant'
   }`
 }
 
@@ -546,7 +546,7 @@ export default function NewItemPage() {
 
       <button
         type="submit"
-        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary p-3.5 text-label-lg text-on-primary shadow-[0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
+        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary p-3.5 text-label-lg text-on-primary active:scale-[0.98]"
       >
         <Icon name="check_circle" className="text-[20px]" />
         {existing ? '저장하기' : `${locationName}도감에 등록하기`}

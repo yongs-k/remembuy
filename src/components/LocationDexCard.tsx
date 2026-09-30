@@ -30,7 +30,7 @@ export function LocationDexCard({
     <button
       type="button"
       onClick={onOpen}
-      className="w-full rounded-xl bg-surface-container-lowest p-space-md text-left shadow-[0_3px_0px_#e1bfb8] transition-colors hover:bg-surface-bright"
+      className="w-full rounded-xl bg-surface-container-lowest p-space-md text-left transition-colors hover:bg-surface-bright"
     >
       <div className="flex items-start justify-between gap-space-sm">
         <div className="flex min-w-0 items-center gap-space-sm">
