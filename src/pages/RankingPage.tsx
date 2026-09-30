@@ -10,6 +10,7 @@ import {
 } from '../state/selectors'
 import { RankRow } from '../components/RankRow'
 import { PodiumItemCard } from '../components/PodiumItemCard'
+import { SampleTag } from '../components/Badge'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 import { getDeviceId } from '../lib/deviceId'
 
@@ -93,6 +94,7 @@ export default function RankingPage() {
           <span className="flex items-center gap-1 text-label-sm text-on-surface-variant">
             <Icon name="schedule" className="text-[14px]" />
             매주 월요일 00:00 갱신
+            <SampleTag />
           </span>
         </div>
         <div>
@@ -124,7 +126,10 @@ export default function RankingPage() {
               <Icon name="verified" className="text-[26px]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-label-md text-tertiary">내 랭킹 기여도</span>
+              <span className="flex items-center gap-1.5 text-label-md text-tertiary">
+                내 랭킹 기여도
+                <SampleTag />
+              </span>
               <p className="mt-0.5 text-body-sm text-on-surface">
                 실사용 인증한 랭킹 아이템으로 도감 신뢰도 점수 <strong className="text-primary">+45점</strong>을
                 획득했어요!

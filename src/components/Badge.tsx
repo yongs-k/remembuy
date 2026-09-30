@@ -7,3 +7,12 @@ export function Badge({ children }: { children: ReactNode }) {
     </span>
   )
 }
+
+/** Marks placeholder content that is not backed by real data. */
+export function SampleTag({ children = '예시' }: { children?: ReactNode }) {
+  return (
+    <span className="shrink-0 rounded bg-surface-container-high px-1.5 py-0.5 text-label-sm font-normal text-on-surface-variant">
+      {children}
+    </span>
+  )
+}

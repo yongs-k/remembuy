@@ -1,6 +1,7 @@
 import { Icon } from '../data/materialIcons'
 import { DUMMY_BUTLER, percentOff } from '../data/purchaseDummy'
 import { formatDday } from '../state/selectors'
+import { SampleTag } from './Badge'
 
 export function ButlerHero({
   greetingName,
@@ -45,7 +46,7 @@ export function ButlerHero({
             <span className="rounded bg-tertiary-fixed px-1.5 py-0.5 text-on-tertiary-fixed">
               {B.rankTag}
             </span>
-            <span className="rounded bg-surface-container-high px-1.5 py-0.5 text-on-surface-variant">예시 가격</span>
+            <SampleTag>예시 가격</SampleTag>
             <span className="truncate text-on-surface-variant">
               {locationName} {B.slotLabel}
             </span>

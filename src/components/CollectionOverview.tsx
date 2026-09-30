@@ -3,6 +3,7 @@ import type { Category, Item, Location } from '../types'
 import { getLocationCompletion, getMasterItemCounts } from '../state/selectors'
 import { LocationDexCard } from './LocationDexCard'
 import { Icon } from '../data/materialIcons'
+import { SampleTag } from './Badge'
 import {
   DUMMY_BADGES,
   DUMMY_COLLECTION_PROFILE,
@@ -70,7 +71,10 @@ export function CollectionOverview({
             </span>
           </div>
           <div className="flex min-w-0 flex-col">
-            <span className="truncate font-heading text-headline-md text-on-surface">{P.title}</span>
+            <span className="flex min-w-0 items-center gap-1.5">
+              <span className="truncate font-heading text-headline-md text-on-surface">{P.title}</span>
+              <SampleTag />
+            </span>
             <span className="text-body-sm text-on-surface-variant">
               다음 등급 <span className="font-bold text-primary">{P.nextLevel}</span>까지{' '}
               {P.exp.total - P.exp.current} EXP
@@ -123,6 +127,7 @@ export function CollectionOverview({
         <div className="mb-space-sm flex items-center gap-1.5">
           <Icon name="military_tech" className="text-[20px] text-tertiary" />
           <h2 className="font-heading text-headline-md text-on-surface">수집 업적 배지함</h2>
+          <SampleTag />
         </div>
         <div className="flex snap-x gap-space-sm overflow-x-auto pb-space-xs">
           {DUMMY_BADGES.map((badge, index) =>
@@ -176,6 +181,7 @@ export function CollectionOverview({
             <span className="flex items-center gap-1 text-label-sm uppercase tracking-wider text-primary">
               <Icon name="event_upcoming" className="text-[16px]" />
               이달의 챌린지 퀘스트
+              <SampleTag />
             </span>
             <h3 className="mt-0.5 font-heading text-headline-md text-on-surface">{Q.title}</h3>
             <p className="mt-0.5 text-body-sm text-on-surface-variant">{Q.reward}</p>

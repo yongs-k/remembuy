@@ -10,3 +10,4 @@ server/data/
 .env
 server/.env
 .superpowers/
+.playwright-mcp/

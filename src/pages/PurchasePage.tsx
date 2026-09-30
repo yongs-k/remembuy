@@ -5,6 +5,7 @@ import { ButlerHero } from '../components/ButlerHero'
 import { DealCard } from '../components/DealCard'
 import { GroupBuyCard } from '../components/GroupBuyCard'
 import { Icon } from '../data/materialIcons'
+import { SampleTag } from '../components/Badge'
 import { DUMMY_PROFILE } from '../data/homeDummy'
 import { DUMMY_BUTLER, DUMMY_DEALS, DUMMY_PARTIES, percentOff, type DealKind } from '../data/purchaseDummy'
 
@@ -53,6 +54,7 @@ export default function PurchasePage() {
           <h2 className="flex items-center gap-1.5 font-heading text-headline-md text-on-surface">
             <Icon name="local_fire_department" className="text-[22px] text-primary" />
             도감 위시 &amp; 특가 레이더
+            <SampleTag />
           </h2>
           <span className="shrink-0 rounded-full bg-error-container px-2 py-0.5 text-label-sm text-on-error-container">
             최대 {maxOff}% OFF
@@ -90,6 +92,7 @@ export default function PurchasePage() {
           <h2 className="flex items-center gap-1.5 font-heading text-headline-md text-on-surface">
             <Icon name="groups_2" className="text-[22px] text-secondary" />
             이웃 수집가 실시간 공구 파티
+            <SampleTag />
           </h2>
           <span className="shrink-0 rounded-full bg-secondary-container px-2 py-0.5 text-label-sm text-on-secondary-container">
             동네 거점 매칭
@@ -106,7 +109,10 @@ export default function PurchasePage() {
 
       <section className="flex items-center justify-between gap-space-sm rounded-2xl bg-primary p-space-md text-on-primary shadow-[0_4px_0px_#8b1901]">
         <div className="flex min-w-0 flex-col">
-          <span className="text-label-sm">원하는 물품이 없나요?</span>
+          <span className="flex items-center gap-1.5 text-label-sm">
+            원하는 물품이 없나요?
+            <SampleTag />
+          </span>
           <span className="font-heading text-headline-md">내가 직접 공구 파티 열기</span>
           <span className="text-body-sm opacity-90">방장 개설 시 즉시 +100P &amp; 무료 배송</span>
         </div>
