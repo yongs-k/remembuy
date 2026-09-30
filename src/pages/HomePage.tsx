@@ -1,18 +1,23 @@
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getLocationCompletion, getRemainingDays } from '../state/selectors'
+import {
+  formatDday,
+  getLocationCompletion,
+  getRemainingDays,
+  getSoonestRemaining,
+  getUpcomingNotifications,
+} from '../state/selectors'
 import { ItemCard } from '../components/ItemCard'
-import { HomeProfileCard } from '../components/HomeProfileCard'
-import { QuestCarousel } from '../components/QuestCarousel'
 import { HomeLocationTile } from '../components/HomeLocationTile'
 import { AnalyzingOverlay } from '../components/AnalyzingOverlay'
 import { resizeImageToBase64 } from '../lib/imageResize'
 import { HomeGameCard } from '../components/HomeGameCard'
 import { Icon } from '../data/materialIcons'
-import { DUMMY_QUESTS } from '../data/homeDummy'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
+
+const RESTOCK_PREVIEW = 3
 
 export default function HomePage() {
   const { items, locations, categories } = useLocker()
@@ -36,6 +41,8 @@ export default function HomePage() {
     const term = search.toLowerCase()
     return items.filter((item) => item.name.toLowerCase().includes(term))
   }, [items, search])
+
+  const upcoming = useMemo(() => getUpcomingNotifications(items, 7), [items])
 
   const categoriesForLocation = useMemo(
     () => categories.filter((c) => c.locationId === selectedLocationId),
@@ -125,17 +132,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-4 p-4">
-      {/* Search bar stays at a fixed tree position so typing never remounts the input. */}
-      {searchResults === null && !selectedLocationId && (
-        <>
-          <HomeProfileCard itemCount={items.length} />
-          <HomeGameCard />
-          <h2 className="pt-space-sm font-heading text-headline-md text-on-surface">추천 퀘스트</h2>
-          <QuestCarousel quests={DUMMY_QUESTS} />
-        </>
-      )}
-
-      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
+      <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest px-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
         <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
           <Icon name="search" className="text-[20px]" />
         </div>
@@ -145,16 +142,64 @@ export default function HomePage() {
           placeholder="상품 검색"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-0 w-full bg-transparent py-2 text-body-lg font-normal text-on-surface placeholder:text-on-surface-variant focus:outline-none"
+          className="min-w-0 w-full bg-transparent py-3 text-body-lg font-normal text-on-surface placeholder:text-on-surface-variant focus:outline-none"
         />
-        <button
-          type="button"
-          aria-label="바코드 스캔"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-on-surface transition-colors hover:bg-surface-variant active:scale-95"
-        >
-          <Icon name="qr_code_scanner" className="text-[20px]" />
-        </button>
       </div>
+
+      {searchResults === null && !selectedLocationId && (
+        <section aria-labelledby="restock-title" className="space-y-space-sm">
+          <div className="flex items-baseline justify-between gap-space-sm">
+            <h2 id="restock-title" className="font-heading text-headline-md text-on-surface">
+              곧 떨어질 상품
+            </h2>
+            {upcoming.length > RESTOCK_PREVIEW && (
+              <button
+                type="button"
+                onClick={() => navigate('/notifications')}
+                className="-my-2 py-2 text-label-md text-primary"
+              >
+                {upcoming.length}개 모두 보기
+              </button>
+            )}
+          </div>
+          {upcoming.length === 0 ? (
+            <p className="rounded-xl bg-surface-container-low px-space-md py-space-md text-body-md text-on-surface-variant">
+              7일 안에 떨어질 상품이 없어요.
+            </p>
+          ) : (
+            <ul className="divide-y divide-surface-container overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0_3px_0px_#eae0de]">
+              {upcoming.slice(0, RESTOCK_PREVIEW).map((item) => {
+                const days = getSoonestRemaining(item)
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/item/${item.id}`)}
+                      className="flex w-full items-center gap-space-sm px-space-md py-3 text-left transition-colors hover:bg-surface-container-low"
+                    >
+                      <span className="min-w-0 flex-1 truncate text-label-lg text-on-surface">
+                        {item.name}
+                      </span>
+                      {days !== undefined && (
+                        <span
+                          className={`shrink-0 rounded px-1.5 py-0.5 text-label-md tabular-nums ${
+                            days <= 3
+                              ? 'bg-error-container text-on-error-container'
+                              : 'bg-surface-container-high text-on-surface-variant'
+                          }`}
+                        >
+                          {formatDday(days)}
+                        </span>
+                      )}
+                      <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </section>
+      )}
 
       {searchResults !== null ? (
         <div className="space-y-2">
@@ -180,17 +225,34 @@ export default function HomePage() {
       )}
 
       {!selectedLocationId && (
-        <div className="grid grid-cols-2 gap-space-sm">
-          {locations.map((location) => (
-            <HomeLocationTile
-              key={location.id}
-              location={location}
-              percent={getLocationCompletion(items, location.id, categories)}
-              count={categories.filter((c) => c.locationId === location.id).length}
-              onClick={() => setSelectedLocationId(location.id)}
-            />
-          ))}
-        </div>
+        <>
+          <section aria-labelledby="locations-title" className="space-y-space-sm pt-space-sm">
+            <div className="flex items-baseline justify-between gap-space-sm">
+              <h2 id="locations-title" className="font-heading text-headline-md text-on-surface">
+                장소별 보관함
+              </h2>
+              <span className="text-body-sm text-on-surface-variant">기록 상품 {items.length}개</span>
+            </div>
+            <div className="grid grid-cols-2 gap-space-sm">
+              {locations.map((location) => (
+                <HomeLocationTile
+                  key={location.id}
+                  location={location}
+                  percent={getLocationCompletion(items, location.id, categories)}
+                  count={
+                    items.filter((i) =>
+                      categories.some((c) => c.id === i.categoryId && c.locationId === location.id)
+                    ).length
+                  }
+                  onClick={() => setSelectedLocationId(location.id)}
+                />
+              ))}
+            </div>
+          </section>
+          <div className="pt-space-sm">
+            <HomeGameCard />
+          </div>
+        </>
       )}
 
       {selectedLocationId && !selectedCategoryId && (

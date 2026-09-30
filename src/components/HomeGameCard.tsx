@@ -11,7 +11,7 @@ export function HomeGameCard() {
   return (
     <div className="rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#eae0de]">
       <div className="mb-space-sm flex items-center justify-between">
-        <span className="font-heading text-headline-md text-on-surface">가상 상자함</span>
+        <h2 className="font-heading text-headline-md text-on-surface">가상 상자함</h2>
         <span className="flex items-center gap-1 text-label-lg font-bold text-tertiary">
           <Icon name="monetization_on" className="text-[16px]" />
           <span>{points}P</span>

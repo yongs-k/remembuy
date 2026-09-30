@@ -3,12 +3,6 @@ export const DUMMY_PROFILE = {
   titleBadge: { icon: 'auto_awesome', text: '욕실마스터' },
 }
 
-export const DUMMY_STATS = {
-  totalSaved: 32000,
-  points: 128,
-  titleProgress: { current: 4, total: 8 },
-}
-
 export type DummyQuest = {
   id: string
   icon: string
