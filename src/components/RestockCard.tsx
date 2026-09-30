@@ -3,7 +3,7 @@ import { DdayLabel } from './Badge'
 import { ItemThumb } from './ItemThumb'
 import type { Item } from '../types'
 import { useLocker } from '../state/LockerContext'
-import { getSoonestRemaining, getRestockDueDays } from '../state/selectors'
+import { getSoonestRemaining } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
 /** One row of a restock list; the parent <ul> draws the card and dividers. */
@@ -11,8 +11,7 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
   const { updateItem } = useLocker()
   const navigate = useNavigate()
   const remaining = getSoonestRemaining(item)
-  const due = getRestockDueDays(item)
-  const canRestock = due !== undefined && due <= 7
+  const canRestock = remaining !== undefined && remaining <= 7
   const lastPurchase = [item.price !== undefined && `${item.price.toLocaleString()}원`, item.place]
     .filter(Boolean)
     .join(' · ')

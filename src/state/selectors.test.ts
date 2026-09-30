@@ -147,6 +147,12 @@ describe('getRemainingDays', () => {
     const item = makeItem({ id: 'i1', daysUntilEmpty: 7, createdAt: '2026-09-01' })
     expect(getRemainingDays(item, '2026-09-11')).toBe(-3)
   })
+
+  it('restarts the countdown from restockedAt after a repurchase', () => {
+    const item = makeItem({ id: 'i1', daysUntilEmpty: 7, createdAt: '2026-09-01', restockedAt: '2026-09-11' })
+    expect(getRemainingDays(item, '2026-09-11')).toBe(7)
+    expect(getRemainingDays(item, '2026-09-14')).toBe(4)
+  })
 })
 
 describe('formatDday', () => {

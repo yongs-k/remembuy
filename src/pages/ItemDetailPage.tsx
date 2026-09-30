@@ -34,7 +34,7 @@ export default function ItemDetailPage() {
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
   const remaining = getRemainingDays(item)
-  const hasCycle = parseRestockCycleDays(item.restockCycle) !== undefined
+  const canRestock = parseRestockCycleDays(item.restockCycle) !== undefined || item.daysUntilEmpty !== undefined
   const meta = [location?.name, category?.name].filter(Boolean).join(' · ')
   const quietBtn =
     'flex min-h-12 flex-1 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low active:scale-[0.98]'
@@ -107,7 +107,7 @@ export default function ItemDetailPage() {
           </a>
         )}
         <div className="flex gap-2">
-          {hasCycle && (
+          {canRestock && (
             <button
               type="button"
               onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}

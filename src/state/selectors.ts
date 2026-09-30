@@ -49,10 +49,12 @@ export function getRankingForCategory(items: Item[], categoryId: string): Item[]
     .sort((a, b) => recommendationRank(a) - recommendationRank(b))
 }
 
+/** Counts down from the last repurchase, so 재구매함 starts a fresh supply of the same length. */
 export function getRemainingDays(item: Item, today: string = new Date().toISOString().slice(0, 10)): number | undefined {
   if (item.daysUntilEmpty === undefined) return undefined
+  const anchor = item.restockedAt ?? item.createdAt
   const elapsedDays = Math.round(
-    (new Date(today).getTime() - new Date(item.createdAt).getTime()) / 86_400_000
+    (new Date(today).getTime() - new Date(anchor).getTime()) / 86_400_000
   )
   return item.daysUntilEmpty - elapsedDays
 }
