@@ -3,14 +3,12 @@ import { LOCATION_COLOR_HEX } from '../data/locationColors'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 
 export function LocationDexCard({
-  rank,
   location,
   percent,
   owned,
   total,
   onOpen,
 }: {
-  rank: number
   location: Location
   percent: number
   owned: number
@@ -19,49 +17,31 @@ export function LocationDexCard({
 }) {
   const color = LOCATION_COLOR_HEX[location.colorToken] ?? '#3F6459'
   const icon = LOCATION_MATERIAL_ICON[location.colorToken] ?? 'inventory_2'
-  const tag =
-    percent >= 100
-      ? { text: '완성', cls: 'bg-secondary-container text-on-secondary-container' }
-      : percent >= 70
-        ? { text: '완성 임박!', cls: 'bg-primary-fixed text-primary' }
-        : null
 
   return (
     <button
       type="button"
       onClick={onOpen}
-      className="w-full rounded-xl bg-surface-container-lowest p-space-md text-left transition-colors hover:bg-surface-bright"
+      className="flex w-full items-center gap-space-sm px-space-md py-3 text-left transition-colors hover:bg-surface-container-low"
     >
-      <div className="flex items-start justify-between gap-space-sm">
-        <div className="flex min-w-0 items-center gap-space-sm">
-          <div
-            className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-lg"
-            style={{ backgroundColor: `${color}33`, color }}
-          >
-            <Icon name={icon} className="text-[28px]" />
-            <span className="absolute left-1 top-1 rounded bg-inverse-surface/80 px-1 text-label-sm text-inverse-on-surface">
-              #{String(rank).padStart(2, '0')}
-            </span>
-          </div>
-          <div className="flex min-w-0 flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="truncate font-heading text-headline-md text-on-surface">{location.name}</span>
-              {tag && (
-                <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-label-sm ${tag.cls}`}>
-                  {tag.text}
-                </span>
-              )}
-            </div>
-            <span className="mt-0.5 text-body-sm text-on-surface-variant">
-              {owned} / {total}종 수집 완료 ({percent}%)
-            </span>
-          </div>
+      <div
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: `${color}26`, color }}
+      >
+        <Icon name={icon} className="text-[24px]" />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="truncate text-label-lg text-on-surface">{location.name}</span>
+          <span className="shrink-0 text-label-md tabular-nums text-on-surface-variant">
+            {percent >= 100 ? <span className="text-secondary">완성</span> : `${owned}/${total}`}
+          </span>
         </div>
-        <Icon name="chevron_right" className="self-center text-[20px] text-on-surface-variant" />
+        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
+          <div className="h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
+        </div>
       </div>
-      <div className="mt-space-sm h-2 w-full overflow-hidden rounded-full bg-surface-container">
-        <div className="h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
-      </div>
+      <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
     </button>
   )
 }

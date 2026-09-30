@@ -10,8 +10,8 @@ import {
 } from '../state/selectors'
 import { RankRow } from '../components/RankRow'
 import { PodiumItemCard } from '../components/PodiumItemCard'
-import { SampleTag } from '../components/Badge'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
+import { LOCATION_COLOR_HEX } from '../data/locationColors'
 import { getDeviceId } from '../lib/deviceId'
 
 type GlobalRankingEntry = { name: string; masterItemId: string | null; score: number; voters: number }
@@ -81,67 +81,34 @@ export default function RankingPage() {
     }
   }, [drill])
 
+  const listCls =
+    'divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card'
+
   if (drill.level === 'locations') {
     const ranked = getLocationsRankedByItemCount(items, locations)
     const totalItems = ranked.reduce((sum, r) => sum + r.itemCount, 0)
     return (
       <div className="space-y-space-md p-margin">
-        <div className="flex items-center justify-end">
-          <span className="flex items-center gap-1 text-label-sm text-on-surface-variant">
-            <Icon name="schedule" className="text-[14px]" />
-            매주 월요일 00:00 갱신
-            <SampleTag />
-          </span>
-        </div>
         <div>
-          <h1 className="font-heading text-display-sm text-on-surface">
-            도감 랭킹
-          </h1>
+          <h1 className="font-heading text-display-sm text-on-surface">내 공간 랭킹</h1>
           <p className="mt-1 text-body-sm text-on-surface-variant">
-            공간별로 가장 많이 채운 도감 순위예요. 총 {totalItems}개 등록됨
+            기록한 상품이 많은 공간 순서예요. 모두 {totalItems}개를 기록했어요.
           </p>
         </div>
-        <ul className="space-y-space-sm">
+        <ul className={listCls}>
           {ranked.map(({ location, itemCount }, index) => (
             <li key={location.id}>
               <RankRow
                 rank={index + 1}
-                hero={index === 0}
                 title={location.name}
-                subtitle={`${itemCount}개 저장됨 · 완성도 ${getLocationCompletion(items, location.id, categories)}%`}
+                subtitle={`${itemCount}개 기록 · 수집률 ${getLocationCompletion(items, location.id, categories)}%`}
                 icon={LOCATION_MATERIAL_ICON[location.colorToken] ?? 'inventory_2'}
+                color={LOCATION_COLOR_HEX[location.colorToken]}
                 onClick={() => setDrill({ level: 'categories', locationId: location.id })}
               />
             </li>
           ))}
         </ul>
-        <div className="rounded-2xl bg-surface-container p-space-md">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-tertiary-container text-on-tertiary-container">
-              <Icon name="verified" className="text-[26px]" />
-            </div>
-            <div className="flex flex-col">
-              <span className="flex items-center gap-1.5 text-label-md text-tertiary">
-                내 랭킹 기여도
-                <SampleTag />
-              </span>
-              <p className="mt-0.5 text-body-sm text-on-surface">
-                실사용 인증한 랭킹 아이템으로 도감 신뢰도 점수 <strong className="text-primary">+45점</strong>을
-                획득했어요!
-              </p>
-            </div>
-          </div>
-          <div className="mt-space-sm h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
-            <div className="h-full rounded-full bg-primary" style={{ width: '65%' }} />
-          </div>
-          <div className="mt-2 flex items-center justify-between text-label-sm text-on-surface-variant">
-            <span className="flex items-center gap-1">
-              <Icon name="stars" className="text-[15px] text-primary" />
-              랭킹 1위 상품 도감 신규 등록 시
-            </span>
-            <span className="text-primary">+30P 추가 보너스</span>
-          </div>
-        </div>
       </div>
     )
   }
@@ -151,16 +118,17 @@ export default function RankingPage() {
     const ranked = getCategoriesRankedByItemCount(items, categories, drill.locationId)
     return (
       <div className="flex flex-col gap-space-md p-margin">
-        <BackPill label="장소 목록" onClick={() => setDrill({ level: 'locations' })} />
-        <h1 className="font-heading text-headline-lg text-on-surface">{location?.name}</h1>
-        <ul className="space-y-space-sm">
+        <BackPill label="공간 목록" onClick={() => setDrill({ level: 'locations' })} />
+        <h1 className="font-heading text-display-sm text-on-surface">{location?.name}</h1>
+        <ul className={listCls}>
           {ranked.map(({ category, itemCount }, index) => (
             <li key={category.id}>
               <RankRow
                 rank={index + 1}
                 title={category.name}
-                subtitle={`${itemCount}개 등록됨`}
-                icon="category"
+                subtitle={`${itemCount}개 기록`}
+                icon={LOCATION_MATERIAL_ICON[location?.colorToken ?? ''] ?? 'category'}
+                color={LOCATION_COLOR_HEX[location?.colorToken ?? '']}
                 onClick={() =>
                   setDrill({
                     level: 'products',
@@ -185,10 +153,10 @@ export default function RankingPage() {
         label="카테고리 목록"
         onClick={() => setDrill({ level: 'categories', locationId: drill.locationId })}
       />
-      <h1 className="font-heading text-headline-lg text-on-surface">{category?.name}</h1>
+      <h1 className="font-heading text-display-sm text-on-surface">{category?.name}</h1>
 
       {ranking.length === 0 ? (
-        <p className="text-body-sm text-on-surface-variant">이 카테고리에는 기록된 상품이 없습니다.</p>
+        <p className="text-body-sm text-on-surface-variant">이 카테고리에는 기록된 상품이 없어요.</p>
       ) : (
         <ol className="space-y-space-md">
           {ranking.map((item, index) => (
@@ -204,32 +172,17 @@ export default function RankingPage() {
         </ol>
       )}
 
-      <div className="flex items-center justify-between gap-space-sm rounded-xl border border-dashed border-outline-variant bg-surface-container-low p-space-md">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-container-highest text-outline">
-            <Icon name="add" className="text-[24px]" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-label-lg text-on-surface">{ranking.length + 1}위 상품 등록하기</span>
-            <span className="text-body-sm text-on-surface-variant">
-              자주 쓰는 다른 상품을 이 카테고리에 추가해보세요
-            </span>
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate('/new')}
-          className="shrink-0 rounded-lg bg-surface-container-lowest px-3 py-1.5 text-label-sm text-primary shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-        >
-          추가
-        </button>
-      </div>
+      <button
+        type="button"
+        onClick={() => navigate('/new')}
+        className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
+      >
+        <Icon name="add" className="text-[20px]" />
+        이 카테고리에 상품 추가
+      </button>
 
-      <div className="space-y-space-sm rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
-        <h2 className="flex items-center gap-1.5 font-heading text-label-lg text-on-surface">
-          <Icon name="public" className="text-[18px] text-secondary" />
-          전체 유저 인기 랭킹
-        </h2>
+      <section className="space-y-space-sm rounded-2xl border border-hairline bg-surface-container-lowest p-space-md shadow-card">
+        <h2 className="font-heading text-headline-md text-on-surface">다른 사람들이 고른 순위</h2>
         {globalRanking === null ? (
           <p className="text-body-sm text-on-surface-variant">불러오는 중...</p>
         ) : globalRanking.length === 0 ? (
@@ -242,34 +195,17 @@ export default function RankingPage() {
                 className="flex items-center justify-between gap-2 text-body-sm"
               >
                 <span className="flex min-w-0 items-center gap-2">
-                  <span
-                    className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-label-md ${
-                      i === 0
-                        ? 'bg-tertiary-fixed text-tertiary'
-                        : 'bg-surface-container-high text-outline'
-                    }`}
-                  >
+                  <span className="w-5 shrink-0 text-center text-label-md tabular-nums text-on-surface-variant">
                     {i + 1}
                   </span>
                   <span className="truncate text-on-surface">{entry.name}</span>
                 </span>
-                <span className="shrink-0 text-on-surface-variant">{entry.voters}명 선택</span>
+                <span className="shrink-0 tabular-nums text-on-surface-variant">{entry.voters}명 선택</span>
               </li>
             ))}
           </ol>
         )}
-      </div>
-
-      <div className="sticky bottom-20 z-40 flex">
-        <button
-          type="button"
-          onClick={() => navigate('/new')}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-float active:scale-[0.98]"
-        >
-          <Icon name="add_box" className="text-[20px]" />
-          아이템 직접등록
-        </button>
-      </div>
+      </section>
     </div>
   )
 }

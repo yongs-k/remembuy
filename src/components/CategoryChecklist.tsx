@@ -23,83 +23,92 @@ export function CategoryChecklist({
   const ownedCount = category.masterItems.length - missingIds.size
 
   return (
-    <section className="rounded-2xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
-      <div className="flex items-center justify-between gap-space-sm">
-        <div className="flex min-w-0 items-center gap-2">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary-container text-secondary">
-            <Icon name="category" className="text-[18px]" />
-          </div>
-          <h3 className="truncate font-heading text-headline-md text-on-surface">{category.name}</h3>
-          <span className="shrink-0 rounded-full bg-surface-container px-2 py-0.5 text-label-sm text-on-surface-variant">
-            {ownedCount}/{category.masterItems.length} 완료 ({percent}%)
+    <section className="rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
+      <div className="flex items-center justify-between gap-space-sm py-1 pl-space-md pr-1">
+        <div className="flex min-w-0 items-baseline gap-2">
+          <h2 className="truncate font-heading text-headline-md text-on-surface">{category.name}</h2>
+          <span className="shrink-0 text-label-md tabular-nums text-on-surface-variant">
+            {ownedCount}/{category.masterItems.length}
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-1 text-on-surface-variant">
-          <button type="button" aria-label="카테고리 이름 수정" onClick={onRename} className="p-1">
+        <div className="flex shrink-0 items-center text-on-surface-variant">
+          <button
+            type="button"
+            aria-label={`${category.name} 이름 수정`}
+            onClick={onRename}
+            className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container"
+          >
             <Icon name="edit" className="text-[18px]" />
           </button>
-          <button type="button" aria-label="카테고리 삭제" onClick={onRemove} className="p-1">
+          <button
+            type="button"
+            aria-label={`${category.name} 삭제`}
+            onClick={onRemove}
+            className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container"
+          >
             <Icon name="delete" className="text-[18px]" />
           </button>
         </div>
       </div>
-      <div className="mt-space-sm h-2 w-full overflow-hidden rounded-full bg-surface-container">
+      <div className="mx-space-md h-1 overflow-hidden rounded-full bg-surface-container-high">
         <div className="h-full rounded-full bg-secondary" style={{ width: `${percent}%` }} />
       </div>
-      <ul className="mt-space-sm space-y-1.5">
+      <ul className="mt-1 divide-y divide-hairline">
         {category.masterItems.map((m) => {
           const owned = !missingIds.has(m.id)
           const item = owned
             ? items.find((i) => i.categoryId === category.id && i.masterItemId === m.id)
             : undefined
           const remaining = item ? getRemainingDays(item) : undefined
-          return (
-            <li
-              key={m.id}
-              className="flex items-center gap-2.5 rounded-lg bg-surface-container-low px-2 py-2"
-            >
+          const rowCls = 'flex min-h-14 w-full items-center gap-2.5 px-space-md py-2 text-left'
+          const content = (
+            <>
               <span
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded ${
+                aria-hidden
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
                   owned ? 'bg-secondary text-on-secondary' : 'border-2 border-outline-variant'
                 }`}
               >
                 {owned && <Icon name="check" className="text-[14px]" />}
               </span>
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="flex items-center gap-1.5 text-label-lg text-on-surface">
-                  <span className="truncate">{m.name}</span>
-                  {remaining !== undefined && (
-                    <DdayLabel days={remaining} />
-                  )}
+              <span className="flex min-w-0 flex-1 flex-col">
+                <span className={`truncate text-label-lg ${owned ? 'text-on-surface' : 'text-on-surface-variant'}`}>
+                  {m.name}
                 </span>
-                <span className="truncate text-body-sm text-on-surface-variant">
-                  {owned ? (item?.name ?? '') : '미등록 슬롯'}
-                </span>
-              </div>
+                {owned && item && <span className="truncate text-body-sm text-on-surface-variant">{item.name}</span>}
+              </span>
+              {remaining !== undefined && <DdayLabel days={remaining} />}
+            </>
+          )
+          return (
+            <li key={m.id}>
               {owned && item ? (
                 <button
                   type="button"
                   onClick={() => onOpenItem(item.id)}
-                  className="shrink-0 rounded-lg bg-surface-container-high px-2.5 py-1 text-label-sm text-on-surface"
+                  className={`${rowCls} transition-colors hover:bg-surface-container-low`}
                 >
-                  관리
+                  {content}
+                  <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={onRecord}
-                  className="shrink-0 rounded-lg bg-surface-container-high px-2.5 py-1 text-label-sm text-primary"
-                >
-                  기록하기
-                </button>
+                <div className={rowCls}>
+                  {content}
+                  <button
+                    type="button"
+                    onClick={onRecord}
+                    aria-label={`${m.name} 기록하기`}
+                    className="min-h-11 shrink-0 rounded-lg border border-hairline px-3 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+                  >
+                    기록하기
+                  </button>
+                </div>
               )}
             </li>
           )
         })}
         {category.masterItems.length === 0 && (
-          <li className="text-body-sm text-on-surface-variant">
-            표준 품목이 아직 없는 카테고리입니다.
-          </li>
+          <li className="px-space-md py-3 text-body-sm text-on-surface-variant">표준 품목이 아직 없는 카테고리예요.</li>
         )}
       </ul>
     </section>

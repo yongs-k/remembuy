@@ -1,55 +1,45 @@
 import { Icon } from '../data/materialIcons'
 
-const CHIP: Record<number, string> = {
-  1: 'bg-tertiary-fixed text-tertiary',
-  2: 'bg-surface-container-high text-outline',
-  3: 'bg-tertiary-fixed/40 text-tertiary',
-}
-
+/** One row of a ranked list; the parent <ul> draws the card and dividers. */
 export function RankRow({
   rank,
   title,
   subtitle,
   icon,
-  hero,
+  color,
   onClick,
 }: {
   rank: number
   title: string
   subtitle: string
   icon: string
-  hero?: boolean
+  color?: string
   onClick: () => void
 }) {
-  const chip = CHIP[rank] ?? 'bg-surface-container-high text-outline'
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center justify-between gap-space-sm rounded-xl bg-surface-container-lowest text-left ${
-        hero
-          ? 'border border-tertiary/40 p-space-lg shadow-card'
-          : 'p-space-md border border-hairline shadow-card'
-      }`}
+      className="flex min-h-16 w-full items-center gap-3 px-space-md py-2 text-left transition-colors hover:bg-surface-container-low"
     >
-      <div className="flex min-w-0 items-center gap-3">
-        <div
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl font-heading text-label-lg ${chip}`}
-        >
-          {rank}위
-        </div>
-        <div
-          className={`flex shrink-0 items-center justify-center rounded-lg bg-surface-container text-on-surface-variant ${
-            hero ? 'h-14 w-14' : 'h-12 w-12'
-          }`}
-        >
-          <Icon name={icon} className="text-[24px]" />
-        </div>
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate font-heading text-headline-md text-on-surface">{title}</span>
-          <span className="text-body-sm text-on-surface-variant">{subtitle}</span>
-        </div>
-      </div>
+      <span
+        className={`w-6 shrink-0 text-center font-heading tabular-nums ${
+          rank === 1 ? 'text-headline-md text-on-surface' : 'text-label-lg text-on-surface-variant'
+        }`}
+      >
+        {rank}
+      </span>
+      <span
+        aria-hidden
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant"
+        style={color ? { backgroundColor: `${color}26`, color } : undefined}
+      >
+        <Icon name={icon} className="text-[22px]" />
+      </span>
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-label-lg text-on-surface">{title}</span>
+        <span className="truncate text-body-sm text-on-surface-variant">{subtitle}</span>
+      </span>
       <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
     </button>
   )

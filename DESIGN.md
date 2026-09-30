@@ -220,7 +220,8 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 
 ### Chips
 - **Style:** Oat pill, walnut label, 36px tall.
-- **State:** selected chips turn terracotta with a white label and expose `aria-pressed`.
+- **State:** selected filter/choice chips turn terracotta with a white label and expose `aria-pressed`.
+- **Switchers:** chips that switch which room you are looking at (컬렉션 room strip) select in Ink with a paper label, so the screen's one terracotta stays on its action. The same applies to state toggles such as 비추천해요.
 
 ### Cards / Containers
 - **Corner Style:** 16–20px.

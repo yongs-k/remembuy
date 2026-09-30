@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
 import { DdayLabel } from '../components/Badge'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
 import { ItemCard } from '../components/ItemCard'
+import { ItemThumb } from '../components/ItemThumb'
 import { Icon } from '../data/materialIcons'
 import { getRemainingDays, parseRestockCycleDays } from '../state/selectors'
 
@@ -12,17 +12,15 @@ export default function ItemDetailPage() {
   const navigate = useNavigate()
   const { items, locations, categories, updateItem } = useLocker()
   const item = items.find((i) => i.id === id)
-  const [imageFailed, setImageFailed] = useState(false)
-  useEffect(() => setImageFailed(false), [item?.id])
 
   if (!item) {
     return (
       <div className="space-y-space-sm p-margin">
-        <p className="text-body-md text-on-surface">상품을 찾을 수 없습니다.</p>
+        <p className="text-body-md text-on-surface">상품을 찾을 수 없어요.</p>
         <button
           type="button"
           onClick={() => navigate('/')}
-          className="text-label-md text-primary underline"
+          className="min-h-11 text-label-md text-primary underline underline-offset-4"
         >
           홈으로 돌아가기
         </button>
@@ -36,55 +34,34 @@ export default function ItemDetailPage() {
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
   const remaining = getRemainingDays(item)
-  const showImage = Boolean(item.imageUrl) && !imageFailed
+  const hasCycle = parseRestockCycleDays(item.restockCycle) !== undefined
+  const meta = [location?.name, category?.name].filter(Boolean).join(' · ')
+  const quietBtn =
+    'flex min-h-12 flex-1 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low active:scale-[0.98]'
 
   return (
     <div className="space-y-space-md p-margin">
       <button
         type="button"
         onClick={() => navigate(-1)}
-        className="inline-flex items-center gap-1 relative rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high before:absolute before:inset-x-0 before:-inset-y-2 before:content-['']"
+        className="relative inline-flex items-center gap-1 rounded-full bg-surface-container px-3 py-1.5 text-label-md text-on-surface-variant transition-colors before:absolute before:inset-x-0 before:-inset-y-2 before:content-[''] hover:bg-surface-container-high"
       >
         <Icon name="arrow_back" className="text-[16px]" />
         뒤로
       </button>
 
-      <div className="rounded-2xl bg-surface-container-lowest p-space-md">
-        <div className="flex gap-space-md">
-          <div className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-surface-container-low text-on-surface-variant">
-            {showImage ? (
-              <img
-                src={item.imageUrl ?? undefined}
-                alt=""
-                className="h-full w-full object-cover"
-                onError={() => setImageFailed(true)}
-              />
-            ) : (
-              <Icon name="inventory_2" className="text-[36px]" />
-            )}
-          </div>
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-1.5 text-label-sm">
-              {location && (
-                <span className="rounded bg-secondary-container px-1.5 py-0.5 text-on-secondary-container">
-                  {location.name}
-                </span>
-              )}
-              {category && (
-                <span className="rounded bg-surface-container-high px-1.5 py-0.5 text-on-surface-variant">
-                  {category.name}
-                </span>
-              )}
-            </div>
-            <h1 className="font-heading text-headline-lg text-on-surface">{item.name}</h1>
+      <div className="flex gap-space-md rounded-2xl border border-hairline bg-surface-container-lowest p-space-md shadow-card">
+        <ItemThumb item={item} className="h-24 w-20" />
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
+          {meta && <span className="text-body-sm text-on-surface-variant">{meta}</span>}
+          <h1 className="font-heading text-headline-lg text-on-surface">{item.name}</h1>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {item.price !== undefined && (
-              <span className="font-heading text-headline-md text-primary">
+              <span className="font-heading text-headline-md tabular-nums text-on-surface">
                 {item.price.toLocaleString()}원
               </span>
             )}
-            {remaining !== undefined && (
-              <DdayLabel days={remaining} />
-            )}
+            {remaining !== undefined && <DdayLabel days={remaining} />}
           </div>
         </div>
       </div>
@@ -97,7 +74,7 @@ export default function ItemDetailPage() {
       )}
 
       {item.note && (
-        <p className="rounded-xl bg-surface-container-lowest p-space-md text-body-sm text-on-surface border border-hairline shadow-card">
+        <p className="rounded-xl border border-hairline bg-surface-container-lowest p-space-md text-body-sm text-on-surface shadow-card">
           {item.note}
         </p>
       )}
@@ -111,65 +88,48 @@ export default function ItemDetailPage() {
             </div>
           )}
           {item.restockCycle && (
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex justify-between gap-2">
               <dt className="text-on-surface-variant">재구매 주기</dt>
-              <dd className="flex items-center gap-2 text-on-surface">
-                {item.restockCycle}
-                {parseRestockCycleDays(item.restockCycle) !== undefined && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })
-                    }
-                    className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface"
-                  >
-                    재구매함
-                  </button>
-                )}
-              </dd>
+              <dd className="text-on-surface">{item.restockCycle}</dd>
             </div>
           )}
         </dl>
       )}
 
-      <div className="flex items-stretch gap-2">
-        {item.affiliateUrl ? (
+      <div className="flex flex-col gap-2">
+        {item.affiliateUrl && (
           <a
             href={item.affiliateUrl}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary active:scale-[0.98]"
+            className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
           >
             <Icon name="shopping_cart" className="text-[18px]" />
             구매하기
           </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="flex flex-1 items-center justify-center rounded-xl bg-surface-container p-3 text-label-lg text-on-surface-variant opacity-60"
-          >
-            구매 링크 없음
-          </button>
         )}
-        <button
-          type="button"
-          onClick={() => navigate(`/new?editId=${item.id}`)}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-surface-container-lowest p-3 text-label-lg text-on-surface active:scale-[0.98]"
-        >
-          <Icon name="edit_note" className="text-[18px]" />
-          메모 수정하기
-        </button>
+        <div className="flex gap-2">
+          {hasCycle && (
+            <button
+              type="button"
+              onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
+              className={quietBtn}
+            >
+              <Icon name="restart_alt" className="text-[18px]" />
+              재구매함
+            </button>
+          )}
+          <button type="button" onClick={() => navigate(`/new?editId=${item.id}`)} className={quietBtn}>
+            <Icon name="edit" className="text-[18px]" />
+            수정하기
+          </button>
+        </div>
       </div>
 
       {relatedItems.length > 0 && (
         <section className="space-y-space-sm">
-          <h2 className="text-label-lg text-on-surface-variant">이런 상품은 어때요?</h2>
+          <h2 className="font-heading text-headline-md text-on-surface">같은 카테고리의 다른 상품</h2>
           <div className="space-y-space-sm">
             {relatedItems.map((related) => (
-              <ItemCard
-                key={related.id}
-                item={related}
-                onClick={() => navigate(`/item/${related.id}`)}
-              />
+              <ItemCard key={related.id} item={related} onClick={() => navigate(`/item/${related.id}`)} />
             ))}
           </div>
         </section>
