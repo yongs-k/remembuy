@@ -2,7 +2,6 @@ import type { Category, Item, Location } from '../types'
 import { getLocationCompletion, getMasterItemCounts } from '../state/selectors'
 import { CategoryChecklist } from './CategoryChecklist'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
-import { DUMMY_DETAIL_GOAL } from '../data/collectionDummy'
 
 export function CollectionDetail({
   items,
@@ -103,7 +102,11 @@ export function CollectionDetail({
         <div className="mt-space-sm h-2 w-full overflow-hidden rounded-full bg-surface-container">
           <div className="h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
         </div>
-        <p className="mt-2 text-label-sm text-on-surface-variant">{DUMMY_DETAIL_GOAL}</p>
+        <p className="mt-2 text-label-sm text-on-surface-variant">
+          {counts.owned >= counts.total
+            ? '모든 표준 소모품을 채웠어요'
+            : `${counts.total - counts.owned}종 더 채우면 완성이에요`}
+        </p>
       </div>
 
       <div className="flex items-center gap-2 rounded-xl bg-surface-container-low p-space-sm text-body-sm text-on-surface-variant">
