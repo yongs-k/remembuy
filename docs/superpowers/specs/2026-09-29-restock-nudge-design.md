@@ -1,5 +1,9 @@
 # 재구매 알림 (Restock Nudge) — Design
 
+> **Update 2026-09-30:** the preset-only parsing below was widened by user
+> decision. `parseRestockCycleDays` now reads any "N일 / N주 / N개월(달) / N년"
+> in the text (a month = 30 days), so free-text and seed cycles get due dates too.
+
 ## Context
 
 `docs/product-roadmap.md`'s Phase 2/3 vision and its "recommended build order"

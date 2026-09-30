@@ -167,8 +167,17 @@ describe('parseRestockCycleDays', () => {
     expect(parseRestockCycleDays('약 90일마다')).toBe(90)
   })
 
-  it('returns undefined for free-text cycles', () => {
-    expect(parseRestockCycleDays('약 2개월마다')).toBeUndefined()
+  it('parses free-text cycles in days, weeks, months and years', () => {
+    expect(parseRestockCycleDays('약 2개월마다')).toBe(60)
+    expect(parseRestockCycleDays('약 1.5개월마다')).toBe(45)
+    expect(parseRestockCycleDays('약 3주마다')).toBe(21)
+    expect(parseRestockCycleDays('두 달, 약 2달마다')).toBe(60)
+    expect(parseRestockCycleDays('1년에 한 번')).toBe(365)
+  })
+
+  it('returns undefined for text without a number and unit, or a zero cycle', () => {
+    expect(parseRestockCycleDays('가끔')).toBeUndefined()
+    expect(parseRestockCycleDays('0일마다')).toBeUndefined()
   })
 
   it('returns undefined for null and undefined', () => {
@@ -178,8 +187,8 @@ describe('parseRestockCycleDays', () => {
 })
 
 describe('getRestockDueDays', () => {
-  it('returns undefined when restockCycle is not a known preset', () => {
-    const item = makeItem({ id: 'i1', restockCycle: '약 2개월마다' })
+  it('returns undefined when restockCycle cannot be parsed', () => {
+    const item = makeItem({ id: 'i1', restockCycle: '가끔' })
     expect(getRestockDueDays(item, '2026-09-05')).toBeUndefined()
   })
 

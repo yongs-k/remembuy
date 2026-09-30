@@ -61,11 +61,14 @@ export function formatDday(days: number): string {
   return days >= 0 ? `D-${days}` : `D+${Math.abs(days)}`
 }
 
-const RESTOCK_CYCLE_PRESETS = [45, 60, 90]
+const CYCLE_UNIT_DAYS: Record<string, number> = { 일: 1, 주: 7, 개월: 30, 달: 30, 년: 365 }
 
+/** "약 45일마다", "약 1.5개월마다", "3주마다" → days. A month counts as 30 days. */
 export function parseRestockCycleDays(restockCycle: string | null | undefined): number | undefined {
-  if (!restockCycle) return undefined
-  return RESTOCK_CYCLE_PRESETS.find((d) => restockCycle === `약 ${d}일마다`)
+  const match = restockCycle?.match(/(\d+(?:\.\d+)?)\s*(개월|달|주|일|년)/)
+  if (!match) return undefined
+  const days = Math.round(Number(match[1]) * CYCLE_UNIT_DAYS[match[2]])
+  return days > 0 ? days : undefined
 }
 
 export function getRestockDueDays(item: Item, today: string = new Date().toISOString().slice(0, 10)): number | undefined {
