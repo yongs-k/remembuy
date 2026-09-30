@@ -16,6 +16,8 @@ export function HomeGameCard() {
           <p role={catalogError ? 'alert' : undefined} className="text-body-sm text-inverse-on-surface/70">
             {catalogError
               ? '게임 정보를 불러오지 못했어요'
+              : points === 0
+                ? '도감 수집률을 올리면 포인트가 쌓여요'
               : dex.length === 0
                 ? '상자를 열어 아이템을 모아보세요'
                 : `${completed}/${dex.length} 완성`}

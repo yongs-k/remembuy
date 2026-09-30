@@ -37,6 +37,9 @@ export default function StorePage() {
           </span>
         )}
       </div>
+      <p className="text-body-sm text-on-surface-variant">
+        포인트로 상자를 열면 아이템 조각이 나와요. 조각을 다 모으면 아이템 수집함에 완성돼요.
+      </p>
 
       {boxes.length === 0 ? (
         <GameCatalogStatus label="상자 정보를" />

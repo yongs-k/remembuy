@@ -46,8 +46,9 @@ export function CollectionOverview({
       <section className="space-y-space-sm">
         <h1 className="font-heading text-display-sm text-on-surface">컬렉션</h1>
         <p className="text-body-md text-on-surface-variant">
-          표준 소모품 {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을
-          모았어요
+          공간마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요.
+          <br />
+          {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을 모았어요.
         </p>
         <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
           <div className="h-full rounded-full bg-secondary" style={{ width: `${overallPercent}%` }} />

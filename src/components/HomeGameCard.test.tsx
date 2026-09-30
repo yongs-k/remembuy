@@ -49,6 +49,12 @@ describe('HomeGameCard', () => {
     expect(screen.getByText('상자를 열어 아이템을 모아보세요')).toBeInTheDocument()
   })
 
+  it('explains how to earn points while the balance is zero', () => {
+    mockGame({ ...STATE, points: 0 }, DEX)
+    render(<HomeGameCard />)
+    expect(screen.getByText('도감 수집률을 올리면 포인트가 쌓여요')).toBeInTheDocument()
+  })
+
   it('says the game is unavailable instead of showing 0P when the catalog fails', () => {
     mockGame(null, [], true)
     render(<HomeGameCard />)

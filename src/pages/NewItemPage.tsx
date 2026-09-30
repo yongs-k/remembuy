@@ -378,21 +378,27 @@ export default function NewItemPage() {
         </div>
 
         {selectedCategory && (
-          <label className={labelCls}>
-            표준 품목과 연결 (선택)
-            <select
-              value={masterItemId}
-              onChange={(e) => setMasterItemId(e.target.value)}
-              className={inputCls}
-            >
-              <option value="">직접 입력 (커스텀 상품)</option>
-              {selectedCategory.masterItems.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div>
+            <label className={labelCls}>
+              어떤 종류의 상품인가요? (선택)
+              <select
+                value={masterItemId}
+                onChange={(e) => setMasterItemId(e.target.value)}
+                aria-describedby="master-item-hint"
+                className={inputCls}
+              >
+                <option value="">목록에 없어요</option>
+                {selectedCategory.masterItems.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p id="master-item-hint" className="mt-1 text-body-sm text-on-surface-variant">
+              고르면 {locationName} 도감에 체크돼요. 도감 수집률이 한 단계 오를 때마다 포인트를 받아요.
+            </p>
+          </div>
         )}
       </section>
 

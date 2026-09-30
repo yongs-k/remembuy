@@ -4,6 +4,9 @@
 
 body {
   @apply bg-surface text-on-surface font-body;
+  /* Wrap Korean at word boundaries; still break long URLs instead of overflowing. */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 h1, h2, h3 {
