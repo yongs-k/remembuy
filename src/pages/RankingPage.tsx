@@ -209,9 +209,9 @@ export default function RankingPage() {
         </ol>
       )}
 
-      <div className="flex items-center justify-between rounded-xl border border-dashed border-outline-variant bg-surface-container-low p-space-md">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-surface-container-highest text-outline">
+      <div className="flex items-center justify-between gap-space-sm rounded-xl border border-dashed border-outline-variant bg-surface-container-low p-space-md">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-container-highest text-outline">
             <Icon name="add" className="text-[24px]" />
           </div>
           <div className="flex flex-col">
@@ -224,7 +224,7 @@ export default function RankingPage() {
         <button
           type="button"
           onClick={() => navigate('/new')}
-          className="rounded-lg bg-surface-container-lowest px-3 py-1.5 text-label-sm text-primary shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+          className="shrink-0 rounded-lg bg-surface-container-lowest px-3 py-1.5 text-label-sm text-primary shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
         >
           추가
         </button>
@@ -265,23 +265,14 @@ export default function RankingPage() {
         )}
       </div>
 
-      <div className="sticky bottom-20 z-40 flex items-stretch gap-space-sm">
+      <div className="sticky bottom-20 z-40 flex">
         <button
           type="button"
           onClick={() => navigate('/new')}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-surface-container-lowest p-3 text-label-lg text-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.08),0_3px_0px_rgba(43,38,37,0.12)] active:translate-y-0.5"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
         >
-          <Icon name="add_box" className="text-[20px] text-primary" />
+          <Icon name="add_box" className="text-[20px]" />
           아이템 직접등록
-        </button>
-        <button
-          type="button"
-          disabled
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901] disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-100"
-        >
-          <Icon name="barcode_scanner" className="text-[20px]" />
-          바코드 찍고 랭킹 등록
-          <span className="text-label-sm font-normal">준비 중</span>
         </button>
       </div>
     </div>

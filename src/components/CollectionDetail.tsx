@@ -126,23 +126,14 @@ export function CollectionDetail({
         />
       ))}
 
-      <div className="sticky bottom-20 z-40 flex items-stretch gap-space-sm">
+      <div className="sticky bottom-20 z-40 flex">
         <button
           type="button"
           onClick={onRecord}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-surface-container-lowest p-3 text-label-lg text-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.08),0_3px_0px_rgba(43,38,37,0.12)] active:translate-y-0.5"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] active:translate-y-0.5 active:shadow-[0_1px_0px_#8b1901]"
         >
-          <Icon name="add_box" className="text-[20px] text-primary" />
+          <Icon name="add_box" className="text-[20px]" />
           아이템 직접등록
-        </button>
-        <button
-          type="button"
-          disabled
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-primary p-3 text-label-lg text-on-primary shadow-[0_4px_12px_rgba(170,48,21,0.25),0_4px_0px_#8b1901] disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none disabled:opacity-100"
-        >
-          <Icon name="barcode_scanner" className="text-[20px]" />
-          바코드 찍고 채우기
-          <span className="text-label-sm font-normal">준비 중</span>
         </button>
       </div>
     </div>
