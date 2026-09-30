@@ -224,7 +224,7 @@ export default function HomePage() {
                 type="button"
                 aria-pressed={filter === key}
                 onClick={() => setFilter(key)}
-                className={`rounded-full px-3 py-1.5 text-label-md ${
+                className={`min-h-9 rounded-full px-3 text-label-md ${
                   filter === key
                     ? 'bg-primary text-on-primary'
                     : 'bg-surface-container text-on-surface-variant'
