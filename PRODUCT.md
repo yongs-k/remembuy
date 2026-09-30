@@ -22,7 +22,7 @@ The act of recording is the game, and the records feed the AI. Logging items pow
 
 - Mobile-first responsive web app (React 18 + Vite + Tailwind, react-router). Express-style game server in `server/`.
 - Information structure: 장소 (Location) → 카테고리 → 상품 (Item). Four default locations: 욕실, 주방, 세탁실, 옷장.
-- Current routes: 홈 `/`, item detail `/item/:id`, 랭킹 `/ranking`, 알림 `/notifications`, 구매 `/purchase`, 가족 케어 `/family`, 새로 기록 `/new`, 컬렉션 `/collection`, 상점 `/store`, 도감 `/dex`, admin `/admin`.
+- Current routes: 홈 `/`, item detail `/item/:id`, 랭킹 `/ranking`, 알림 `/notifications`, 구매 `/purchase`, 새로 기록 `/new`, 컬렉션 `/collection`, 상점 `/store`, 도감 `/dex`, admin `/admin`.
 - Restock loop: restock-cycle due dates merge into 알림, the 재구매함 reset lives on 알림 and item detail, and adding an item can use Gemini-backed product image search.
 
 ## Capabilities and Constraints
@@ -36,7 +36,7 @@ The act of recording is the game, and the records feed the AI. Logging items pow
 
 - Specs: `REMEMBUY_스펙_안티그래비티용.md` (original MVP spec) and `docs/product-roadmap.md` (the AI vision).
 - Stitch mockups: `stitch/stitch_remembuy_gamified_purchase_tracker/` (reference only).
-- Data today is seed and dummy (`src/data/seedItems.ts`, `homeDummy.ts`, `purchaseDummy.ts`, `familyData.ts`). There are no real users, testimonials, metrics, or affiliate partnerships. Do not fabricate any.
+- Data today is seed data (`src/data/seedItems.ts`). 가족 케어 was removed on 2026-09-30 until family sharing has a backend. There are no real users, testimonials, metrics, or affiliate partnerships. Do not fabricate any.
 
 ## Product Principles
 

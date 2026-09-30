@@ -44,10 +44,3 @@ export type FeedPost = {
   locationId: string
   categoryId: string
 }
-
-export type FamilyMember = {
-  id: string
-  name: string
-  relation: string
-  items: Array<{ itemName: string; daysUntilEmpty: number }>
-}
