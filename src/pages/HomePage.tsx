@@ -233,7 +233,7 @@ export default function HomePage() {
               </h2>
               <span className="text-body-sm text-on-surface-variant">기록 상품 {items.length}개</span>
             </div>
-            <div className="grid grid-cols-2 gap-space-sm">
+            <div className="grid grid-cols-2 gap-space-sm sm:grid-cols-3">
               {locations.map((location) => (
                 <HomeLocationTile
                   key={location.id}
@@ -256,7 +256,7 @@ export default function HomePage() {
       )}
 
       {selectedLocationId && !selectedCategoryId && (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {categoriesForLocation.map((category) => {
             const count = items.filter((i) => i.categoryId === category.id).length
             return (
@@ -316,7 +316,7 @@ export default function HomePage() {
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-[0_6px_16px_rgba(170,48,21,0.35),0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-1 active:shadow-[0_2px_0px_#8b1901] md:bottom-8 md:right-[max(1rem,calc(50%-410px+1rem))]"
+        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-[0_6px_16px_rgba(170,48,21,0.35),0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-1 active:shadow-[0_2px_0px_#8b1901] md:right-[max(1rem,calc(50%-384px+1rem))]"
         aria-label="새로 기록하기"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">

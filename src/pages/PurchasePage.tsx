@@ -129,7 +129,7 @@ export default function PurchasePage() {
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center md:bottom-8"
+        className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex justify-center"
       >
         {notice && (
           <span className="max-w-[90%] rounded-full bg-inverse-surface px-4 py-2 text-label-md text-inverse-on-surface shadow-[0_4px_12px_rgba(0,0,0,0.2)]">

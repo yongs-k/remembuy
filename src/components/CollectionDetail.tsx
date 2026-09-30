@@ -123,7 +123,7 @@ export function CollectionDetail({
         />
       ))}
 
-      <div className="sticky bottom-20 z-40 flex items-stretch gap-space-sm md:bottom-4">
+      <div className="sticky bottom-20 z-40 flex items-stretch gap-space-sm">
         <button
           type="button"
           onClick={onRecord}

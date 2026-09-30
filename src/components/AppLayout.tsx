@@ -21,36 +21,10 @@ export function AppLayout() {
   ).length
 
   return (
-    <div className="flex h-dvh bg-surface text-on-surface md:mx-auto md:max-w-[820px]">
-      <nav className="hidden w-56 flex-col gap-1 border-r-2 border-ink bg-surface-container-lowest p-4 md:flex">
-        <div className="mb-4 flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-[0_3px_0px_#8b1901]">
-            <Icon name="token" className="text-[20px]" />
-          </div>
-          <span className="font-heading text-lg text-primary">REMEMBUY</span>
-        </div>
-        {TABS.map((tab) => (
-          <NavLink
-            key={tab.to}
-            to={tab.to}
-            end={tab.to === '/'}
-            className={({ isActive }) =>
-              `flex items-center gap-2 rounded-xl border-2 px-3 py-2 text-sm ${
-                isActive
-                  ? 'border-ink bg-primary text-on-primary shadow-[0_3px_0px_#8b1901]'
-                  : 'border-transparent text-on-surface-variant'
-              }`
-            }
-          >
-            <Icon name={tab.icon} className="text-[20px]" />
-            {tab.label}
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="flex min-w-0 flex-1 flex-col">
+    <div className="h-dvh bg-surface-container-low">
+      <div className="relative mx-auto flex h-full max-w-3xl flex-col bg-surface text-on-surface md:border-x-2 md:border-ink">
         <header className="flex items-center justify-between border-b-2 border-ink bg-surface-container-lowest px-4 py-3">
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-[0_3px_0px_#8b1901]">
               <Icon name="token" className="text-[20px]" />
             </div>
@@ -68,30 +42,28 @@ export function AppLayout() {
             )}
           </button>
         </header>
-        <main className="flex-1 overflow-y-auto pb-20 md:pb-4">
-          <div className="mx-auto w-full max-w-3xl">
-            <Outlet />
-          </div>
+        <main className="flex-1 overflow-y-auto pb-20">
+          <Outlet />
         </main>
-      </div>
 
-      <nav className="fixed inset-x-0 bottom-0 grid grid-cols-5 border-t-2 border-ink bg-surface-container-lowest pb-[env(safe-area-inset-bottom)] md:hidden">
-        {TABS.map((tab) => (
-          <NavLink
-            key={tab.to}
-            to={tab.to}
-            end={tab.to === '/'}
-            className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 py-2 text-xs ${
-                isActive ? 'text-primary font-bold' : 'text-on-surface-variant'
-              }`
-            }
-          >
-            <Icon name={tab.icon} className="text-[22px]" />
-            {tab.label}
-          </NavLink>
-        ))}
-      </nav>
+        <nav className="fixed inset-x-0 bottom-0 z-40 mx-auto grid max-w-3xl grid-cols-5 border-t-2 border-ink bg-surface-container-lowest pb-[env(safe-area-inset-bottom)] md:border-x-2">
+          {TABS.map((tab) => (
+            <NavLink
+              key={tab.to}
+              to={tab.to}
+              end={tab.to === '/'}
+              className={({ isActive }) =>
+                `flex flex-col items-center gap-0.5 py-2 text-xs ${
+                  isActive ? 'text-primary font-bold' : 'text-on-surface-variant'
+                }`
+              }
+            >
+              <Icon name={tab.icon} className="text-[22px]" />
+              {tab.label}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
     </div>
   )
 }

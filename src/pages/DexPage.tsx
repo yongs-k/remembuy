@@ -33,7 +33,7 @@ export default function DexPage() {
           return (
             <div key={grade} className="space-y-2">
               <h2 className="text-label-lg font-bold text-on-surface-variant">{gradeLabel(grade)}</h2>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {entries.map((entry) => (
                   <DexItemCard key={entry.id} entry={entry} onOpen={() => setSelected(entry)} />
                 ))}
