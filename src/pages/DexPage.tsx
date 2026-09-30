@@ -55,20 +55,29 @@ export default function DexPage() {
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
           onClick={() => setSelected(null)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setSelected(null)
+          }}
         >
           <div
-            className="w-full max-w-md space-y-2 rounded-t-2xl bg-surface-container-lowest p-4 pb-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dex-sheet-title"
+            className="w-full max-w-md space-y-2 rounded-t-2xl bg-surface-container-lowest p-4 pb-[calc(2rem+env(safe-area-inset-bottom))]"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-center font-heading text-headline-md text-on-surface">{selected.name}</p>
+            <p id="dex-sheet-title" className="text-center font-heading text-headline-md text-on-surface">
+              {selected.name}
+            </p>
             <p className="text-center text-body-sm text-on-surface-variant">{gradeLabel(selected.grade)}</p>
             <p className="text-center text-body-sm text-on-surface-variant">
               {selected.fragmentCount} / {selected.fragmentsRequired} 조각
             </p>
             <button
               type="button"
+              autoFocus
               onClick={() => setSelected(null)}
-              className="w-full pt-2 text-center text-body-sm text-on-surface-variant"
+              className="min-h-11 w-full text-center text-body-md text-on-surface-variant"
             >
               닫기
             </button>

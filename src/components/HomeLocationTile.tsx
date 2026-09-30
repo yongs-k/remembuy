@@ -21,7 +21,7 @@ export function HomeLocationTile({
     <button
       type="button"
       onClick={onClick}
-      className="flex h-[126px] flex-col justify-between rounded-xl bg-surface-container-lowest p-space-md text-left border border-hairline shadow-card transition-shadow hover:border border-hairline shadow-card"
+      className="flex h-[126px] flex-col justify-between rounded-xl bg-surface-container-lowest p-space-md text-left border border-hairline shadow-card transition-colors hover:border-outline-variant"
     >
       <div className="flex items-start justify-between">
         <div
@@ -35,7 +35,7 @@ export function HomeLocationTile({
             <path
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
-              stroke="#eae0de"
+              stroke="#e7e2db"
               strokeWidth="4"
             />
             <path

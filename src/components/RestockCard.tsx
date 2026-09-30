@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { DdayLabel } from './Badge'
+import { ItemThumb } from './ItemThumb'
 import type { Item } from '../types'
 import { useLocker } from '../state/LockerContext'
 import { getSoonestRemaining, getRestockDueDays } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
+/** One row of a restock list; the parent <ul> draws the card and dividers. */
 export function RestockCard({ item, showLastPurchase = false }: { item: Item; showLastPurchase?: boolean }) {
   const { updateItem } = useLocker()
   const navigate = useNavigate()
@@ -16,11 +18,13 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
     .join(' · ')
 
   return (
-    <li className="rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card">
-      <div className="flex items-center gap-space-sm">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant">
-          <Icon name="inventory_2" className="text-[22px]" />
-        </div>
+    <li className="px-space-md py-2">
+      <button
+        type="button"
+        onClick={() => navigate(`/item/${item.id}`)}
+        className="flex min-h-14 w-full items-center gap-3 text-left"
+      >
+        <ItemThumb item={item} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-label-lg text-on-surface">{item.name}</p>
           {showLastPurchase && lastPurchase && (
@@ -28,33 +32,29 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
           )}
         </div>
         {remaining !== undefined && <DdayLabel days={remaining} />}
-      </div>
-      <div className="mt-space-sm flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => navigate(`/item/${item.id}`)}
-          className="rounded-lg bg-surface-container-high px-3 py-1.5 text-label-md text-on-surface"
-        >
-          상세보기
-        </button>
-        {canRestock && (
-          <button
-            type="button"
-            onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
-            className="rounded-lg bg-surface-container-high px-3 py-1.5 text-label-md text-on-surface"
-          >
-            재구매함
-          </button>
-        )}
-        {item.affiliateUrl && (
-          <a
-            href={item.affiliateUrl}
-            className="ml-auto rounded-lg bg-primary px-3 py-1.5 text-label-md text-on-primary active:scale-[0.98]"
-          >
-            구매하기
-          </a>
-        )}
-      </div>
+        <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+      </button>
+      {(canRestock || item.affiliateUrl) && (
+        <div className="flex gap-2 pb-1 pl-[3.75rem]">
+          {canRestock && (
+            <button
+              type="button"
+              onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
+              className="min-h-11 rounded-lg border border-hairline px-3 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+            >
+              재구매함
+            </button>
+          )}
+          {item.affiliateUrl && (
+            <a
+              href={item.affiliateUrl}
+              className="flex min-h-11 items-center rounded-lg bg-primary px-3 text-label-md text-on-primary active:scale-[0.98]"
+            >
+              구매하기
+            </a>
+          )}
+        </div>
+      )}
     </li>
   )
 }

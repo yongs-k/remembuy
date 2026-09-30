@@ -24,6 +24,15 @@ describe('useSeenNotifications', () => {
     expect(result.current.seenIds.slice().sort()).toEqual(['a', 'b', 'c'])
   })
 
+  it('a mark in one place clears the unread state everywhere else', () => {
+    const header = renderHook(() => useSeenNotifications())
+    const page = renderHook(() => useSeenNotifications())
+    act(() => {
+      page.result.current.markSeen(['n1'])
+    })
+    expect(header.result.current.seenIds).toEqual(['n1'])
+  })
+
   it('persists to localStorage', () => {
     const { result } = renderHook(() => useSeenNotifications())
     act(() => {

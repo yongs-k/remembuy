@@ -36,7 +36,7 @@ export default function NotificationsPage() {
           <p className="text-body-sm text-on-surface-variant">임박한 소모품이 없습니다.</p>
         </div>
       ) : (
-        <ul className="space-y-space-sm">
+        <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
           {upcoming.map((item) => (
             <RestockCard key={item.id} item={item} />
           ))}

@@ -2,6 +2,7 @@ import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
 import { Badge, DdayLabel } from './Badge'
+import { ItemThumb } from './ItemThumb'
 import { getRemainingDays } from '../state/selectors'
 
 const RANK_CHIP = [
@@ -28,8 +29,7 @@ export function PodiumItemCard({
 
   return (
     <div
-      onClick={onOpen}
-      className={`cursor-pointer overflow-hidden rounded-xl bg-surface-container-lowest ${
+      className={`overflow-hidden rounded-xl bg-surface-container-lowest ${
         isFirst
           ? 'border border-primary/30 shadow-card'
           : 'border border-hairline shadow-card'
@@ -41,13 +41,17 @@ export function PodiumItemCard({
           <span className="text-label-md tracking-wider">추천 순 1위</span>
         </div>
       )}
-      <div className={`flex gap-space-md ${compact ? 'p-space-sm' : 'p-space-md'}`}>
+      <button
+        type="button"
+        onClick={onOpen}
+        className={`flex w-full gap-space-md text-left transition-colors hover:bg-surface-container-low ${compact ? 'p-space-sm' : 'p-space-md'}`}
+      >
         <div
-          className={`relative flex shrink-0 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant ${
+          className={`relative shrink-0 ${
             compact ? 'h-12 w-12' : isFirst ? 'h-24 w-20' : 'h-20 w-16'
           }`}
         >
-          <Icon name="inventory_2" className="text-[28px]" />
+          <ItemThumb item={item} className="h-full w-full" />
           <span
             className={`absolute left-1 top-1 flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-label-sm ${chip}`}
           >
@@ -61,13 +65,13 @@ export function PodiumItemCard({
             )}
             {item.podiumRank === 1 && <Badge>다시 살래요</Badge>}
           </div>
-          <h3
+          <p
             className={`line-clamp-2 font-heading text-on-surface ${
               compact ? 'text-label-lg' : 'text-headline-md'
             }`}
           >
             {item.name}
-          </h3>
+          </p>
           {item.recommendation !== undefined && (
             <RecommendationBadge recommendation={item.recommendation} />
           )}
@@ -79,28 +83,30 @@ export function PodiumItemCard({
             </p>
           )}
         </div>
-      </div>
-      <div className="flex items-center justify-between border-t border-surface-container-high px-space-md py-1.5">
+      </button>
+      <div className="flex items-center justify-between border-t border-surface-container-high px-space-md py-1">
         <span className="text-label-sm text-on-surface-variant">순위 지정</span>
-        <div className="flex gap-1.5">
+        <div className="-mr-1.5 flex">
           {([1, 2, 3] as const).map((rank) => {
             const isAssigned = item.podiumRank === rank
             return (
               <button
                 key={rank}
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onAssign(isAssigned ? null : rank)
-                }}
-                className={`flex h-7 w-7 items-center justify-center rounded-full text-label-md ${
-                  isAssigned
-                    ? 'bg-tertiary-fixed text-tertiary'
-                    : 'bg-surface-container-high text-outline'
-                }`}
+                onClick={() => onAssign(isAssigned ? null : rank)}
+                aria-pressed={isAssigned}
                 aria-label={`${rank}등으로 지정`}
+                className="group flex h-11 w-11 items-center justify-center"
               >
-                {rank}
+                <span
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-label-md tabular-nums transition-colors ${
+                    isAssigned
+                      ? 'bg-tertiary-fixed text-on-tertiary-fixed'
+                      : 'border border-hairline text-on-surface-variant group-hover:bg-surface-container-low'
+                  }`}
+                >
+                  {rank}
+                </span>
               </button>
             )
           })}

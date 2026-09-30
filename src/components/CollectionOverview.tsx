@@ -93,7 +93,7 @@ export function CollectionOverview({
           </div>
           <span className="text-label-sm text-on-surface-variant">총 {locations.length}개 공간</span>
         </div>
-        <div className="mb-space-sm flex gap-1.5 overflow-x-auto pb-space-sm">
+        <div className="mb-space-sm flex gap-1.5 overflow-x-auto pb-space-xs [scrollbar-width:none]">
           {chips.map((chip) => {
             const count = rows.filter((r) => matches[chip.key](r.percent)).length
             const active = filter === chip.key

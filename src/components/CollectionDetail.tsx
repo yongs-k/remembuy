@@ -66,7 +66,7 @@ export function CollectionDetail({
         </span>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-space-xs">
+      <div className="flex gap-1.5 overflow-x-auto pb-space-xs [scrollbar-width:none]">
         {locations.map((l) => {
           const c = getMasterItemCounts(items, categories, l.id)
           const active = l.id === location.id

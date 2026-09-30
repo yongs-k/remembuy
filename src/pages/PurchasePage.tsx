@@ -40,7 +40,7 @@ export default function PurchasePage() {
           </button>
         </div>
       ) : (
-        <ul className="space-y-space-sm">
+        <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
           {upcoming.map((item) => (
             <RestockCard key={item.id} item={item} showLastPurchase />
           ))}
