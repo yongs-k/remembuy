@@ -123,51 +123,14 @@ export default function HomePage() {
     }
   }
 
-  if (searchResults !== null) {
-    return (
-      <div className="space-y-4 p-4">
-        <div className="flex items-center gap-2 rounded-xl bg-surface-container-lowest p-1.5 shadow-[0_3px_0px_#eae0de] focus-within:ring-2 focus-within:ring-primary">
-          <div className="pointer-events-none flex items-center pl-2.5 text-on-surface-variant">
-            <Icon name="search" className="text-[20px]" />
-          </div>
-          <input
-            type="search"
-            placeholder="상품 검색"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="min-w-0 w-full bg-transparent py-1.5 text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
-          />
-          <button
-            type="button"
-            aria-label="바코드 스캔"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-on-surface transition-colors hover:bg-surface-variant active:scale-95"
-          >
-            <Icon name="qr_code_scanner" className="text-[20px]" />
-          </button>
-        </div>
-        <div className="space-y-2">
-          {searchResults.length === 0 ? (
-            <p className="text-body-sm text-on-surface-variant">검색 결과가 없습니다.</p>
-          ) : (
-            searchResults.map((item) => (
-              <ItemCard key={item.id} item={item} onClick={() => navigate(`/item/${item.id}`)} />
-            ))
-          )}
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4 p-4">
-      {!selectedLocationId && (
+      {/* Search bar stays at a fixed tree position so typing never remounts the input. */}
+      {searchResults === null && !selectedLocationId && (
         <>
           <HomeProfileCard itemCount={items.length} />
           <HomeGameCard />
-          <div className="flex items-center justify-between">
-            <h2 className="font-heading text-lg">추천 퀘스트</h2>
-            <span className="text-label-md text-on-surface-variant">전체보기 →</span>
-          </div>
+          <h2 className="pt-space-sm font-heading text-headline-md text-on-surface">추천 퀘스트</h2>
           <QuestCarousel quests={DUMMY_QUESTS} />
         </>
       )}
@@ -178,10 +141,11 @@ export default function HomePage() {
         </div>
         <input
           type="search"
+          aria-label="상품 검색"
           placeholder="상품 검색"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="min-w-0 w-full bg-transparent py-1.5 text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none"
+          className="min-w-0 w-full bg-transparent py-2 text-body-lg font-normal text-on-surface placeholder:text-on-surface-variant focus:outline-none"
         />
         <button
           type="button"
@@ -192,6 +156,18 @@ export default function HomePage() {
         </button>
       </div>
 
+      {searchResults !== null ? (
+        <div className="space-y-2">
+          {searchResults.length === 0 ? (
+            <p className="text-body-sm text-on-surface-variant">검색 결과가 없습니다.</p>
+          ) : (
+            searchResults.map((item) => (
+              <ItemCard key={item.id} item={item} onClick={() => navigate(`/item/${item.id}`)} />
+            ))
+          )}
+        </div>
+      ) : (
+      <>
       {(selectedLocationId || selectedCategoryId) && (
         <button
           type="button"
@@ -272,11 +248,13 @@ export default function HomePage() {
           </div>
         </>
       )}
+      </>
+      )}
 
       <button
         type="button"
         onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-[0_6px_16px_rgba(170,48,21,0.35),0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-1 active:shadow-[0_2px_0px_#8b1901] md:bottom-8"
+        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-[0_6px_16px_rgba(170,48,21,0.35),0_3px_0px_#8b1901] transition-all hover:bg-primary-container active:translate-y-1 active:shadow-[0_2px_0px_#8b1901] md:bottom-8 md:right-[max(1rem,calc(50%-410px+1rem))]"
         aria-label="새로 기록하기"
       >
         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
@@ -289,18 +267,28 @@ export default function HomePage() {
         <div
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
           onClick={closeRecordSheet}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') closeRecordSheet()
+          }}
         >
           <div
-            className="w-full max-w-md space-y-2 rounded-t-2xl bg-surface-container-lowest p-4 pb-8"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="record-sheet-title"
+            className="w-full max-w-md space-y-2 rounded-t-2xl bg-surface-container-lowest p-4 pb-[calc(2rem+env(safe-area-inset-bottom))]"
             onClick={(e) => e.stopPropagation()}
           >
             {!showLinkInput ? (
               <>
-                <p className="pb-1 text-center text-body-sm text-on-surface-variant">
+                <h2
+                  id="record-sheet-title"
+                  className="pb-1 text-center text-label-lg text-on-surface"
+                >
                   어떻게 기록할까요?
-                </p>
+                </h2>
                 <button
                   type="button"
+                  autoFocus
                   onClick={() => cameraInputRef.current?.click()}
                   className="flex w-full items-center gap-3 rounded-xl border-2 border-ink p-3 text-left text-on-surface"
                 >
@@ -373,15 +361,20 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <p className="pb-1 text-center text-body-sm text-on-surface-variant">
+                <h2
+                  id="record-sheet-title"
+                  className="pb-1 text-center text-label-lg text-on-surface"
+                >
                   상품 링크를 붙여넣어주세요
-                </p>
+                </h2>
                 <input
                   type="url"
+                  autoFocus
+                  aria-label="상품 링크"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 text-body-md text-on-surface focus:border-primary focus:outline-none"
+                  className="w-full rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 text-body-lg font-normal text-on-surface focus:border-primary focus:outline-none"
                   disabled={isAnalyzing}
                 />
                 {analyzeError && (

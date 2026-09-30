@@ -1,10 +1,11 @@
 import { DUMMY_PROFILE, DUMMY_STATS } from '../data/homeDummy'
 import { Icon } from '../data/materialIcons'
+import { useGame } from '../state/GameContext'
 
 export function HomeProfileCard({ itemCount }: { itemCount: number }) {
+  const points = useGame().state?.points ?? 0
   return (
     <div className="relative overflow-hidden rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#eae0de]">
-      <div className="pointer-events-none absolute -right-12 -top-12 h-28 w-28 rounded-full bg-primary-fixed/20 blur-2xl" />
       <div className="relative z-10 mb-space-md flex items-center justify-between">
         <div className="flex items-center gap-space-sm">
           <div className="relative">
@@ -63,7 +64,7 @@ export function HomeProfileCard({ itemCount }: { itemCount: number }) {
         <div className="flex flex-col items-center text-center">
           <div className="flex items-center gap-0.5 text-tertiary">
             <Icon name="monetization_on" className="text-[14px]" />
-            <span className="font-heading text-body-lg font-extrabold">{DUMMY_STATS.points}</span>
+            <span className="font-heading text-body-lg font-extrabold">{points}</span>
           </div>
           <span className="mt-0.5 text-label-sm text-on-surface-variant">포인트</span>
         </div>

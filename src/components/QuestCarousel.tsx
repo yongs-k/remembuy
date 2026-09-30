@@ -29,7 +29,6 @@ export function QuestCarousel({ quests }: { quests: DummyQuest[] }) {
               key={quest.id}
               className="relative w-full flex-shrink-0 snap-center overflow-hidden rounded-xl bg-surface-container-lowest p-space-md shadow-[0_4px_0px_#eae0de]"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-tertiary-fixed/30 blur-xl" />
               <div className="relative flex items-start justify-between gap-space-sm">
                 <div className="flex items-start gap-space-sm">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary-container text-secondary shadow-[0_2px_0px_#aecdc4]">

@@ -48,7 +48,7 @@ export function AppLayout() {
         ))}
       </nav>
 
-      <div className="flex flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b-2 border-ink bg-surface-container-lowest px-4 py-3">
           <div className="flex items-center gap-2 md:hidden">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container shadow-[0_3px_0px_#8b1901]">
@@ -59,12 +59,12 @@ export function AppLayout() {
           <button
             type="button"
             onClick={() => navigate('/notifications')}
-            className="relative ml-auto text-on-surface hover:text-primary"
-            aria-label="알림"
+            className="relative -m-2 ml-auto flex h-11 w-11 items-center justify-center rounded-full text-on-surface hover:text-primary"
+            aria-label={unreadCount > 0 ? `알림, 새 알림 ${unreadCount}개` : '알림'}
           >
             <Icon name="notifications" className="text-[22px]" />
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface-container-lowest" />
+              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface-container-lowest" />
             )}
           </button>
         </header>
@@ -75,7 +75,7 @@ export function AppLayout() {
         </main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 grid grid-cols-5 border-t-2 border-ink bg-surface-container-lowest md:hidden">
+      <nav className="fixed inset-x-0 bottom-0 grid grid-cols-5 border-t-2 border-ink bg-surface-container-lowest pb-[env(safe-area-inset-bottom)] md:hidden">
         {TABS.map((tab) => (
           <NavLink
             key={tab.to}

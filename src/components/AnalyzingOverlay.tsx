@@ -38,19 +38,21 @@ export function AnalyzingOverlay({
     >
       <div className="mx-auto flex min-h-full w-full max-w-sm flex-col items-center justify-center gap-space-md p-margin">
         <div className="relative h-[120px] w-[120px] shrink-0">
-          <div className="absolute inset-0 animate-ring-glow rounded-full bg-[radial-gradient(circle,rgba(255,185,95,0.35),transparent_70%)]" />
-          <div className="absolute inset-2 animate-spin rounded-full border-4 border-transparent border-r-primary-container border-t-tertiary-fixed-dim" />
+          <div className="absolute inset-0 animate-ring-glow rounded-full bg-[radial-gradient(circle,rgba(255,185,95,0.35),transparent_70%)] motion-reduce:animate-none" />
+          <div className="absolute inset-2 animate-spin rounded-full border-4 border-transparent border-r-primary-container border-t-tertiary-fixed-dim motion-reduce:animate-none" />
           <div className="absolute inset-3.5 overflow-hidden rounded-full">
             {SCAN_ICONS.map((name, i) => (
               <span
                 key={name}
-                className="absolute inset-0 flex animate-icon-cycle items-center justify-center opacity-0"
+                className={`absolute inset-0 flex animate-icon-cycle items-center justify-center opacity-0 ${
+                  i === 0 ? 'motion-reduce:animate-none motion-reduce:opacity-100' : 'motion-reduce:hidden'
+                }`}
                 style={{ animationDelay: ICON_DELAYS[i] }}
               >
                 <Icon name={name} className="text-[34px] text-tertiary-fixed-dim" />
               </span>
             ))}
-            <div className="absolute inset-x-0 h-3.5 animate-scan-sweep bg-gradient-to-b from-transparent via-tertiary-fixed-dim/90 to-transparent" />
+            <div className="absolute inset-x-0 h-3.5 animate-scan-sweep bg-gradient-to-b from-transparent via-tertiary-fixed-dim/90 to-transparent motion-reduce:hidden" />
           </div>
         </div>
 
@@ -58,7 +60,9 @@ export function AnalyzingOverlay({
           {PERCENTS.map((pct, i) => (
             <span
               key={pct}
-              className="absolute inset-0 animate-text-cycle bg-gradient-to-r from-tertiary-fixed-dim to-primary-container bg-clip-text text-headline-lg font-bold text-transparent opacity-0"
+              className={`absolute inset-0 animate-text-cycle text-headline-lg font-bold text-tertiary-fixed-dim opacity-0 ${
+                i === 0 ? 'motion-reduce:animate-none motion-reduce:opacity-100' : 'motion-reduce:hidden'
+              }`}
               style={{ animationDelay: CYCLE_DELAYS[i] }}
             >
               {pct}%
@@ -70,7 +74,9 @@ export function AnalyzingOverlay({
           {STATUS_LABELS.map((label, i) => (
             <span
               key={label}
-              className="absolute inset-0 animate-text-cycle truncate text-body-sm text-outline-variant opacity-0"
+              className={`absolute inset-0 animate-text-cycle truncate text-body-sm text-outline-variant opacity-0 ${
+                i === 0 ? 'motion-reduce:animate-none motion-reduce:opacity-100' : 'motion-reduce:hidden'
+              }`}
               style={{ animationDelay: CYCLE_DELAYS[i] }}
             >
               {label}
