@@ -56,6 +56,22 @@ export default function HomePage() {
 
   useEffect(() => setFilter('all'), [selectedCategoryId])
 
+  const gameCardRef = useRef<HTMLDivElement>(null)
+  const [gameCardVisible, setGameCardVisible] = useState(false)
+  useEffect(() => {
+    const card = gameCardRef.current
+    if (!card || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => setGameCardVisible(entry.isIntersecting), {
+      threshold: 0.25,
+    })
+    observer.observe(card)
+    return () => {
+      observer.disconnect()
+      // The card unmounts when drilling into a room; don't leave the button hidden.
+      setGameCardVisible(false)
+    }
+  }, [selectedLocationId])
+
   function handleBack() {
     goBack(() => setSearchParams(selectedCategoryId && selectedLocationId ? { loc: selectedLocationId } : {}))
   }
@@ -190,7 +206,9 @@ export default function HomePage() {
               ))}
             </div>
           </section>
-          <HomeGameCard />
+          <div ref={gameCardRef}>
+            <HomeGameCard />
+          </div>
         </>
       )}
 
@@ -250,8 +268,9 @@ export default function HomePage() {
         </>
       )}
 
-      {/* Steps aside while the purchase toast occupies the same spot above the tab bar. */}
-      {!lastPurchase && (
+      {/* Steps aside while the purchase toast holds the same spot, and while the
+          game card is on screen so it never sits on the card's buttons. */}
+      {!lastPurchase && !gameCardVisible && (
         <button
           type="button"
           onClick={() => setShowRecordOptions(true)}

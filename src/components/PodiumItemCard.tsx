@@ -64,7 +64,7 @@ export function PodiumItemCard({
             {remaining !== undefined && (
               <DdayLabel days={remaining} />
             )}
-            {item.podiumRank === 1 && <Badge>다시 살래요</Badge>}
+            {item.podiumRank === 1 && <Badge>내 1위</Badge>}
           </div>
           <p
             className={`line-clamp-2 font-heading text-on-surface ${

@@ -461,7 +461,7 @@ export default function NewItemPage() {
         </label>
 
         <div className="space-y-1">
-          <span className={labelCls}>다시 살 건가요? (선택)</span>
+          <span className={labelCls}>추천하나요? (선택)</span>
           <RecommendationToggle value={recommendation} onChange={setRecommendation} />
         </div>
         <label className={labelCls}>

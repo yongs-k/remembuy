@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getUpcomingNotifications } from '../state/selectors'
+import { getSoonestRemaining, getUpcomingNotifications } from '../state/selectors'
 import { RestockCard } from '../components/RestockCard'
 import { Icon } from '../data/materialIcons'
 
@@ -16,7 +16,10 @@ export default function PurchasePage() {
   // Products the user said they'd buy again, minus the ones already listed above.
   const recommended = useMemo(() => {
     const dueIds = new Set(upcoming.map((item) => item.id))
-    return items.filter((item) => item.recommendation === 'recommend' && !dueIds.has(item.id))
+    const soonest = (item: (typeof items)[number]) => getSoonestRemaining(item) ?? Number.POSITIVE_INFINITY
+    return items
+      .filter((item) => item.recommendation === 'recommend' && !dueIds.has(item.id))
+      .sort((a, b) => soonest(a) - soonest(b))
   }, [items, upcoming])
 
   return (
@@ -60,9 +63,9 @@ export default function PurchasePage() {
       <section aria-labelledby="recommended-title" className="space-y-space-sm">
         <div>
           <h2 id="recommended-title" className="font-heading text-headline-md text-on-surface">
-            다시 살래요
+            추천한 상품
           </h2>
-          <p className="mt-0.5 text-body-sm text-on-surface-variant">"추천해요"로 기록한 상품이에요</p>
+          <p className="mt-0.5 text-body-sm text-on-surface-variant">"추천해요"를 누른 상품이에요. 지금 바로 살 때가 아닌 것만 모았어요.</p>
         </div>
         {recommended.length === 0 ? (
           <p className="rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg text-body-sm text-on-surface-variant">

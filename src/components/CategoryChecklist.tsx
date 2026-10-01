@@ -93,17 +93,21 @@ export function CategoryChecklist({
                   <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
                 </button>
               ) : (
-                <div className={rowCls}>
+                // The whole empty row records it; a quiet + replaces a column of identical buttons.
+                <button
+                  type="button"
+                  onClick={() => onRecord(m.id, m.name)}
+                  aria-label={`${m.name} 기록하기`}
+                  className={`${rowCls} transition-colors hover:bg-surface-container-low`}
+                >
                   {content}
-                  <button
-                    type="button"
-                    onClick={() => onRecord(m.id, m.name)}
-                    aria-label={`${m.name} 기록하기`}
-                    className="min-h-11 shrink-0 rounded-lg border border-hairline px-3 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+                  <span
+                    aria-hidden
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-hairline text-on-surface-variant"
                   >
-                    기록하기
-                  </button>
-                </div>
+                    <Icon name="add" className="text-[18px]" />
+                  </span>
+                </button>
               )}
             </li>
           )
