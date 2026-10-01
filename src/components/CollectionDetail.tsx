@@ -118,7 +118,7 @@ export function CollectionDetail({
         className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
       >
         <Icon name="add" className="text-[20px]" />
-        {location.name}에 새로 기록하기
+        {location.name}에 기록하기
       </button>
     </div>
   )

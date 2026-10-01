@@ -21,7 +21,7 @@ export function HomeGameCard() {
     <div className="rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface shadow-float">
       <div className="flex items-start justify-between gap-space-sm">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <h2 className="font-heading text-headline-md">가상 상자함</h2>
+          <h2 className="font-heading text-headline-md">상자</h2>
           <p role={catalogError ? 'alert' : undefined} className="text-body-sm text-inverse-on-surface/70">
             {catalogError
               ? '게임 정보를 불러오지 못했어요'

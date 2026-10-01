@@ -17,7 +17,7 @@ type HomeFilter = 'all' | 'urgent' | 'recommended'
 const RESTOCK_PREVIEW = 3
 
 export default function HomePage() {
-  const { items, locations, categories } = useLocker()
+  const { items, locations, categories, lastPurchase } = useLocker()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const selectedLocationId = searchParams.get('loc')
@@ -120,7 +120,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-space-lg p-4 pb-24">
+    <div className="space-y-space-lg p-4 pb-28">
       {!selectedLocationId && (
         <section aria-labelledby="restock-title" className="space-y-space-sm pt-space-xs">
           <h1 id="restock-title" className="font-heading text-display-sm text-on-surface">
@@ -170,7 +170,7 @@ export default function HomePage() {
           <section aria-labelledby="locations-title" className="space-y-space-sm">
             <div className="flex items-baseline justify-between gap-space-sm">
               <h2 id="locations-title" className="font-heading text-headline-md text-on-surface">
-                장소별 보관함
+                장소별 도감
               </h2>
               <span className="text-body-sm text-on-surface-variant">기록 상품 {items.length}개</span>
             </div>
@@ -240,7 +240,7 @@ export default function HomePage() {
           </div>
           <div className="space-y-2">
             {itemsForCategory.length === 0 ? (
-              <p className="text-body-sm text-on-surface-variant">조건에 맞는 상품이 없습니다.</p>
+              <p className="text-body-sm text-on-surface-variant">조건에 맞는 상품이 없어요.</p>
             ) : (
               itemsForCategory.map((item) => (
                 <ItemCard key={item.id} item={item} onClick={() => navigate(`/item/${item.id}`)} />
@@ -250,17 +250,19 @@ export default function HomePage() {
         </>
       )}
 
-      <button
-        type="button"
-        onClick={() => setShowRecordOptions(true)}
-        className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-float transition-all hover:bg-primary-container active:scale-[0.98] md:right-[max(1rem,calc(50%-384px+1rem))]"
-        aria-label="새로 기록하기"
-      >
-        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-          <Icon name="add" className="text-[18px]" />
-        </span>
-        <span className="text-label-lg font-bold">물품 등록</span>
-      </button>
+      {/* Steps aside while the purchase toast occupies the same spot above the tab bar. */}
+      {!lastPurchase && (
+        <button
+          type="button"
+          onClick={() => setShowRecordOptions(true)}
+          className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-float transition-all hover:bg-primary-container active:scale-[0.98] md:right-[max(1rem,calc(50%-384px+1rem))]"
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
+            <Icon name="add" className="text-[18px]" />
+          </span>
+          <span className="text-label-lg font-bold">기록하기</span>
+        </button>
+      )}
 
       {showRecordOptions && (
         <Sheet

@@ -29,7 +29,7 @@ export default function StorePage() {
   return (
     <div className="space-y-4 p-4">
       <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
-        <h1 className="font-heading text-display-sm">선물상자 상점</h1>
+        <h1 className="font-heading text-display-sm">상자</h1>
         {!catalogError && (
           <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
             <Icon name="monetization_on" className="text-[20px]" />

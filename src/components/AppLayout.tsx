@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { getUpcomingNotifications } from '../state/selectors'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
@@ -15,6 +15,9 @@ const TABS = [
 
 export function AppLayout() {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const headerIconCls = (active: boolean) =>
+    `relative flex h-11 w-11 items-center justify-center rounded-full hover:text-primary ${active ? 'text-primary' : 'text-on-surface'}`
   const { items } = useLocker()
   const { seenIds } = useSeenNotifications()
   const unreadCount = getUpcomingNotifications(items, 7).filter(
@@ -35,7 +38,8 @@ export function AppLayout() {
             <button
               type="button"
               onClick={() => navigate('/notifications')}
-              className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface hover:text-primary"
+              aria-current={pathname === '/notifications' ? 'page' : undefined}
+              className={headerIconCls(pathname === '/notifications')}
               aria-label={unreadCount > 0 ? `알림, 새 알림 ${unreadCount}개` : '알림'}
             >
               <Icon name="notifications" className="text-[22px]" />
@@ -46,7 +50,8 @@ export function AppLayout() {
             <button
               type="button"
               onClick={() => navigate('/settings')}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface hover:text-primary"
+              aria-current={pathname === '/settings' ? 'page' : undefined}
+              className={headerIconCls(pathname === '/settings')}
               aria-label="설정"
             >
               <Icon name="settings" className="text-[22px]" />

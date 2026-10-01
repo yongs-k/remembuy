@@ -52,7 +52,7 @@ export function CollectionOverview({
       <section className="space-y-space-sm">
         <h1 className="font-heading text-display-sm text-on-surface">컬렉션</h1>
         <p className="text-body-md text-on-surface-variant">
-          공간마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요.
+          장소마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요.
           <br />
           {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을 모았어요.
         </p>
@@ -64,7 +64,7 @@ export function CollectionOverview({
             [
               ['수집률', `${overallPercent}%`],
               ['등록 상품', `${items.length}개`],
-              ['완성한 공간', `${completedCount}/${locations.length}`],
+              ['완성한 장소', `${completedCount}/${locations.length}`],
             ] as const
           ).map(([label, value]) => (
             <div key={label} className="flex flex-col-reverse gap-0.5">
@@ -76,7 +76,7 @@ export function CollectionOverview({
       </section>
 
       <section className="space-y-space-sm">
-        <h2 className="font-heading text-headline-md text-on-surface">공간별 도감</h2>
+        <h2 className="font-heading text-headline-md text-on-surface">장소별 도감</h2>
         {showFilters && (
         <div className="flex gap-1.5 overflow-x-auto pb-space-xs [scrollbar-width:none]">
           {chips.map((chip) => {
@@ -99,7 +99,7 @@ export function CollectionOverview({
         </div>
         )}
         {visible.length === 0 ? (
-          <p className="text-body-sm text-on-surface-variant">해당하는 공간이 없어요.</p>
+          <p className="text-body-sm text-on-surface-variant">해당하는 장소가 없어요.</p>
         ) : (
           <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
             {visible.map((row) => (
