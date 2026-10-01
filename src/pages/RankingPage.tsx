@@ -198,7 +198,11 @@ export default function RankingPage() {
 
       <button
         type="button"
-        onClick={() => navigate('/new')}
+        onClick={() =>
+          navigate('/new', {
+            state: { prefill: { manual: true, locationId: drill.locationId, categoryId: drill.categoryId } },
+          })
+        }
         className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
       >
         <Icon name="add" className="text-[20px]" />

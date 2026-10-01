@@ -55,6 +55,21 @@ describe('HomeGameCard', () => {
     expect(screen.getByText('도감 수집률을 올리면 포인트가 쌓여요')).toBeInTheDocument()
   })
 
+  it('sends the user to earn points when no box is affordable yet', () => {
+    vi.mocked(GameContextModule.useGame).mockReturnValue({
+      state: { ...STATE, points: 100 },
+      boxes: [{ id: 'b1', name: '시작 상자', costPoints: 500 }],
+      dex: DEX,
+      catalogError: false,
+      refresh: refreshMock,
+      claim: vi.fn(),
+      openBox: vi.fn(),
+    })
+    render(<HomeGameCard />)
+    fireEvent.click(screen.getByText('도감 채우러 가기'))
+    expect(navigateMock).toHaveBeenCalledWith('/collection')
+  })
+
   it('says the game is unavailable instead of showing 0P when the catalog fails', () => {
     mockGame(null, [], true)
     render(<HomeGameCard />)

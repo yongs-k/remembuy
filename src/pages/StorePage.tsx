@@ -58,17 +58,33 @@ export default function StorePage() {
                   <span>{box.costPoints}P</span>
                 </span>
               </div>
-              <button
-                type="button"
-                disabled={!affordable || opening === box.id}
-                onClick={() => handleOpen(box.id)}
-                className="w-full rounded-xl bg-primary py-2.5 text-label-lg text-on-primary active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
-              >
-                {opening === box.id ? '여는 중...' : '1개 열기'}
-              </button>
-              {!affordable && <p className="text-center text-label-sm text-primary">포인트가 부족해요</p>}
+              {affordable ? (
+                <button
+                  type="button"
+                  disabled={opening === box.id}
+                  onClick={() => handleOpen(box.id)}
+                  className="min-h-12 w-full rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98] disabled:bg-surface-container-high disabled:text-on-surface-variant"
+                >
+                  {opening === box.id ? '여는 중...' : '1개 열기'}
+                </button>
+              ) : (
+                <>
+                  <p className="text-center text-body-sm tabular-nums text-on-surface-variant">
+                    {box.costPoints - points}P 더 모으면 열 수 있어요
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/collection')}
+                    className="min-h-12 w-full rounded-xl border border-hairline text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
+                  >
+                    도감 채우러 가기
+                  </button>
+                </>
+              )}
               {failedBoxId === box.id && (
-                <p className="text-center text-label-sm text-primary">상자를 열지 못했어요, 다시 시도해주세요</p>
+                <p role="alert" className="text-center text-body-sm text-error">
+                  상자를 열지 못했어요. 다시 시도해 주세요.
+                </p>
               )}
             </div>
           )

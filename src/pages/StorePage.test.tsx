@@ -41,11 +41,13 @@ describe('StorePage', () => {
     expect(screen.getByText('상자 정보를 불러오는 중...')).toBeInTheDocument()
   })
 
-  it('disables the open button and shows a hint when points are below cost', () => {
+  it('says how many points are missing and points to the collection instead of a dead button', () => {
     mockGame({ state: { ...STATE, points: 100 } })
     render(<StorePage />)
-    expect(screen.getByRole('button', { name: '1개 열기' })).toBeDisabled()
-    expect(screen.getByText('포인트가 부족해요')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '1개 열기' })).not.toBeInTheDocument()
+    expect(screen.getByText('400P 더 모으면 열 수 있어요')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '도감 채우러 가기' }))
+    expect(navigateMock).toHaveBeenCalledWith('/collection')
   })
 
   it('opens the box and shows the result modal on success', async () => {
@@ -66,7 +68,7 @@ describe('StorePage', () => {
     render(<StorePage />)
     fireEvent.click(screen.getByRole('button', { name: '1개 열기' }))
     await waitFor(() =>
-      expect(screen.getByText('상자를 열지 못했어요, 다시 시도해주세요')).toBeInTheDocument()
+      expect(screen.getByText('상자를 열지 못했어요. 다시 시도해 주세요.')).toBeInTheDocument()
     )
   })
 })

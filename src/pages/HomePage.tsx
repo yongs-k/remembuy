@@ -144,7 +144,7 @@ export default function HomePage() {
                   onClick={() => navigate('/notifications')}
                   className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
                 >
-                  만료 임박 제품 보기
+                  전체 보기
                   <span className="tabular-nums text-on-surface-variant">{upcoming.length}개</span>
                   <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
                 </button>

@@ -236,7 +236,7 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 - Optional or rarely used fields fold behind a native `<details>` ("+ 새 장소 추가", "구매 정보 · 메모 (선택)").
 
 ### Navigation
-- Bottom tab bar with five tabs (홈 · 랭킹 · 구매 · 상자 · 컬렉션), white with a hairline top edge. The active tab is terracotta and bold. The header bell opens 만료 임박 제품, where a terracotta dot marks unread items.
+- Bottom tab bar with five tabs (홈 · 랭킹 · 구매 · 상자 · 컬렉션), white with a hairline top edge. The active tab is terracotta and bold. The header bell opens 곧 떨어질 상품 (the full list behind home's top three), where a terracotta dot marks unread items.
 - Drill-downs (room → category) live in the URL query (`?loc=`, `?cat=`, `?room=`) so the phone's back gesture steps out one level. In-app back pills step back through history.
 
 ### Sheets

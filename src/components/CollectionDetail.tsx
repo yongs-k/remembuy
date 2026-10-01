@@ -27,7 +27,7 @@ export function CollectionDetail({
   onRemoveLocation: () => void
   onRenameCategory: (id: string, name: string) => void
   onRemoveCategory: (id: string, name: string) => void
-  onRecord: () => void
+  onRecord: (target?: { categoryId: string; masterItemId: string; masterItemName: string }) => void
   onOpenItem: (itemId: string) => void
 }) {
   const locationCategories = categories.filter((c) => c.locationId === location.id)
@@ -107,14 +107,14 @@ export function CollectionDetail({
           items={items}
           onRename={() => onRenameCategory(category.id, category.name)}
           onRemove={() => onRemoveCategory(category.id, category.name)}
-          onRecord={onRecord}
+          onRecord={(masterItemId, masterItemName) => onRecord({ categoryId: category.id, masterItemId, masterItemName })}
           onOpenItem={onOpenItem}
         />
       ))}
 
       <button
         type="button"
-        onClick={onRecord}
+        onClick={() => onRecord()}
         className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
       >
         <Icon name="add" className="text-[20px]" />

@@ -3,10 +3,19 @@ import { useGame } from '../state/GameContext'
 import { Icon } from '../data/materialIcons'
 
 export function HomeGameCard() {
-  const { state, dex, catalogError, refresh } = useGame()
+  const { state, dex, boxes, catalogError, refresh } = useGame()
   const navigate = useNavigate()
   const points = state?.points ?? 0
   const completed = dex.filter((entry) => entry.status === 'COMPLETE').length
+  const cheapestBox = boxes.length ? Math.min(...boxes.map((box) => box.costPoints)) : undefined
+  // Can't open anything yet: send the user to where points are earned instead of a dead end.
+  const needsPoints = !catalogError && cheapestBox !== undefined && points < cheapestBox
+
+  const primary = catalogError
+    ? { label: '다시 시도', onClick: () => void refresh() }
+    : needsPoints
+      ? { label: '도감 채우러 가기', onClick: () => navigate('/collection') }
+      : { label: '상자 열기', onClick: () => navigate('/store') }
 
   return (
     <div className="rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface shadow-float">
@@ -16,11 +25,13 @@ export function HomeGameCard() {
           <p role={catalogError ? 'alert' : undefined} className="text-body-sm text-inverse-on-surface/70">
             {catalogError
               ? '게임 정보를 불러오지 못했어요'
-              : points === 0
-                ? '도감 수집률을 올리면 포인트가 쌓여요'
-              : dex.length === 0
-                ? '상자를 열어 아이템을 모아보세요'
-                : `${completed}/${dex.length} 완성`}
+              : needsPoints
+                ? `상자는 ${cheapestBox}P부터 열 수 있어요. 도감 수집률이 오르면 포인트가 쌓여요`
+                : points === 0
+                  ? '도감 수집률을 올리면 포인트가 쌓여요'
+                  : dex.length === 0
+                    ? '상자를 열어 아이템을 모아보세요'
+                    : `${completed}/${dex.length} 완성`}
           </p>
         </div>
         {!catalogError && (
@@ -33,10 +44,10 @@ export function HomeGameCard() {
       <div className="mt-space-lg flex items-stretch gap-2">
         <button
           type="button"
-          onClick={() => (catalogError ? void refresh() : navigate('/store'))}
+          onClick={primary.onClick}
           className="min-h-11 flex-1 rounded-xl bg-tertiary-fixed-dim text-label-lg text-on-tertiary-fixed transition-transform active:scale-[0.98]"
         >
-          {catalogError ? '다시 시도' : '상자 열기'}
+          {primary.label}
         </button>
         <button
           type="button"

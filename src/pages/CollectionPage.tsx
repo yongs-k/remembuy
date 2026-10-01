@@ -5,6 +5,7 @@ import { CollectionOverview } from '../components/CollectionOverview'
 import { CollectionDetail } from '../components/CollectionDetail'
 import { Sheet } from '../components/Sheet'
 import { useBack } from '../hooks/useBack'
+import type { RecordPrefill } from './NewItemPage'
 
 type Target = { kind: 'location' | 'category'; id: string; name: string }
 type Pending = { action: 'rename' | 'remove'; target: Target }
@@ -147,7 +148,16 @@ export default function CollectionPage() {
         onRemoveLocation={() => ask('remove', { kind: 'location', id: openLocation.id, name: openLocation.name })}
         onRenameCategory={(id, name) => ask('rename', { kind: 'category', id, name })}
         onRemoveCategory={(id, name) => ask('remove', { kind: 'category', id, name })}
-        onRecord={() => navigate('/new')}
+        onRecord={(target) => {
+          const prefill: RecordPrefill = {
+            manual: true,
+            locationId: openLocation.id,
+            categoryId: target?.categoryId,
+            masterItemId: target?.masterItemId,
+            name: target?.masterItemName,
+          }
+          navigate('/new', { state: { prefill } })
+        }}
         onOpenItem={(itemId) => navigate(`/item/${itemId}`)}
       />
       {sheet}

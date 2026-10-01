@@ -21,7 +21,7 @@ export default function NotificationsPage() {
     <div className="space-y-space-md p-margin">
       <div>
         <div className="flex items-baseline justify-between gap-space-sm">
-          <h1 className="font-heading text-display-sm text-on-surface">만료 임박 제품</h1>
+          <h1 className="font-heading text-display-sm text-on-surface">곧 떨어질 상품</h1>
           {upcoming.length > 0 && (
             <span className="shrink-0 text-label-md tabular-nums text-primary">{upcoming.length}개</span>
           )}

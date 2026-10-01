@@ -15,7 +15,8 @@ export function CategoryChecklist({
   items: Item[]
   onRename: () => void
   onRemove: () => void
-  onRecord: () => void
+  /** Opens /new for this category, pre-linked to the missing standard item. */
+  onRecord: (masterItemId: string, masterItemName: string) => void
   onOpenItem: (itemId: string) => void
 }) {
   const percent = getCategoryCompletion(items, category)
@@ -96,7 +97,7 @@ export function CategoryChecklist({
                   {content}
                   <button
                     type="button"
-                    onClick={onRecord}
+                    onClick={() => onRecord(m.id, m.name)}
                     aria-label={`${m.name} 기록하기`}
                     className="min-h-11 shrink-0 rounded-lg border border-hairline px-3 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
                   >
