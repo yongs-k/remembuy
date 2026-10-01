@@ -85,6 +85,8 @@ type LockerContextValue = {
   categories: Category[]
   addItem: (item: Item) => void
   updateItem: (id: string, patch: Partial<Item>) => void
+  /** A confirmed repurchase today: restarts the countdown and feeds the observed cycle. */
+  recordPurchase: (id: string) => void
   removeItem: (id: string) => void
   addLocation: (name: string) => Location
   renameLocation: (id: string, name: string) => void
@@ -130,6 +132,17 @@ export function LockerProvider({ children }: { children: ReactNode }) {
     categories: state.categories,
     addItem: (item) => dispatch({ type: 'ADD_ITEM', item }),
     updateItem: (id, patch) => dispatch({ type: 'UPDATE_ITEM', id, patch }),
+    recordPurchase: (id) => {
+      const item = state.items.find((i) => i.id === id)
+      if (!item) return
+      const today = new Date().toISOString().slice(0, 10)
+      const earlier = item.purchaseHistory ?? (item.restockedAt ? [item.restockedAt] : [])
+      dispatch({
+        type: 'UPDATE_ITEM',
+        id,
+        patch: { purchaseHistory: [...earlier.filter((d) => d !== today), today], restockedAt: today },
+      })
+    },
     removeItem: (id) => dispatch({ type: 'REMOVE_ITEM', id }),
     addLocation: (name) => {
       const location: Location = { id: `loc-${Date.now()}`, name, colorToken: 'bathroom' }

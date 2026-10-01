@@ -3,15 +3,21 @@ import { DdayLabel } from './Badge'
 import { ItemThumb } from './ItemThumb'
 import type { Item } from '../types'
 import { useLocker } from '../state/LockerContext'
+import { usePendingPurchases } from '../hooks/usePendingPurchases'
 import { getSoonestRemaining } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
 /** One row of a restock list; the parent <ul> draws the card and dividers. */
 export function RestockCard({ item, showLastPurchase = false }: { item: Item; showLastPurchase?: boolean }) {
-  const { updateItem } = useLocker()
+  const { recordPurchase } = useLocker()
+  const pendingPurchases = usePendingPurchases()
   const navigate = useNavigate()
   const remaining = getSoonestRemaining(item)
-  const canRestock = remaining !== undefined && remaining <= 7
+  const dueSoon = remaining !== undefined && remaining <= 7
+  // Items with a purchase link are only recorded after the link was used (구매 완료);
+  // items without one keep the plain 재구매함.
+  const awaitingConfirm = Boolean(item.affiliateUrl) && pendingPurchases.isPending(item.id)
+  const canRestock = dueSoon && !item.affiliateUrl
   const lastPurchase = [item.price !== undefined && `${item.price.toLocaleString()}원`, item.place]
     .filter(Boolean)
     .join(' · ')
@@ -37,15 +43,30 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
       {canRestock && (
         <button
           type="button"
-          onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
+          onClick={() => recordPurchase(item.id)}
           className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
         >
           재구매함
         </button>
       )}
-      {item.affiliateUrl && (
+      {awaitingConfirm && (
+        <button
+          type="button"
+          onClick={() => {
+            recordPurchase(item.id)
+            pendingPurchases.clear(item.id)
+          }}
+          className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+        >
+          구매 완료
+        </button>
+      )}
+      {item.affiliateUrl && !awaitingConfirm && (
         <a
           href={item.affiliateUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => pendingPurchases.markOpened(item.id)}
           aria-label={`${item.name} 구매하기`}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary active:scale-[0.98]"
         >

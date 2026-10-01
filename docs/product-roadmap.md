@@ -67,6 +67,12 @@ and each a stepping stone to the next:
 2. **Statistical refinement.** Once real usage history accumulates, replace
    the user's stated `restockCycle` with an observed average/median gap
    between records for that item, recomputed as new data comes in.
+   *Status (2026-10-01): started.* `Item.purchaseHistory` records each
+   confirmed repurchase. Items with a purchase link are recorded only via
+   구매 완료, which appears for 3 days after the link is opened; items
+   without a link are recorded via 재구매함. Once two gaps exist, their
+   median (`getObservedCycleDays`) replaces the typed cycle and
+   days-until-empty.
 3. **Learned/model-based, last.** Only once rule-based and statistical
    approaches are validated (and there's enough data to justify it) does
    it make sense to introduce an actual model — for ranking multiple

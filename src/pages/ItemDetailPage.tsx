@@ -5,12 +5,20 @@ import { RecommendationToggle } from '../components/RecommendationToggle'
 import { ItemCard } from '../components/ItemCard'
 import { ItemThumb } from '../components/ItemThumb'
 import { Icon } from '../data/materialIcons'
-import { getRemainingDays, parseRestockCycleDays } from '../state/selectors'
+import {
+  getObservedCycleDays,
+  getPurchaseDates,
+  getRemainingDays,
+  MIN_OBSERVED_GAPS,
+  parseRestockCycleDays,
+} from '../state/selectors'
+import { usePendingPurchases } from '../hooks/usePendingPurchases'
 
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { items, locations, categories, updateItem } = useLocker()
+  const { items, locations, categories, updateItem, recordPurchase } = useLocker()
+  const pendingPurchases = usePendingPurchases()
   const item = items.find((i) => i.id === id)
 
   if (!item) {
@@ -34,7 +42,12 @@ export default function ItemDetailPage() {
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
   const remaining = getRemainingDays(item)
-  const canRestock = parseRestockCycleDays(item.restockCycle) !== undefined || item.daysUntilEmpty !== undefined
+  const tracksSupply = parseRestockCycleDays(item.restockCycle) !== undefined || item.daysUntilEmpty !== undefined
+  // Link items are recorded via 구매 완료 after the link was opened; others via 재구매함.
+  const canRestock = tracksSupply && !item.affiliateUrl
+  const awaitingConfirm = Boolean(item.affiliateUrl) && pendingPurchases.isPending(item.id)
+  const repurchases = getPurchaseDates(item).length - 1
+  const observedDays = getObservedCycleDays(item)
   const meta = [location?.name, category?.name].filter(Boolean).join(' · ')
   const quietBtn =
     'flex min-h-12 flex-1 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low active:scale-[0.98]'
@@ -79,7 +92,7 @@ export default function ItemDetailPage() {
         </p>
       )}
 
-      {(item.place || item.restockCycle) && (
+      {(item.place || item.restockCycle || repurchases > 0) && (
         <dl className="space-y-1.5 rounded-xl bg-surface-container-low p-space-md text-body-sm">
           {item.place && (
             <div className="flex justify-between gap-2">
@@ -89,8 +102,18 @@ export default function ItemDetailPage() {
           )}
           {item.restockCycle && (
             <div className="flex justify-between gap-2">
-              <dt className="text-on-surface-variant">재구매 주기</dt>
+              <dt className="text-on-surface-variant">{observedDays ? '입력한 주기' : '재구매 주기'}</dt>
               <dd className="text-on-surface">{item.restockCycle}</dd>
+            </div>
+          )}
+          {repurchases > 0 && (
+            <div className="flex justify-between gap-2">
+              <dt className="text-on-surface-variant">실제 구매 간격</dt>
+              <dd className="text-right tabular-nums text-on-surface">
+                {observedDays
+                  ? `약 ${observedDays}일 · 재구매 ${repurchases}회`
+                  : `재구매 ${repurchases}회 · ${MIN_OBSERVED_GAPS - repurchases}번 더 기록하면 계산해요`}
+              </dd>
             </div>
           )}
         </dl>
@@ -100,6 +123,9 @@ export default function ItemDetailPage() {
         {item.affiliateUrl && (
           <a
             href={item.affiliateUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => pendingPurchases.markOpened(item.id)}
             className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
           >
             <Icon name="shopping_cart" className="text-[18px]" />
@@ -108,13 +134,22 @@ export default function ItemDetailPage() {
         )}
         <div className="flex gap-2">
           {canRestock && (
-            <button
-              type="button"
-              onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
-              className={quietBtn}
-            >
+            <button type="button" onClick={() => recordPurchase(item.id)} className={quietBtn}>
               <Icon name="restart_alt" className="text-[18px]" />
               재구매함
+            </button>
+          )}
+          {awaitingConfirm && (
+            <button
+              type="button"
+              onClick={() => {
+                recordPurchase(item.id)
+                pendingPurchases.clear(item.id)
+              }}
+              className={quietBtn}
+            >
+              <Icon name="check" className="text-[18px]" />
+              구매 완료
             </button>
           )}
           <button type="button" onClick={() => navigate(`/new?editId=${item.id}`)} className={quietBtn}>

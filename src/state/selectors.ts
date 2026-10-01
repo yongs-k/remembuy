@@ -49,14 +49,42 @@ export function getRankingForCategory(items: Item[], categoryId: string): Item[]
     .sort((a, b) => recommendationRank(a) - recommendationRank(b))
 }
 
-/** Counts down from the last repurchase, so 재구매함 starts a fresh supply of the same length. */
+const DAY_MS = 86_400_000
+
+/** createdAt plus every confirmed repurchase, oldest first, one entry per day. */
+export function getPurchaseDates(item: Item): string[] {
+  const later = item.purchaseHistory ?? (item.restockedAt ? [item.restockedAt] : [])
+  return [...new Set([item.createdAt, ...later])].sort()
+}
+
+/** Gaps needed before the observed cycle replaces what the user typed. */
+export const MIN_OBSERVED_GAPS = 2
+
+/** Median days between purchases; undefined until MIN_OBSERVED_GAPS gaps exist. */
+export function getObservedCycleDays(item: Item): number | undefined {
+  const dates = getPurchaseDates(item)
+  const gaps = dates
+    .slice(1)
+    .map((date, i) => Math.round((new Date(date).getTime() - new Date(dates[i]).getTime()) / DAY_MS))
+    .filter((gap) => gap > 0)
+  if (gaps.length < MIN_OBSERVED_GAPS) return undefined
+  const sorted = [...gaps].sort((a, b) => a - b)
+  const mid = Math.floor(sorted.length / 2)
+  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+}
+
+/**
+ * Counts down from the last repurchase, so 재구매함 starts a fresh supply. Once
+ * enough purchases are recorded, the observed cycle replaces the typed estimate.
+ */
 export function getRemainingDays(item: Item, today: string = new Date().toISOString().slice(0, 10)): number | undefined {
   if (item.daysUntilEmpty === undefined) return undefined
+  const supplyDays = getObservedCycleDays(item) ?? item.daysUntilEmpty
   const anchor = item.restockedAt ?? item.createdAt
   const elapsedDays = Math.round(
     (new Date(today).getTime() - new Date(anchor).getTime()) / 86_400_000
   )
-  return item.daysUntilEmpty - elapsedDays
+  return supplyDays - elapsedDays
 }
 
 export function formatDday(days: number): string {
@@ -74,8 +102,9 @@ export function parseRestockCycleDays(restockCycle: string | null | undefined): 
 }
 
 export function getRestockDueDays(item: Item, today: string = new Date().toISOString().slice(0, 10)): number | undefined {
-  const cycleDays = parseRestockCycleDays(item.restockCycle)
-  if (cycleDays === undefined) return undefined
+  const statedDays = parseRestockCycleDays(item.restockCycle)
+  if (statedDays === undefined) return undefined
+  const cycleDays = getObservedCycleDays(item) ?? statedDays
   const anchor = item.restockedAt ?? item.createdAt
   const elapsedDays = Math.round(
     (new Date(today).getTime() - new Date(anchor).getTime()) / 86_400_000

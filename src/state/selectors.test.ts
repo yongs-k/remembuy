@@ -14,6 +14,8 @@ import {
   formatDday,
   parseRestockCycleDays,
   getRestockDueDays,
+  getObservedCycleDays,
+  getSoonestRemaining,
 } from './selectors'
 import type { Category, Item, Location } from '../types'
 
@@ -222,6 +224,36 @@ describe('getRestockDueDays', () => {
   it('returns a negative number once the cycle has passed', () => {
     const item = makeItem({ id: 'i1', restockCycle: '약 45일마다', createdAt: '2026-09-01' })
     expect(getRestockDueDays(item, '2026-10-20')).toBe(-4)
+  })
+})
+
+describe('getObservedCycleDays', () => {
+  it('stays undefined until two gaps between purchases exist', () => {
+    expect(getObservedCycleDays(makeItem({ id: 'i1', createdAt: '2026-09-01' }))).toBeUndefined()
+    const once = makeItem({ id: 'i1', createdAt: '2026-09-01', purchaseHistory: ['2026-10-01'] })
+    expect(getObservedCycleDays(once)).toBeUndefined()
+  })
+
+  it('uses the median gap, so one late purchase does not swing it', () => {
+    const item = makeItem({
+      id: 'i1',
+      createdAt: '2026-01-01',
+      purchaseHistory: ['2026-01-31', '2026-03-02', '2026-06-10'],
+    })
+    // gaps 30, 30, 100 -> median 30
+    expect(getObservedCycleDays(item)).toBe(30)
+  })
+
+  it('replaces the typed cycle once learned', () => {
+    const item = makeItem({
+      id: 'i1',
+      restockCycle: '약 90일마다',
+      createdAt: '2026-07-01',
+      purchaseHistory: ['2026-08-10', '2026-09-19'],
+      restockedAt: '2026-09-19',
+    })
+    // observed 40 days from the last purchase on 09-19
+    expect(getSoonestRemaining(item, '2026-09-29')).toBe(30)
   })
 })
 

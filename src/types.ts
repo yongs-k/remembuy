@@ -30,6 +30,9 @@ export type Item = {
   place?: string
   restockCycle?: string | null
   restockedAt?: string | null // ISO date of the last confirmed repurchase; falls back to createdAt when unset
+  // ISO dates of every confirmed repurchase (재구매함, or 구매 완료 after the purchase link);
+  // the gaps between createdAt and these dates drive the observed restock cycle.
+  purchaseHistory?: string[]
   affiliateUrl?: string | null
   imageUrl?: string | null
   createdAt: string
