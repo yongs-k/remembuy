@@ -11,3 +11,7 @@ server/data/
 server/.env
 .superpowers/
 .playwright-mcp/
+# Local-only: Stitch reference mockups, editor workspaces, impeccable run artifacts
+stitch/
+*.code-workspace
+.impeccable/
