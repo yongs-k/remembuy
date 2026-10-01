@@ -22,7 +22,8 @@ export function PodiumItemCard({
   onOpen: () => void
   onAssign: (rank: 1 | 2 | 3 | null) => void
 }) {
-  const isFirst = index === 0
+  // The ranking sorts recommended items first; only call it 추천 1위 when it really is recommended.
+  const isFirst = index === 0 && item.recommendation === 'recommend'
   const compact = index >= 3
   const remaining = getRemainingDays(item)
   const chip = RANK_CHIP[index] ?? 'bg-surface-container-high text-outline'

@@ -38,7 +38,13 @@ export function CollectionOverview({
     { key: 'almost', label: '완성 임박' },
     { key: 'none', label: '미시작' },
   ]
-  const visible = rows.filter((r) => matches[filter](r.percent))
+  // Only offer filters when one of them would actually narrow the list.
+  const showFilters = chips.some((chip) => {
+    const count = rows.filter((r) => matches[chip.key](r.percent)).length
+    return count > 0 && count < rows.length
+  })
+  const activeFilter = showFilters ? filter : 'all'
+  const visible = rows.filter((r) => matches[activeFilter](r.percent))
   const completedCount = rows.filter((r) => r.percent >= 100).length
 
   return (
@@ -71,10 +77,11 @@ export function CollectionOverview({
 
       <section className="space-y-space-sm">
         <h2 className="font-heading text-headline-md text-on-surface">공간별 도감</h2>
+        {showFilters && (
         <div className="flex gap-1.5 overflow-x-auto pb-space-xs [scrollbar-width:none]">
           {chips.map((chip) => {
             const count = rows.filter((r) => matches[chip.key](r.percent)).length
-            const active = filter === chip.key
+            const active = activeFilter === chip.key
             return (
               <button
                 key={chip.key}
@@ -90,6 +97,7 @@ export function CollectionOverview({
             )
           })}
         </div>
+        )}
         {visible.length === 0 ? (
           <p className="text-body-sm text-on-surface-variant">해당하는 공간이 없어요.</p>
         ) : (

@@ -15,44 +15,42 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
   const lastPurchase = [item.price !== undefined && `${item.price.toLocaleString()}원`, item.place]
     .filter(Boolean)
     .join(' · ')
+  const hasActions = canRestock || Boolean(item.affiliateUrl)
 
   return (
-    <li className="px-space-md py-2">
+    <li className="flex items-center gap-1.5 py-1 pl-space-md pr-2">
       <button
         type="button"
         onClick={() => navigate(`/item/${item.id}`)}
-        className="flex min-h-14 w-full items-center gap-3 text-left"
+        className="flex min-h-14 min-w-0 flex-1 items-center gap-3 text-left"
       >
         <ItemThumb item={item} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-label-lg text-on-surface">{item.name}</p>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-label-lg text-on-surface">{item.name}</span>
           {showLastPurchase && lastPurchase && (
-            <p className="truncate text-body-sm text-on-surface-variant">지난 구매 {lastPurchase}</p>
+            <span className="block truncate text-body-sm text-on-surface-variant">지난 구매 {lastPurchase}</span>
           )}
-        </div>
+        </span>
         {remaining !== undefined && <DdayLabel days={remaining} />}
-        <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+        {!hasActions && <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />}
       </button>
-      {(canRestock || item.affiliateUrl) && (
-        <div className="flex gap-2 pb-1 pl-[3.75rem]">
-          {canRestock && (
-            <button
-              type="button"
-              onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
-              className="min-h-11 rounded-lg border border-hairline px-3 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
-            >
-              재구매함
-            </button>
-          )}
-          {item.affiliateUrl && (
-            <a
-              href={item.affiliateUrl}
-              className="flex min-h-11 items-center rounded-lg bg-primary px-3 text-label-md text-on-primary active:scale-[0.98]"
-            >
-              구매하기
-            </a>
-          )}
-        </div>
+      {canRestock && (
+        <button
+          type="button"
+          onClick={() => updateItem(item.id, { restockedAt: new Date().toISOString().slice(0, 10) })}
+          className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+        >
+          재구매함
+        </button>
+      )}
+      {item.affiliateUrl && (
+        <a
+          href={item.affiliateUrl}
+          aria-label={`${item.name} 구매하기`}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary active:scale-[0.98]"
+        >
+          <Icon name="shopping_cart" className="text-[20px]" />
+        </a>
       )}
     </li>
   )
