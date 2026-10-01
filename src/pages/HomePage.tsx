@@ -123,30 +123,33 @@ export default function HomePage() {
     <div className="space-y-space-lg p-4 pb-24">
       {!selectedLocationId && (
         <section aria-labelledby="restock-title" className="space-y-space-sm pt-space-xs">
-          <div className="flex items-baseline justify-between gap-space-sm">
-            <h1 id="restock-title" className="font-heading text-display-sm text-on-surface">
-              곧 떨어질 상품
-            </h1>
-            {upcoming.length > RESTOCK_PREVIEW && (
-              <button
-                type="button"
-                onClick={() => navigate('/notifications')}
-                className="-my-2 shrink-0 py-2 text-label-md text-primary"
-              >
-                {upcoming.length}개 모두 보기
-              </button>
-            )}
-          </div>
+          <h1 id="restock-title" className="font-heading text-display-sm text-on-surface">
+            곧 떨어질 상품
+          </h1>
           {upcoming.length === 0 ? (
             <p className="rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg text-body-md text-on-surface-variant">
               7일 안에 떨어질 상품이 없어요.
             </p>
           ) : (
-            <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
-              {upcoming.slice(0, RESTOCK_PREVIEW).map((item) => (
-                <RestockCard key={item.id} item={item} />
-              ))}
-            </ul>
+            <>
+              {/* upcoming is sorted most-overdue first, so the preview is the most urgent three. */}
+              <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
+                {upcoming.slice(0, RESTOCK_PREVIEW).map((item) => (
+                  <RestockCard key={item.id} item={item} />
+                ))}
+              </ul>
+              {upcoming.length > RESTOCK_PREVIEW && (
+                <button
+                  type="button"
+                  onClick={() => navigate('/notifications')}
+                  className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
+                >
+                  만료 임박 제품 보기
+                  <span className="tabular-nums text-on-surface-variant">{upcoming.length}개</span>
+                  <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+                </button>
+              )}
+            </>
           )}
         </section>
       )}
