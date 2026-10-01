@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { LOCATIONS, CATEGORIES } from './locations'
-import { SEED_ITEMS } from './seedItems'
+import { SEED_ITEMS, withFreshSeedDates } from './seedItems'
+import { getSoonestRemaining } from '../state/selectors'
 
 describe('seed items', () => {
   it('every seed item references a real location and category', () => {
@@ -51,5 +52,25 @@ describe('seed items', () => {
   it('has unique item ids', () => {
     const ids = SEED_ITEMS.map((i) => i.id)
     expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('starts with only a few items due soon and none overdue', () => {
+    const remaining = SEED_ITEMS.map((i) => getSoonestRemaining(i)).filter((d): d is number => d !== undefined)
+    expect(remaining.every((d) => d >= 0)).toBe(true)
+    const dueSoon = remaining.filter((d) => d <= 7).length
+    expect(dueSoon).toBeGreaterThan(0)
+    expect(dueSoon).toBeLessThanOrEqual(5)
+  })
+})
+
+describe('withFreshSeedDates', () => {
+  it('re-anchors seed dates but keeps user edits and non-seed items', () => {
+    const seed = SEED_ITEMS[0]
+    const stale = { ...seed, name: '내가 바꾼 이름', createdAt: '2020-01-01' }
+    const mine = { ...seed, id: 'item-1', createdAt: '2020-01-01' }
+    const [fresh, untouched] = withFreshSeedDates([stale, mine])
+    expect(fresh.createdAt).toBe(seed.createdAt)
+    expect(fresh.name).toBe('내가 바꾼 이름')
+    expect(untouched.createdAt).toBe('2020-01-01')
   })
 })

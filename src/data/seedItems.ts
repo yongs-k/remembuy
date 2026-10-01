@@ -18,7 +18,7 @@ export const SEED_ITEMS: Item[] = [
     place: '올리브영',
     restockCycle: '약 2개월마다',
     affiliateUrl: null,
-    createdAt: '2026-07-01',
+    createdAt: daysAgo(20),
   },
   {
     id: 'seed-2',
@@ -43,7 +43,7 @@ export const SEED_ITEMS: Item[] = [
     place: '다이소',
     restockCycle: '약 1개월마다',
     affiliateUrl: null,
-    createdAt: '2026-08-10',
+    createdAt: daysAgo(24),
   },
   {
     id: 'seed-4',
@@ -55,7 +55,7 @@ export const SEED_ITEMS: Item[] = [
     place: '이마트',
     restockCycle: '약 3주마다',
     affiliateUrl: null,
-    createdAt: '2026-08-15',
+    createdAt: daysAgo(9),
   },
   {
     id: 'seed-5',
@@ -79,7 +79,7 @@ export const SEED_ITEMS: Item[] = [
     place: '이마트',
     restockCycle: '약 4개월마다',
     affiliateUrl: null,
-    createdAt: '2026-06-01',
+    createdAt: daysAgo(50),
   },
   {
     id: 'seed-7',
@@ -91,7 +91,7 @@ export const SEED_ITEMS: Item[] = [
     place: '쿠팡',
     restockCycle: '약 2개월마다',
     affiliateUrl: null,
-    createdAt: '2026-07-05',
+    createdAt: daysAgo(35),
   },
   {
     id: 'seed-8',
@@ -103,7 +103,7 @@ export const SEED_ITEMS: Item[] = [
     place: '다이소',
     restockCycle: '약 6개월마다',
     affiliateUrl: null,
-    createdAt: '2026-05-01',
+    createdAt: daysAgo(80),
   },
   {
     id: 'seed-9',
@@ -115,7 +115,7 @@ export const SEED_ITEMS: Item[] = [
     place: '유니클로',
     restockCycle: null,
     affiliateUrl: null,
-    createdAt: '2025-11-01',
+    createdAt: daysAgo(120),
   },
   {
     id: 'seed-10',
@@ -139,7 +139,7 @@ export const SEED_ITEMS: Item[] = [
     place: '올리브영',
     restockCycle: '약 4개월마다',
     affiliateUrl: null,
-    createdAt: '2026-04-01',
+    createdAt: daysAgo(75),
   },
   {
     id: 'seed-12',
@@ -151,7 +151,7 @@ export const SEED_ITEMS: Item[] = [
     place: '백화점',
     restockCycle: '약 6개월마다',
     affiliateUrl: null,
-    createdAt: '2026-03-01',
+    createdAt: daysAgo(50),
   },
   {
     id: 'seed-13',
@@ -163,7 +163,7 @@ export const SEED_ITEMS: Item[] = [
     place: '이케아',
     restockCycle: null,
     affiliateUrl: null,
-    createdAt: '2026-02-01',
+    createdAt: daysAgo(90),
   },
   {
     id: 'seed-14',
@@ -187,7 +187,7 @@ export const SEED_ITEMS: Item[] = [
     place: '다이소',
     restockCycle: '약 6개월마다',
     affiliateUrl: null,
-    createdAt: '2026-05-10',
+    createdAt: daysAgo(30),
   },
   {
     id: 'seed-16',
@@ -199,7 +199,7 @@ export const SEED_ITEMS: Item[] = [
     place: '쿠팡',
     restockCycle: '약 2개월마다',
     affiliateUrl: null,
-    createdAt: '2026-07-01',
+    createdAt: daysAgo(58),
   },
   {
     id: 'seed-17',
@@ -211,7 +211,7 @@ export const SEED_ITEMS: Item[] = [
     place: '다이소',
     restockCycle: '약 6개월마다',
     affiliateUrl: null,
-    createdAt: '2026-01-01',
+    createdAt: daysAgo(120),
   },
   {
     id: 'seed-18',
@@ -223,7 +223,7 @@ export const SEED_ITEMS: Item[] = [
     place: '쿠팡',
     restockCycle: null,
     affiliateUrl: null,
-    createdAt: '2025-09-01',
+    createdAt: daysAgo(150),
   },
   {
     id: 'seed-19',
@@ -247,6 +247,25 @@ export const SEED_ITEMS: Item[] = [
     place: '홈플러스',
     restockCycle: '약 4개월마다',
     affiliateUrl: null,
-    createdAt: '2026-05-20',
+    createdAt: daysAgo(30),
   },
 ]
+
+/**
+ * Seed items were stored in localStorage with whatever dates they had on first
+ * run, so old installs show them months overdue. Re-anchor untouched-by-design
+ * fields (createdAt, and daysUntilEmpty where the seed defines one) to today's
+ * seed values; names, notes and other user edits are kept.
+ */
+export function withFreshSeedDates(items: Item[]): Item[] {
+  const seeds = new Map(SEED_ITEMS.map((seed) => [seed.id, seed]))
+  return items.map((item) => {
+    const seed = seeds.get(item.id)
+    if (!seed) return item
+    return {
+      ...item,
+      createdAt: seed.createdAt,
+      ...(seed.daysUntilEmpty !== undefined && { daysUntilEmpty: seed.daysUntilEmpty }),
+    }
+  })
+}

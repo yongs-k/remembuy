@@ -1,6 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react'
 import type { Item, Location, Category } from '../types'
-import { SEED_ITEMS } from '../data/seedItems'
+import { SEED_ITEMS, withFreshSeedDates } from '../data/seedItems'
 import { LOCATIONS as SEED_LOCATIONS, CATEGORIES as SEED_CATEGORIES } from '../data/locations'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 
@@ -97,6 +97,10 @@ type LockerContextValue = {
 
 const LockerContext = createContext<LockerContextValue | null>(null)
 
+// Bump the version to re-anchor seed item dates once more in existing browsers.
+const SEED_DATES_KEY = 'remembuy:seedDatesVersion'
+const SEED_DATES_VERSION = '2026-10-01'
+
 const INITIAL_STATE: State = {
   items: SEED_ITEMS,
   locations: SEED_LOCATIONS,
@@ -105,12 +109,20 @@ const INITIAL_STATE: State = {
 
 export function LockerProvider({ children }: { children: ReactNode }) {
   const [persisted, setPersisted] = useLocalStorage<State>('remembuy:state', INITIAL_STATE)
-  const [state, dispatch] = useReducer(reducer, persisted)
+  const [seedDatesVersion, setSeedDatesVersion] = useLocalStorage<string | null>(SEED_DATES_KEY, null)
+  const [state, dispatch] = useReducer(reducer, persisted, (saved) =>
+    seedDatesVersion === SEED_DATES_VERSION ? saved : { ...saved, items: withFreshSeedDates(saved.items) }
+  )
 
   useEffect(() => {
     setPersisted(state)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
+
+  useEffect(() => {
+    if (seedDatesVersion !== SEED_DATES_VERSION) setSeedDatesVersion(SEED_DATES_VERSION)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const value: LockerContextValue = {
     items: state.items,
