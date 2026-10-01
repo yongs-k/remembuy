@@ -41,13 +41,13 @@ describe('BoxOpenResultModal', () => {
     expect(screen.getByText('골드 거울')).toBeInTheDocument()
   })
 
-  it('calls onClose from the backdrop and the 닫기 button, and onViewDex from 수집함으로 이동', () => {
+  it('calls onClose from the backdrop and the 닫기 button, and onViewDex from 아이템 수집함 보기', () => {
     const onClose = vi.fn()
     const onViewDex = vi.fn()
     render(<BoxOpenResultModal result={FRAGMENT_RESULT} onClose={onClose} onViewDex={onViewDex} />)
     screen.getByText('닫기').click()
     expect(onClose).toHaveBeenCalledTimes(1)
-    screen.getByText('수집함으로 이동').click()
+    screen.getByText('아이템 수집함 보기').click()
     expect(onViewDex).toHaveBeenCalledTimes(1)
   })
 })

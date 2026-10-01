@@ -54,7 +54,7 @@ export function HomeGameCard() {
           onClick={() => navigate('/dex')}
           className="min-h-11 flex-1 rounded-xl border border-inverse-on-surface/20 text-label-lg text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/10"
         >
-          수집함 보기
+          아이템 수집함
         </button>
       </div>
     </div>

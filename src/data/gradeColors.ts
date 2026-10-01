@@ -1,4 +1,5 @@
-type GradeStyle = { bg: string; text: string; shadow: string }
+// Flat tinted tiles: the retired Stitch zero-blur offset shadows are gone (DESIGN.md).
+type GradeStyle = { bg: string; text: string }
 
 export const GRADE_ORDER = ['COMMON', 'ADVANCED', 'RARE', 'LEGENDARY'] as const
 
@@ -14,22 +15,18 @@ const GRADE_COLOR: Record<string, GradeStyle> = {
   COMMON: {
     bg: 'bg-surface-container-high',
     text: 'text-on-surface-variant',
-    shadow: 'shadow-[0_2px_0px_#e1bfb8]',
   },
   ADVANCED: {
     bg: 'bg-secondary-container',
     text: 'text-secondary',
-    shadow: 'shadow-[0_2px_0px_#aecdc4]',
   },
   RARE: {
     bg: 'bg-primary-container',
     text: 'text-on-primary-container',
-    shadow: 'shadow-[0_2px_0px_#8b1901]',
   },
   LEGENDARY: {
     bg: 'bg-tertiary-fixed',
     text: 'text-on-tertiary-fixed',
-    shadow: 'shadow-[0_2px_0px_#653e00]',
   },
 }
 

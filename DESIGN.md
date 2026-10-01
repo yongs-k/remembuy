@@ -125,7 +125,7 @@ components:
 
 Most of REMEMBUY is a pantry ledger: warm off-white paper, hairline edges, near-black ink, and one terracotta accent kept for the few things that need a hand on them now. It should feel like a well-kept shelf, not a dashboard. The things that run out soon are the loudest thing on screen, and everything else steps back.
 
-The game layer (points, boxes, the 아이템 수집함) lives in a separate, darker place: a lit cabinet in warm espresso with gold numerals. It appears in three spots only: the home game card, and the Store and 아이템 수집함 headers. That contrast is what makes the reward feel like a reward without dragging the utility screens toward a toy look.
+The game layer (points, boxes, the 아이템 수집함) lives in a separate, darker place: a lit cabinet in warm espresso with gold numerals. It appears only in game surfaces: the home game card, the Store and 아이템 수집함 headers, the Store box cards, the box-result sheet and the completion celebration. Game actions (상자 열기, 1개 열기, 아이템 수집함 보기) are gold buttons on that espresso. That contrast is what makes the reward feel like a reward without dragging the utility screens toward a toy look.
 
 This world replaced the Stitch "tactile soft-brutalism" skin on 2026-09-30. The pink surface tint, ink-black 2px rules and zero-blur offset shadows are retired.
 
@@ -220,7 +220,7 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 
 ### Chips
 - **Style:** Oat pill, walnut label, 36px tall.
-- **State:** selected filter/choice chips turn terracotta with a white label and expose `aria-pressed`.
+- **State:** selected filter chips on list screens turn terracotta with a white label and expose `aria-pressed`. On forms, selected choice chips are Ink, because the form's submit button holds the screen's one terracotta.
 - **Switchers:** chips that switch which room you are looking at (컬렉션 room strip) select in Ink with a paper label, so the screen's one terracotta stays on its action. The same applies to state toggles such as 비추천해요.
 
 ### Cards / Containers
@@ -242,7 +242,7 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 - Drill-downs (room → category) live in the URL query (`?loc=`, `?cat=`, `?room=`) so the phone's back gesture steps out one level. In-app back pills step back through history.
 
 ### Sheets
-- Every choice, confirmation or small form that overlays a page is a bottom sheet on the native `<dialog>` (`src/components/Sheet.tsx`). It is Card White, 20px top corners, uses the Float shadow, and has a 40% black backdrop.
+- Every choice, confirmation or small form that overlays a page is a bottom sheet on the native `<dialog>` (`src/components/Sheet.tsx`). It is Card White (or the espresso cabinet tone for game results), with 20px top corners, the Float shadow, and a 40% black backdrop. Full-screen moments such as the completion celebration use the same native modal (`useModalDialog`).
 - Escape and a backdrop tap close it. Focus is trapped while it is open and returns to the opener when it closes.
 - The first focus goes to the safe control, marked `data-autofocus`. In a delete confirmation that is 취소, never the destructive button.
 - Destructive confirmations use an Error-red (#ba1a1a) full-width button and say what else will be lost. Never use `window.prompt`, `confirm` or `alert`.

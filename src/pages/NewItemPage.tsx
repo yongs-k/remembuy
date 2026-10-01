@@ -39,7 +39,7 @@ const smallBtnCls =
 function chipCls(active: boolean) {
   return `min-h-9 rounded-full px-3 text-label-md ${
     active
-      ? 'bg-primary text-on-primary'
+      ? 'bg-on-surface text-surface'
       : 'bg-surface-container text-on-surface-variant'
   }`
 }
@@ -74,6 +74,17 @@ export default function NewItemPage() {
       : undefined
 
   const isManualEntry = !existing && (!prefill || prefill.manual === true)
+  // Opened from a 기록하기 button: say where this record goes, so the pre-set chips make sense.
+  const prefillContext =
+    prefill?.manual && prefillLocation
+      ? [
+          prefillLocation.name,
+          prefillCategory?.name,
+          prefillCategory?.masterItems.find((m) => m.id === prefillMasterItemId)?.name,
+        ]
+          .filter(Boolean)
+          .join(" · ")
+      : null
 
   const [name, setName] = useState(existing?.name ?? prefill?.name ?? '')
   const [locationId, setLocationId] = useState(
@@ -229,6 +240,13 @@ export default function NewItemPage() {
         </h1>
       </div>
 
+      {prefillContext && (
+        <p className="rounded-xl bg-surface-container-low px-space-md py-space-sm text-body-sm text-on-surface">
+          <span className="text-on-surface-variant">기록할 곳 </span>
+          {prefillContext}
+        </p>
+      )}
+
       <section className={cardCls}>
         <h2 className="font-heading text-headline-md text-on-surface">무엇을 기록할까요?</h2>
 
@@ -278,7 +296,7 @@ export default function NewItemPage() {
                       setImageCandidate(null)
                       setImageLoaded(false)
                     }}
-                    className="min-h-11 rounded-lg bg-primary px-3 text-label-md text-on-primary"
+                    className="min-h-11 rounded-lg border border-hairline bg-surface-container-lowest px-3 text-label-md text-on-surface"
                   >
                     이 이미지 쓰기
                   </button>
@@ -313,7 +331,7 @@ export default function NewItemPage() {
             ))}
           </div>
           <details className="mt-1.5" open={Boolean(prefill?.suggestedLocationName)}>
-            <summary className="inline-flex min-h-11 cursor-pointer items-center text-label-md text-primary">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center text-label-md text-on-surface-variant underline underline-offset-4">
               + 새 장소 추가
             </summary>
             <div className="flex gap-2">
@@ -356,7 +374,7 @@ export default function NewItemPage() {
             </select>
           </label>
           <details className="mt-1.5" open={Boolean(prefill?.suggestedCategoryName)}>
-            <summary className="inline-flex min-h-11 cursor-pointer items-center text-label-md text-primary">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center text-label-md text-on-surface-variant underline underline-offset-4">
               + 새 카테고리 추가
             </summary>
             <div className="flex gap-2">

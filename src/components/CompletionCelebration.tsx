@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../data/materialIcons'
+import { useModalDialog } from './Sheet'
 
 const CONFETTI = [
   { left: '20%', color: '#ffb95f', delay: '0s' },
@@ -27,6 +28,8 @@ export function CompletionCelebration({
 }) {
   const hasGain = dexAfter > dexBefore
   const [barGrown, setBarGrown] = useState(false)
+  const ref = useRef<HTMLDialogElement>(null)
+  useModalDialog(ref)
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setBarGrown(true))
@@ -34,15 +37,15 @@ export function CompletionCelebration({
   }, [])
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="등록 완료"
+    <dialog
+      ref={ref}
+      aria-label="기록 완료"
       onClick={onDismiss}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onDismiss()
+      onCancel={(e) => {
+        e.preventDefault()
+        onDismiss()
       }}
-      className="fixed inset-0 z-[60] cursor-pointer overflow-y-auto bg-[#1e1512] text-white"
+      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none cursor-pointer overflow-y-auto bg-[#1e1512] text-white"
     >
       <div className="relative mx-auto flex min-h-full w-full max-w-sm flex-col items-center justify-center gap-space-sm p-margin">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -64,7 +67,7 @@ export function CompletionCelebration({
           </div>
         </div>
 
-        <h2 className="text-headline-lg font-extrabold">도감 등록 완료!</h2>
+        <h2 className="text-headline-lg font-extrabold">{hasGain ? '도감 등록 완료!' : '기록 완료!'}</h2>
         <p className="text-body-sm text-outline-variant">{itemName}</p>
 
         {pointsAwarded > 0 && (
@@ -92,13 +95,13 @@ export function CompletionCelebration({
 
         <button
           type="button"
-          autoFocus
+          data-autofocus
           onClick={onDismiss}
           className="mt-space-lg min-h-11 rounded-xl border border-white/25 px-space-xl text-label-lg text-white transition-colors hover:bg-white/10"
         >
           확인
         </button>
       </div>
-    </div>
+    </dialog>
   )
 }

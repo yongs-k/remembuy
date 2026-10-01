@@ -27,7 +27,7 @@ export default function StorePage() {
   }
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-space-md p-margin">
       <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
         <h1 className="font-heading text-display-sm">상자</h1>
         {!catalogError && (
@@ -49,11 +49,11 @@ export default function StorePage() {
           return (
             <div
               key={box.id}
-              className="space-y-3 rounded-xl bg-surface-container-lowest p-space-md border border-hairline shadow-card"
+              className="space-y-3 rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface shadow-float"
             >
               <div className="flex items-center justify-between">
-                <span className="font-heading text-headline-md text-on-surface">{box.name}</span>
-                <span className="flex items-center gap-1 text-label-lg font-bold text-tertiary">
+                <span className="font-heading text-headline-md">{box.name}</span>
+                <span className="flex items-center gap-1 text-label-lg font-bold tabular-nums text-tertiary-fixed-dim">
                   <Icon name="monetization_on" className="text-[16px]" />
                   <span>{box.costPoints}P</span>
                 </span>
@@ -63,26 +63,26 @@ export default function StorePage() {
                   type="button"
                   disabled={opening === box.id}
                   onClick={() => handleOpen(box.id)}
-                  className="min-h-12 w-full rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98] disabled:bg-surface-container-high disabled:text-on-surface-variant"
+                  className="min-h-12 w-full rounded-xl bg-tertiary-fixed-dim text-label-lg text-on-tertiary-fixed active:scale-[0.98] disabled:bg-inverse-on-surface/15 disabled:text-inverse-on-surface/70"
                 >
                   {opening === box.id ? '여는 중...' : '1개 열기'}
                 </button>
               ) : (
                 <>
-                  <p className="text-center text-body-sm tabular-nums text-on-surface-variant">
+                  <p className="text-center text-body-sm tabular-nums text-inverse-on-surface/70">
                     {box.costPoints - points}P 더 모으면 열 수 있어요
                   </p>
                   <button
                     type="button"
                     onClick={() => navigate('/collection')}
-                    className="min-h-12 w-full rounded-xl border border-hairline text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
+                    className="min-h-12 w-full rounded-xl border border-inverse-on-surface/20 text-label-lg text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/10"
                   >
                     도감 채우러 가기
                   </button>
                 </>
               )}
               {failedBoxId === box.id && (
-                <p role="alert" className="text-center text-body-sm text-error">
+                <p role="alert" className="text-center text-body-sm text-inverse-primary">
                   상자를 열지 못했어요. 다시 시도해 주세요.
                 </p>
               )}

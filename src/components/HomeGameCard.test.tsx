@@ -84,7 +84,7 @@ describe('HomeGameCard', () => {
     render(<HomeGameCard />)
     fireEvent.click(screen.getByText('상자 열기'))
     expect(navigateMock).toHaveBeenCalledWith('/store')
-    fireEvent.click(screen.getByText('수집함 보기'))
+    fireEvent.click(screen.getByText('아이템 수집함'))
     expect(navigateMock).toHaveBeenCalledWith('/dex')
   })
 })

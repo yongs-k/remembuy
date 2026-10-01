@@ -5,7 +5,7 @@ import { gradeColor, gradeLabel } from '../data/gradeColors'
 export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => void }) {
   if (entry.status === 'LOCKED') {
     return (
-      <div className="flex flex-col items-center gap-1 rounded-xl bg-surface-container p-space-sm text-center opacity-60">
+      <div className="flex flex-col items-center gap-1 rounded-xl border border-dashed border-outline-variant p-space-sm text-center">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant">
           <Icon name="lock" className="text-[18px]" />
         </div>
@@ -21,7 +21,7 @@ export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => 
     <button
       type="button"
       onClick={onOpen}
-      className={`flex w-full flex-col items-center gap-1 rounded-xl ${color.bg} p-space-sm text-center ${color.shadow} transition-transform active:scale-95`}
+      className={`flex w-full flex-col items-center gap-1 rounded-xl ${color.bg} p-space-sm text-center transition-transform active:scale-95`}
     >
       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-on-surface">
         <Icon name={entry.status === 'COMPLETE' ? 'check_circle' : 'inventory_2'} className="text-[18px]" />
@@ -32,7 +32,7 @@ export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => 
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-low">
           <div
             data-testid="dex-progress-fill"
-            className="h-full rounded-full bg-primary"
+            className="h-full rounded-full bg-tertiary"
             style={{ width: `${percent}%` }}
           />
         </div>
