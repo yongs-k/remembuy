@@ -61,8 +61,13 @@ export default function HomePage() {
   useEffect(() => {
     const card = gameCardRef.current
     if (!card || typeof IntersectionObserver === 'undefined') return
+    // Watch only the bottom band where the floating button sits, so the button
+    // hides just while the card passes under it (on desktop the whole home fits
+    // on screen and the card sits above the button, which must stay visible).
+    // The button occupies roughly the bottom 160px (bottom-24 + its 48px height).
+    const band = 160
     const observer = new IntersectionObserver(([entry]) => setGameCardVisible(entry.isIntersecting), {
-      threshold: 0.25,
+      rootMargin: `-${Math.max(0, window.innerHeight - band)}px 0px 0px 0px`,
     })
     observer.observe(card)
     return () => {
@@ -139,9 +144,20 @@ export default function HomePage() {
     <div className="space-y-space-lg p-4 pb-28">
       {!selectedLocationId && (
         <section aria-labelledby="restock-title" className="space-y-space-sm pt-space-xs">
-          <h1 id="restock-title" className="font-heading text-display-sm text-on-surface">
-            곧 떨어질 상품
-          </h1>
+          <div className="flex items-center justify-between gap-space-sm">
+            <h1 id="restock-title" className="font-heading text-display-sm text-on-surface">
+              곧 떨어질 상품
+            </h1>
+            {/* Wide screens have room for an inline CTA; phones get the floating button. */}
+            <button
+              type="button"
+              onClick={() => setShowRecordOptions(true)}
+              className="hidden min-h-11 shrink-0 items-center gap-1.5 rounded-xl bg-primary px-4 text-label-lg text-on-primary active:scale-[0.98] md:inline-flex"
+            >
+              <Icon name="add" className="text-[18px]" />
+              기록하기
+            </button>
+          </div>
           {upcoming.length === 0 ? (
             <p className="rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg text-body-md text-on-surface-variant">
               7일 안에 떨어질 상품이 없어요.
@@ -274,7 +290,7 @@ export default function HomePage() {
         <button
           type="button"
           onClick={() => setShowRecordOptions(true)}
-          className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-float transition-all hover:bg-primary-container active:scale-[0.98] md:right-[max(1rem,calc(50%-384px+1rem))]"
+          className="fixed bottom-24 right-4 z-30 flex items-center gap-2 rounded-full bg-primary py-3 pl-3 pr-4 text-on-primary shadow-float transition-all hover:bg-primary-container active:scale-[0.98] md:hidden"
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
             <Icon name="add" className="text-[18px]" />
