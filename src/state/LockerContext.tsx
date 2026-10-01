@@ -87,6 +87,7 @@ function reducer(state: State, action: Action): State {
 type LastPurchase = {
   id: string
   name: string
+  date: string
   prev: Pick<Item, 'purchaseHistory' | 'restockedAt'>
 }
 
@@ -102,6 +103,8 @@ type LockerContextValue = {
   lastPurchase: LastPurchase | null
   undoLastPurchase: () => void
   dismissLastPurchase: () => void
+  /** Price/store for one recorded purchase; also becomes the item's latest price/place. */
+  recordPurchaseDetails: (id: string, date: string, details: { price?: number; place?: string }) => void
   removeItem: (id: string) => void
   addLocation: (name: string) => Location
   renameLocation: (id: string, name: string) => void
@@ -213,6 +216,7 @@ export function LockerProvider({ children }: { children: ReactNode }) {
       setLastPurchase({
         id,
         name: item.name,
+        date: today,
         prev: { purchaseHistory: item.purchaseHistory, restockedAt: item.restockedAt },
       })
       dispatch({
@@ -228,6 +232,19 @@ export function LockerProvider({ children }: { children: ReactNode }) {
       setLastPurchase(null)
     },
     dismissLastPurchase: () => setLastPurchase(null),
+    recordPurchaseDetails: (id, date, details) => {
+      const item = state.items.find((i) => i.id === id)
+      if (!item) return
+      dispatch({
+        type: 'UPDATE_ITEM',
+        id,
+        patch: {
+          ...(details.price !== undefined && { price: details.price }),
+          ...(details.place && { place: details.place }),
+          purchaseDetails: { ...item.purchaseDetails, [date]: details },
+        },
+      })
+    },
     removeItem: (id) => dispatch({ type: 'REMOVE_ITEM', id }),
     addLocation: (name) => {
       const location: Location = { id: `loc-${Date.now()}`, name, colorToken: 'bathroom' }

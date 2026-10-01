@@ -33,6 +33,9 @@ export type Item = {
   // ISO dates of every confirmed repurchase (재구매함, or 구매 완료 after the purchase link);
   // the gaps between createdAt and these dates drive the observed restock cycle.
   purchaseHistory?: string[]
+  // Optional price/store per purchase date (same keys as purchaseHistory); price
+  // and place above stay the latest values for display.
+  purchaseDetails?: Record<string, { price?: number; place?: string }>
   affiliateUrl?: string | null
   imageUrl?: string | null
   createdAt: string
