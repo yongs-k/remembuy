@@ -59,7 +59,11 @@ export function PurchaseUndoToast() {
       >
         {lastPurchase && (
           <div className="pointer-events-auto flex w-full max-w-md items-center gap-1 rounded-xl bg-on-surface py-1 pl-space-md pr-1 text-surface shadow-float">
-            <span className="min-w-0 flex-1 truncate text-body-md">{lastPurchase.name} 재구매로 기록했어요</span>
+            {/* Two lines so the item name isn't cut off beside the two actions. */}
+            <span className="flex min-w-0 flex-1 flex-col py-1">
+              <span className="truncate text-label-lg">{lastPurchase.name}</span>
+              <span className="text-body-sm text-surface/70">재구매로 기록했어요</span>
+            </span>
             <button
               type="button"
               onClick={openDetails}
