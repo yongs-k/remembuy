@@ -12,6 +12,7 @@ import CollectionPage from './pages/CollectionPage'
 import StorePage from './pages/StorePage'
 import DexPage from './pages/DexPage'
 import AdminPage from './pages/AdminPage'
+import SettingsPage from './pages/SettingsPage'
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/store" element={<StorePage />} />
           <Route path="/dex" element={<DexPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>
       </GameProvider>

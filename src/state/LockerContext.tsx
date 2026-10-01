@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useRef, useState, type ReactNode } from 'react'
 import { fetchRemoteLocker, pushRemoteLocker, type LockerSnapshot } from '../lib/lockerSync'
+import { getDeviceId } from '../lib/deviceId'
 import type { Item, Location, Category } from '../types'
 import { SEED_ITEMS, withFreshSeedDates } from '../data/seedItems'
 import { LOCATIONS as SEED_LOCATIONS, CATEGORIES as SEED_CATEGORIES } from '../data/locations'
@@ -138,15 +139,15 @@ export function LockerProvider({ children }: { children: ReactNode }) {
   const [lastPurchase, setLastPurchase] = useState<LastPurchase | null>(null)
   const syncReady = useRef(false)
   const skipNextPush = useRef(false)
-  const pendingPush = useRef<LockerSnapshot<State> | null>(null)
+  const pendingPush = useRef<{ snapshot: LockerSnapshot<State>; deviceId: string } | null>(null)
   const pushTimer = useRef<ReturnType<typeof setTimeout>>()
 
   function flushPush() {
     clearTimeout(pushTimer.current)
-    const snapshot = pendingPush.current
-    if (!snapshot) return
+    const pending = pendingPush.current
+    if (!pending) return
     pendingPush.current = null
-    pushRemoteLocker(snapshot).catch((error) => console.warn('locker sync failed', error))
+    pushRemoteLocker(pending.snapshot, pending.deviceId).catch((error) => console.warn('locker sync failed', error))
   }
 
   useEffect(() => {
@@ -159,7 +160,10 @@ export function LockerProvider({ children }: { children: ReactNode }) {
           setLocalUpdatedAt(remote.updatedAt)
           dispatch({ type: 'REPLACE_STATE', state: remote.state })
         } else if (!remote || (localUpdatedAt && localUpdatedAt > remote.updatedAt)) {
-          pendingPush.current = { state, updatedAt: localUpdatedAt ?? new Date().toISOString() }
+          pendingPush.current = {
+            snapshot: { state, updatedAt: localUpdatedAt ?? new Date().toISOString() },
+            deviceId: getDeviceId(),
+          }
           flushPush()
         }
       })
@@ -184,7 +188,7 @@ export function LockerProvider({ children }: { children: ReactNode }) {
     if (!syncReady.current) return
     const updatedAt = new Date().toISOString()
     setLocalUpdatedAt(updatedAt)
-    pendingPush.current = { state, updatedAt }
+    pendingPush.current = { snapshot: { state, updatedAt }, deviceId: getDeviceId() }
     clearTimeout(pushTimer.current)
     pushTimer.current = setTimeout(flushPush, 1000)
     // eslint-disable-next-line react-hooks/exhaustive-deps

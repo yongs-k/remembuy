@@ -31,17 +31,27 @@ export function AppLayout() {
             </div>
             <span className="font-heading text-lg text-primary">REMEMBUY</span>
           </div>
-          <button
-            type="button"
-            onClick={() => navigate('/notifications')}
-            className="relative -m-2 ml-auto flex h-11 w-11 items-center justify-center rounded-full text-on-surface hover:text-primary"
-            aria-label={unreadCount > 0 ? `알림, 새 알림 ${unreadCount}개` : '알림'}
-          >
-            <Icon name="notifications" className="text-[22px]" />
-            {unreadCount > 0 && (
-              <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface-container-lowest" />
-            )}
-          </button>
+          <div className="-my-2 -mr-2 ml-auto flex">
+            <button
+              type="button"
+              onClick={() => navigate('/notifications')}
+              className="relative flex h-11 w-11 items-center justify-center rounded-full text-on-surface hover:text-primary"
+              aria-label={unreadCount > 0 ? `알림, 새 알림 ${unreadCount}개` : '알림'}
+            >
+              <Icon name="notifications" className="text-[22px]" />
+              {unreadCount > 0 && (
+                <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-primary ring-2 ring-surface-container-lowest" />
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/settings')}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface hover:text-primary"
+              aria-label="설정"
+            >
+              <Icon name="settings" className="text-[22px]" />
+            </button>
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto pb-20">
           <Outlet />
