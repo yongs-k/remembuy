@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { getLocationCompletion, getRemainingDays, getUpcomingNotifications } from '../state/selectors'
 import { ItemCard } from '../components/ItemCard'
@@ -9,6 +9,8 @@ import { AnalyzingOverlay } from '../components/AnalyzingOverlay'
 import { resizeImageToBase64 } from '../lib/imageResize'
 import { HomeGameCard } from '../components/HomeGameCard'
 import { Icon } from '../data/materialIcons'
+import { Sheet } from '../components/Sheet'
+import { useBack } from '../hooks/useBack'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
 
@@ -17,8 +19,10 @@ const RESTOCK_PREVIEW = 3
 export default function HomePage() {
   const { items, locations, categories } = useLocker()
   const navigate = useNavigate()
-  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null)
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const selectedLocationId = searchParams.get('loc')
+  const selectedCategoryId = searchParams.get('cat')
+  const goBack = useBack()
   const [filter, setFilter] = useState<HomeFilter>('all')
   const [showRecordOptions, setShowRecordOptions] = useState(false)
   const [showLinkInput, setShowLinkInput] = useState(false)
@@ -50,13 +54,10 @@ export default function HomePage() {
     })
   }, [items, selectedCategoryId, filter])
 
+  useEffect(() => setFilter('all'), [selectedCategoryId])
+
   function handleBack() {
-    if (selectedCategoryId) {
-      setSelectedCategoryId(null)
-      setFilter('all')
-    } else if (selectedLocationId) {
-      setSelectedLocationId(null)
-    }
+    goBack(() => setSearchParams(selectedCategoryId && selectedLocationId ? { loc: selectedLocationId } : {}))
   }
 
   function closeRecordSheet() {
@@ -181,7 +182,7 @@ export default function HomePage() {
                       categories.some((c) => c.id === i.categoryId && c.locationId === location.id)
                     ).length
                   }
-                  onClick={() => setSelectedLocationId(location.id)}
+                  onClick={() => setSearchParams({ loc: location.id })}
                 />
               ))}
             </div>
@@ -198,7 +199,7 @@ export default function HomePage() {
               <button
                 key={category.id}
                 type="button"
-                onClick={() => setSelectedCategoryId(category.id)}
+                onClick={() => setSearchParams({ loc: selectedLocationId ?? category.locationId, cat: category.id })}
                 className="rounded-xl bg-surface-container-lowest p-space-md text-left border border-hairline shadow-card"
               >
                 <p className="text-label-lg text-on-surface">{category.name}</p>
@@ -259,20 +260,11 @@ export default function HomePage() {
       </button>
 
       {showRecordOptions && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40"
-          onClick={closeRecordSheet}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') closeRecordSheet()
-          }}
+        <Sheet
+          labelledBy="record-sheet-title"
+          // While analyzing, Escape belongs to the overlay's cancel.
+          onClose={() => !isAnalyzing && !isAnalyzingPhoto && closeRecordSheet()}
         >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="record-sheet-title"
-            className="w-full max-w-md space-y-2 rounded-t-2xl bg-surface-container-lowest p-4 pb-[calc(2rem+env(safe-area-inset-bottom))]"
-            onClick={(e) => e.stopPropagation()}
-          >
             {!showLinkInput ? (
               <>
                 <h2
@@ -283,7 +275,7 @@ export default function HomePage() {
                 </h2>
                 <button
                   type="button"
-                  autoFocus
+                  data-autofocus
                   onClick={() => cameraInputRef.current?.click()}
                   className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
@@ -349,7 +341,7 @@ export default function HomePage() {
                 <button
                   type="button"
                   onClick={closeRecordSheet}
-                  className="w-full pt-2 text-center text-body-sm text-on-surface-variant"
+                  className="min-h-11 w-full text-center text-body-md text-on-surface-variant"
                 >
                   취소
                 </button>
@@ -404,15 +396,13 @@ export default function HomePage() {
                 </button>
               </>
             )}
-          </div>
-        </div>
-      )}
-
-      {isAnalyzing && (
-        <AnalyzingOverlay dialogLabel="링크 분석 중" onCancel={handleCancelAnalyze} />
-      )}
-      {isAnalyzingPhoto && (
-        <AnalyzingOverlay dialogLabel="사진 분석 중" onCancel={handleCancelAnalyze} />
+          {isAnalyzing && (
+            <AnalyzingOverlay dialogLabel="링크 분석 중" onCancel={handleCancelAnalyze} />
+          )}
+          {isAnalyzingPhoto && (
+            <AnalyzingOverlay dialogLabel="사진 분석 중" onCancel={handleCancelAnalyze} />
+          )}
+        </Sheet>
       )}
     </div>
   )

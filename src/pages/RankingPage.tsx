@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import {
   getLocationsRankedByItemCount,
@@ -13,6 +13,7 @@ import { PodiumItemCard } from '../components/PodiumItemCard'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 import { LOCATION_COLOR_HEX } from '../data/locationColors'
 import { getDeviceId } from '../lib/deviceId'
+import { useBack } from '../hooks/useBack'
 
 type GlobalRankingEntry = { name: string; masterItemId: string | null; score: number; voters: number }
 
@@ -37,7 +38,30 @@ function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
 export default function RankingPage() {
   const { items, locations, categories, setPodiumRank } = useLocker()
   const navigate = useNavigate()
-  const [drill, setDrill] = useState<DrillLevel>({ level: 'locations' })
+  const goBack = useBack()
+  // The drill-down lives in the URL so the phone's back gesture steps out of it.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const loc = searchParams.get('loc')
+  const cat = searchParams.get('cat')
+  // Memoized: the effects below refetch whenever drill changes identity.
+  const drill = useMemo<DrillLevel>(
+    () =>
+      loc && cat
+        ? { level: 'products', locationId: loc, categoryId: cat }
+        : loc
+          ? { level: 'categories', locationId: loc }
+          : { level: 'locations' },
+    [loc, cat]
+  )
+  function setDrill(next: DrillLevel) {
+    setSearchParams(
+      next.level === 'locations'
+        ? {}
+        : next.level === 'categories'
+          ? { loc: next.locationId }
+          : { loc: next.locationId, cat: next.categoryId }
+    )
+  }
 
   const lastSubmittedRef = useRef<string | null>(null)
   const [globalRanking, setGlobalRanking] = useState<GlobalRankingEntry[] | null>(null)
@@ -118,7 +142,7 @@ export default function RankingPage() {
     const ranked = getCategoriesRankedByItemCount(items, categories, drill.locationId)
     return (
       <div className="flex flex-col gap-space-md p-margin">
-        <BackPill label="공간 목록" onClick={() => setDrill({ level: 'locations' })} />
+        <BackPill label="공간 목록" onClick={() => goBack(() => setDrill({ level: 'locations' }))} />
         <h1 className="font-heading text-display-sm text-on-surface">{location?.name}</h1>
         <ul className={listCls}>
           {ranked.map(({ category, itemCount }, index) => (
@@ -151,7 +175,7 @@ export default function RankingPage() {
     <div className="flex flex-col gap-space-md p-margin">
       <BackPill
         label="카테고리 목록"
-        onClick={() => setDrill({ level: 'categories', locationId: drill.locationId })}
+        onClick={() => goBack(() => setDrill({ level: 'categories', locationId: drill.locationId }))}
       />
       <h1 className="font-heading text-display-sm text-on-surface">{category?.name}</h1>
 
