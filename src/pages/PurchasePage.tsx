@@ -6,46 +6,76 @@ import { RestockCard } from '../components/RestockCard'
 import { Icon } from '../data/materialIcons'
 
 const WINDOW_DAYS = 30
+const listCls =
+  'divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card'
 
 export default function PurchasePage() {
   const { items } = useLocker()
   const navigate = useNavigate()
   const upcoming = useMemo(() => getUpcomingNotifications(items, WINDOW_DAYS), [items])
+  // Products the user said they'd buy again, minus the ones already listed above.
+  const recommended = useMemo(() => {
+    const dueIds = new Set(upcoming.map((item) => item.id))
+    return items.filter((item) => item.recommendation === 'recommend' && !dueIds.has(item.id))
+  }, [items, upcoming])
 
   return (
-    <div className="space-y-space-md p-margin">
-      <div>
-        <h1 className="font-heading text-display-sm text-on-surface">
-          다시 살 상품
-        </h1>
-        <p className="mt-1 text-body-sm text-on-surface-variant">
-          {WINDOW_DAYS}일 안에 떨어지거나 재구매 주기가 돌아오는 상품이에요
-        </p>
-      </div>
+    <div className="space-y-space-lg p-margin">
+      <h1 className="font-heading text-display-sm text-on-surface">다시 살 상품</h1>
 
-      {upcoming.length === 0 ? (
-        <div className="flex flex-col items-center gap-space-sm rounded-2xl bg-surface-container-lowest p-space-xl text-center border border-hairline shadow-card">
-          <Icon name="task_alt" className="text-[32px] text-secondary" />
-          <p className="text-body-sm text-on-surface-variant">
-            {WINDOW_DAYS}일 안에 다시 살 상품이 없어요.
-            <br />
-            상품에 소진일이나 재구매 주기를 기록하면 여기에 모여요.
+      <section aria-labelledby="due-title" className="space-y-space-sm">
+        <div>
+          <h2 id="due-title" className="font-heading text-headline-md text-on-surface">
+            곧 다시 살 때예요
+          </h2>
+          <p className="mt-0.5 text-body-sm text-on-surface-variant">
+            {WINDOW_DAYS}일 안에 떨어지거나 재구매 주기가 돌아오는 상품이에요
           </p>
-          <button
-            type="button"
-            onClick={() => navigate('/new')}
-            className="rounded-lg bg-primary px-4 py-2 text-label-md text-on-primary active:scale-[0.98]"
-          >
-            상품 기록하기
-          </button>
         </div>
-      ) : (
-        <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
-          {upcoming.map((item) => (
-            <RestockCard key={item.id} item={item} showLastPurchase />
-          ))}
-        </ul>
-      )}
+        {upcoming.length === 0 ? (
+          <div className="flex flex-col items-center gap-space-sm rounded-2xl border border-hairline bg-surface-container-lowest p-space-xl text-center shadow-card">
+            <Icon name="task_alt" className="text-[32px] text-secondary" />
+            <p className="text-body-sm text-on-surface-variant">
+              {WINDOW_DAYS}일 안에 다시 살 상품이 없어요.
+              <br />
+              상품에 소진일이나 재구매 주기를 기록하면 여기에 모여요.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate('/new')}
+              className="min-h-11 rounded-lg bg-primary px-4 text-label-md text-on-primary active:scale-[0.98]"
+            >
+              상품 기록하기
+            </button>
+          </div>
+        ) : (
+          <ul className={listCls}>
+            {upcoming.map((item) => (
+              <RestockCard key={item.id} item={item} showLastPurchase />
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section aria-labelledby="recommended-title" className="space-y-space-sm">
+        <div>
+          <h2 id="recommended-title" className="font-heading text-headline-md text-on-surface">
+            다시 살래요
+          </h2>
+          <p className="mt-0.5 text-body-sm text-on-surface-variant">"추천해요"로 기록한 상품이에요</p>
+        </div>
+        {recommended.length === 0 ? (
+          <p className="rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg text-body-sm text-on-surface-variant">
+            상품 상세에서 "추천해요"를 누르면 여기에 모여요.
+          </p>
+        ) : (
+          <ul className={listCls}>
+            {recommended.map((item) => (
+              <RestockCard key={item.id} item={item} showLastPurchase />
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   )
 }

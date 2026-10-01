@@ -3,6 +3,7 @@ import { useLocker } from '../state/LockerContext'
 import { getUpcomingNotifications } from '../state/selectors'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
 import { Icon } from '../data/materialIcons'
+import { PurchaseUndoToast } from './PurchaseUndoToast'
 
 const TABS = [
   { to: '/', label: '홈', icon: 'cottage' },
@@ -63,6 +64,7 @@ export function AppLayout() {
             </NavLink>
           ))}
         </nav>
+        <PurchaseUndoToast />
       </div>
     </div>
   )

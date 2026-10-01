@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, useRef, type ReactNode } from 'react'
+import { createContext, useContext, useReducer, useEffect, useRef, useState, type ReactNode } from 'react'
 import { fetchRemoteLocker, pushRemoteLocker, type LockerSnapshot } from '../lib/lockerSync'
 import type { Item, Location, Category } from '../types'
 import { SEED_ITEMS, withFreshSeedDates } from '../data/seedItems'
@@ -83,6 +83,12 @@ function reducer(state: State, action: Action): State {
   }
 }
 
+type LastPurchase = {
+  id: string
+  name: string
+  prev: Pick<Item, 'purchaseHistory' | 'restockedAt'>
+}
+
 type LockerContextValue = {
   items: Item[]
   locations: Location[]
@@ -91,6 +97,10 @@ type LockerContextValue = {
   updateItem: (id: string, patch: Partial<Item>) => void
   /** A confirmed repurchase today: restarts the countdown and feeds the observed cycle. */
   recordPurchase: (id: string) => void
+  /** The most recent recordPurchase, kept so a mistaken tap can be undone. */
+  lastPurchase: LastPurchase | null
+  undoLastPurchase: () => void
+  dismissLastPurchase: () => void
   removeItem: (id: string) => void
   addLocation: (name: string) => Location
   renameLocation: (id: string, name: string) => void
@@ -125,6 +135,7 @@ export function LockerProvider({ children }: { children: ReactNode }) {
   // then every change is pushed a second later. Offline, the app runs on the
   // local copy alone and pushes again on the next change.
   const [localUpdatedAt, setLocalUpdatedAt] = useLocalStorage<string | null>(STATE_UPDATED_KEY, null)
+  const [lastPurchase, setLastPurchase] = useState<LastPurchase | null>(null)
   const syncReady = useRef(false)
   const skipNextPush = useRef(false)
   const pendingPush = useRef<LockerSnapshot<State> | null>(null)
@@ -195,12 +206,24 @@ export function LockerProvider({ children }: { children: ReactNode }) {
       if (!item) return
       const today = new Date().toISOString().slice(0, 10)
       const earlier = item.purchaseHistory ?? (item.restockedAt ? [item.restockedAt] : [])
+      setLastPurchase({
+        id,
+        name: item.name,
+        prev: { purchaseHistory: item.purchaseHistory, restockedAt: item.restockedAt },
+      })
       dispatch({
         type: 'UPDATE_ITEM',
         id,
         patch: { purchaseHistory: [...earlier.filter((d) => d !== today), today], restockedAt: today },
       })
     },
+    lastPurchase,
+    undoLastPurchase: () => {
+      if (!lastPurchase) return
+      dispatch({ type: 'UPDATE_ITEM', id: lastPurchase.id, patch: lastPurchase.prev })
+      setLastPurchase(null)
+    },
+    dismissLastPurchase: () => setLastPurchase(null),
     removeItem: (id) => dispatch({ type: 'REMOVE_ITEM', id }),
     addLocation: (name) => {
       const location: Location = { id: `loc-${Date.now()}`, name, colorToken: 'bathroom' }

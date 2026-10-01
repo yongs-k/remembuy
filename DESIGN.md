@@ -245,6 +245,9 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 - The first focus goes to the safe control, marked `data-autofocus`. In a delete confirmation that is 취소, never the destructive button.
 - Destructive confirmations use an Error-red (#ba1a1a) full-width button and say what else will be lost. Never use `window.prompt`, `confirm` or `alert`.
 
+### Toasts
+- Short confirmations with an undo (e.g. "재구매로 기록했어요 · 되돌리기") sit above the tab bar for 6 seconds, in an `aria-live` region. They are Ink with a paper label and a light-terracotta (`inverse-primary`) action, never espresso and gold, which belong to the game.
+
 ### Signature: D-day label
 Plain tabular text, never a pill. When urgent (≤7 days, or ≤3 in the home preview) it turns terracotta with a 6px dot in front.
 
