@@ -84,12 +84,10 @@ export default function ItemDetailPage() {
         </div>
       </div>
 
-      {item.daysUntilEmpty === undefined && (
-        <RecommendationToggle
-          value={item.recommendation}
-          onChange={(value) => updateItem(item.id, { recommendation: value })}
-        />
-      )}
+      <RecommendationToggle
+        value={item.recommendation}
+        onChange={(value) => updateItem(item.id, { recommendation: value })}
+      />
 
       {item.note && (
         <p className="rounded-xl border border-hairline bg-surface-container-lowest p-space-md text-body-sm text-on-surface shadow-card">

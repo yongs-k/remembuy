@@ -13,13 +13,6 @@ describe('seed items', () => {
     }
   })
 
-  it('never sets both recommendation and daysUntilEmpty', () => {
-    for (const item of SEED_ITEMS) {
-      const hasBoth = item.recommendation !== undefined && item.daysUntilEmpty !== undefined
-      expect(hasBoth).toBe(false)
-    }
-  })
-
   it('recommendation is only ever "recommend" or "notRecommend" when set', () => {
     for (const item of SEED_ITEMS) {
       if (item.recommendation !== undefined) {

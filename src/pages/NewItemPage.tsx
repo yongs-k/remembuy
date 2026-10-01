@@ -9,19 +9,20 @@ import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 import { useGame } from '../state/GameContext'
 import type { Item } from '../types'
 
-type ProgressMode = 'recommendation' | 'daysUntilEmpty'
-
-type RecordPrefill = {
-  name: string | null
-  locationId: string | null
-  suggestedLocationName: string | null
-  categoryId: string | null
-  suggestedCategoryName: string | null
-  masterItemId: string | null
-  place: string | null
-  price: number | null
-  restockCycle: string | null
+/** Route state for /new: from link/photo analysis, or from a 기록하기 button (manual). */
+export type RecordPrefill = {
+  name?: string | null
+  locationId?: string | null
+  suggestedLocationName?: string | null
+  categoryId?: string | null
+  suggestedCategoryName?: string | null
+  masterItemId?: string | null
+  place?: string | null
+  price?: number | null
+  restockCycle?: string | null
   sourceUrl?: string
+  /** Opened from a 기록하기 button: the user still types it in, so keep image search. */
+  manual?: boolean
 }
 
 const CYCLE_PRESETS = [45, 60, 90]
@@ -41,6 +42,10 @@ function chipCls(active: boolean) {
       ? 'bg-primary text-on-primary'
       : 'bg-surface-container text-on-surface-variant'
   }`
+}
+
+function daysSince(date: string): number {
+  return Math.max(0, Math.round((Date.now() - new Date(date).getTime()) / 86_400_000))
 }
 
 export default function NewItemPage() {
@@ -68,7 +73,7 @@ export default function NewItemPage() {
       ? prefillCategory.masterItems.find((m) => m.id === prefill.masterItemId)?.id
       : undefined
 
-  const isManualEntry = !existing && !prefill
+  const isManualEntry = !existing && (!prefill || prefill.manual === true)
 
   const [name, setName] = useState(existing?.name ?? prefill?.name ?? '')
   const [locationId, setLocationId] = useState(
@@ -88,15 +93,13 @@ export default function NewItemPage() {
   const [restockCycle, setRestockCycle] = useState(
     existing?.restockCycle ?? prefill?.restockCycle ?? ''
   )
-  const [progressMode, setProgressMode] = useState<ProgressMode>(
-    existing?.daysUntilEmpty !== undefined ? 'daysUntilEmpty' : 'recommendation'
-  )
   // Unset until the user taps one: a default would record opinions nobody gave.
   const [recommendation, setRecommendation] = useState<'recommend' | 'notRecommend' | undefined>(
     existing?.recommendation
   )
+  // Independent of the rating: '' means "not tracked".
   const [daysUntilEmpty, setDaysUntilEmpty] = useState(
-    existing ? Math.max(0, getRemainingDays(existing) ?? 30) : 30
+    existing?.daysUntilEmpty !== undefined ? String(Math.max(0, getRemainingDays(existing) ?? 0)) : ''
   )
   const [price, setPrice] = useState<number | ''>(existing?.price ?? prefill?.price ?? '')
   const [affiliateUrl, setAffiliateUrl] = useState(
@@ -175,13 +178,13 @@ export default function NewItemPage() {
       restockCycle: restockCycle || null,
       imageUrl,
       note: note || undefined,
-      recommendation: progressMode === 'recommendation' ? recommendation : undefined,
+      recommendation,
+      // Stored as a supply length from the countdown anchor, so add the days
+      // already elapsed when editing an existing item.
       daysUntilEmpty:
-        progressMode === 'daysUntilEmpty'
-          ? existing
-            ? daysUntilEmpty - (getRemainingDays({ ...existing, daysUntilEmpty: 0 }) ?? 0)
-            : daysUntilEmpty
-          : undefined,
+        daysUntilEmpty.trim() === ''
+          ? undefined
+          : Number(daysUntilEmpty) + (existing ? daysSince(existing.restockedAt ?? existing.createdAt) : 0),
       price: price === '' ? undefined : Number(price),
       affiliateUrl: affiliateUrl || null,
       createdAt: existing?.createdAt ?? new Date().toISOString().slice(0, 10),
@@ -439,46 +442,22 @@ export default function NewItemPage() {
           />
         </label>
 
-        <div role="radiogroup" aria-label="함께 기록할 것" className="space-y-space-sm">
-          <span className={labelCls}>함께 기록할 것</span>
-          <div className="grid grid-cols-2 gap-1 rounded-xl bg-surface-container-low p-1">
-            {(
-              [
-                ['recommendation', '다시 살지 평가'],
-                ['daysUntilEmpty', '다 쓰기까지 남은 날'],
-              ] as const
-            ).map(([mode, label]) => (
-              <button
-                key={mode}
-                type="button"
-                role="radio"
-                aria-checked={progressMode === mode}
-                onClick={() => setProgressMode(mode)}
-                className={`min-h-11 rounded-lg text-label-md transition-colors ${
-                  progressMode === mode
-                    ? 'bg-surface-container-lowest text-on-surface shadow-card'
-                    : 'text-on-surface-variant'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          {progressMode === 'recommendation' ? (
-            <RecommendationToggle value={recommendation} onChange={setRecommendation} />
-          ) : (
-            <label className={labelCls}>
-              소진까지 남은 일수
-              <input
-                type="number"
-                min={0}
-                value={daysUntilEmpty}
-                onChange={(e) => setDaysUntilEmpty(Number(e.target.value))}
-                className={inputCls}
-              />
-            </label>
-          )}
+        <div className="space-y-1">
+          <span className={labelCls}>다시 살 건가요? (선택)</span>
+          <RecommendationToggle value={recommendation} onChange={setRecommendation} />
         </div>
+        <label className={labelCls}>
+          다 쓰기까지 남은 날 (선택)
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            value={daysUntilEmpty}
+            onChange={(e) => setDaysUntilEmpty(e.target.value)}
+            placeholder="예: 30"
+            className={inputCls}
+          />
+        </label>
       </section>
 
       <details className={`group ${cardCls}`} open={hasOptionalDetails}>

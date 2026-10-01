@@ -23,7 +23,7 @@ export type Item = {
   categoryId: string
   masterItemId?: string
   note?: string
-  recommendation?: 'recommend' | 'notRecommend' // mutually exclusive with daysUntilEmpty
+  recommendation?: 'recommend' | 'notRecommend' // independent of daysUntilEmpty; both may be set
   daysUntilEmpty?: number
   podiumRank?: 1 | 2 | 3 // per-category: at most one item holds each rank at a time
   price?: number
