@@ -35,7 +35,9 @@ The act of recording is the game, and the records feed the AI. Logging items pow
 - **Registration pays no reward.** Points come only from slot claims. Never build a registration-reward path.
 - **The Stitch PRD is reference-only.** Vision features with no backing API (3D room placement, house tiers, gacha pulls, social room tours, receipt OCR, commerce deep-links or auto-refill, group-buy) are out of scope until a backing API exists.
 - Preference signal is binary: `Item.recommendation` ('recommend' | 'notRecommend') replaced the 1–5 star rating.
-- Undecided / not re-confirmed at init: whether to keep the no-login, device-ID + localStorage architecture permanently; whether the UI stays Korean-only; whether the share feed returns (it has no route today).
+- Storage (decided 2026-10-01): records live in a server DB keyed by the device ID (`lockers` table, `/api/locker`), with localStorage as the offline copy. There is no login yet, so a device whose storage is cleared gets a new ID and can't reach its old records until a recovery path exists.
+- Reminders (decided 2026-10-01): until the app is complete, restock nudges appear only in-app (the header bell → 만료 임박 제품). No push notifications yet.
+- Undecided: whether the UI stays Korean-only; whether the share feed returns (it has no route today).
 
 ## Evidence on Hand
 

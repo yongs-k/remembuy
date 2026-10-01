@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react'
+import { createContext, useContext, useReducer, useEffect, useRef, type ReactNode } from 'react'
+import { fetchRemoteLocker, pushRemoteLocker, type LockerSnapshot } from '../lib/lockerSync'
 import type { Item, Location, Category } from '../types'
 import { SEED_ITEMS, withFreshSeedDates } from '../data/seedItems'
 import { LOCATIONS as SEED_LOCATIONS, CATEGORIES as SEED_CATEGORIES } from '../data/locations'
@@ -17,9 +18,12 @@ type Action =
   | { type: 'RENAME_CATEGORY'; id: string; name: string }
   | { type: 'REMOVE_CATEGORY'; id: string }
   | { type: 'SET_PODIUM_RANK'; itemId: string; categoryId: string; rank: 1 | 2 | 3 | null }
+  | { type: 'REPLACE_STATE'; state: State }
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
+    case 'REPLACE_STATE':
+      return action.state
     case 'ADD_ITEM':
       return { ...state, items: [...state.items, action.item] }
     case 'UPDATE_ITEM':
@@ -102,6 +106,7 @@ const LockerContext = createContext<LockerContextValue | null>(null)
 // Bump the version to re-anchor seed item dates once more in existing browsers.
 const SEED_DATES_KEY = 'remembuy:seedDatesVersion'
 const SEED_DATES_VERSION = '2026-10-01'
+const STATE_UPDATED_KEY = 'remembuy:stateUpdatedAt'
 
 const INITIAL_STATE: State = {
   items: SEED_ITEMS,
@@ -116,8 +121,61 @@ export function LockerProvider({ children }: { children: ReactNode }) {
     seedDatesVersion === SEED_DATES_VERSION ? saved : { ...saved, items: withFreshSeedDates(saved.items) }
   )
 
+  // Server copy keyed by device id: pulled once on start (newer copy wins),
+  // then every change is pushed a second later. Offline, the app runs on the
+  // local copy alone and pushes again on the next change.
+  const [localUpdatedAt, setLocalUpdatedAt] = useLocalStorage<string | null>(STATE_UPDATED_KEY, null)
+  const syncReady = useRef(false)
+  const skipNextPush = useRef(false)
+  const pendingPush = useRef<LockerSnapshot<State> | null>(null)
+  const pushTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  function flushPush() {
+    clearTimeout(pushTimer.current)
+    const snapshot = pendingPush.current
+    if (!snapshot) return
+    pendingPush.current = null
+    pushRemoteLocker(snapshot).catch((error) => console.warn('locker sync failed', error))
+  }
+
+  useEffect(() => {
+    let cancelled = false
+    fetchRemoteLocker<State>()
+      .then((remote) => {
+        if (cancelled) return
+        if (remote && (!localUpdatedAt || remote.updatedAt > localUpdatedAt)) {
+          skipNextPush.current = true
+          setLocalUpdatedAt(remote.updatedAt)
+          dispatch({ type: 'REPLACE_STATE', state: remote.state })
+        } else if (!remote || (localUpdatedAt && localUpdatedAt > remote.updatedAt)) {
+          pendingPush.current = { state, updatedAt: localUpdatedAt ?? new Date().toISOString() }
+          flushPush()
+        }
+      })
+      .catch((error) => console.warn('locker fetch failed', error))
+      .finally(() => {
+        if (!cancelled) syncReady.current = true
+      })
+    window.addEventListener('pagehide', flushPush)
+    return () => {
+      cancelled = true
+      window.removeEventListener('pagehide', flushPush)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useEffect(() => {
     setPersisted(state)
+    if (skipNextPush.current) {
+      skipNextPush.current = false
+      return
+    }
+    if (!syncReady.current) return
+    const updatedAt = new Date().toISOString()
+    setLocalUpdatedAt(updatedAt)
+    pendingPush.current = { state, updatedAt }
+    clearTimeout(pushTimer.current)
+    pushTimer.current = setTimeout(flushPush, 1000)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state])
 

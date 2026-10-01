@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import { DdayLabel } from '../components/Badge'
+import { Sheet } from '../components/Sheet'
+import { useBack } from '../hooks/useBack'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
 import { RecommendationToggle } from '../components/RecommendationToggle'
@@ -17,8 +20,10 @@ import { usePendingPurchases } from '../hooks/usePendingPurchases'
 export default function ItemDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { items, locations, categories, updateItem, recordPurchase } = useLocker()
+  const { items, locations, categories, updateItem, recordPurchase, removeItem } = useLocker()
   const pendingPurchases = usePendingPurchases()
+  const goBack = useBack()
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const item = items.find((i) => i.id === id)
 
   if (!item) {
@@ -168,6 +173,44 @@ export default function ItemDetailPage() {
             ))}
           </div>
         </section>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setConfirmDelete(true)}
+        className="mx-auto flex min-h-11 items-center gap-1 px-3 text-label-md text-error"
+      >
+        <Icon name="delete" className="text-[18px]" />
+        이 상품 삭제
+      </button>
+
+      {confirmDelete && (
+        <Sheet labelledBy="delete-item-title" onClose={() => setConfirmDelete(false)}>
+          <h2 id="delete-item-title" className="text-center text-label-lg text-on-surface">
+            이 상품을 삭제할까요?
+          </h2>
+          <p className="text-center text-body-sm text-on-surface-variant">
+            {item.name}의 메모와 구매 기록도 함께 삭제되고, 되돌릴 수 없어요.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              removeItem(item.id)
+              goBack(() => navigate('/', { replace: true }))
+            }}
+            className="min-h-12 w-full rounded-xl bg-error text-label-lg text-on-error active:scale-[0.98]"
+          >
+            삭제
+          </button>
+          <button
+            type="button"
+            data-autofocus
+            onClick={() => setConfirmDelete(false)}
+            className="min-h-11 w-full text-center text-body-md text-on-surface-variant"
+          >
+            취소
+          </button>
+        </Sheet>
       )}
     </div>
   )
