@@ -236,7 +236,14 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 - Optional or rarely used fields fold behind a native `<details>` ("+ 새 장소 추가", "구매 정보 · 메모 (선택)").
 
 ### Navigation
-- Bottom tab bar with five tabs (홈 · 랭킹 · 구매 · 상자 · 컬렉션), white with a hairline top edge. The active tab is terracotta and bold. 알림 lives in the header bell, where a terracotta dot marks unread items.
+- Bottom tab bar with five tabs (홈 · 랭킹 · 구매 · 상자 · 컬렉션), white with a hairline top edge. The active tab is terracotta and bold. The header bell opens 만료 임박 제품, where a terracotta dot marks unread items.
+- Drill-downs (room → category) live in the URL query (`?loc=`, `?cat=`, `?room=`) so the phone's back gesture steps out one level. In-app back pills step back through history.
+
+### Sheets
+- Every choice, confirmation or small form that overlays a page is a bottom sheet on the native `<dialog>` (`src/components/Sheet.tsx`). It is Card White, 20px top corners, uses the Float shadow, and has a 40% black backdrop.
+- Escape and a backdrop tap close it. Focus is trapped while it is open and returns to the opener when it closes.
+- The first focus goes to the safe control, marked `data-autofocus`. In a delete confirmation that is 취소, never the destructive button.
+- Destructive confirmations use an Error-red (#ba1a1a) full-width button and say what else will be lost. Never use `window.prompt`, `confirm` or `alert`.
 
 ### Signature: D-day label
 Plain tabular text, never a pill. When urgent (≤7 days, or ≤3 in the home preview) it turns terracotta with a 6px dot in front.
