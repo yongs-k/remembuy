@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '../data/materialIcons'
 import { Sheet } from '../components/Sheet'
 import { adoptDeviceId, DEVICE_ID_PATTERN, getDeviceId } from '../lib/deviceId'
-import { fetchRemoteLocker } from '../lib/lockerSync'
+import { fetchRemoteLocker, fetchShortCode, normalizeShortCode, resolveShortCode } from '../lib/lockerSync'
 
 type Found = { code: string; itemCount: number; updatedAt: string }
 
@@ -15,10 +15,17 @@ export default function SettingsPage() {
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [found, setFound] = useState<Found | null>(null)
+  // Short code from the server; null while loading or when the server is down
+  // (the long code still works then).
+  const [shortCode, setShortCode] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetchShortCode().then(setShortCode, (error) => console.warn('short code unavailable', error))
+  }, [])
 
   async function copyCode() {
     try {
-      await navigator.clipboard.writeText(myCode)
+      await navigator.clipboard.writeText(shortCode ?? myCode)
       setCopied(true)
     } catch {
       setCopied(false)
@@ -28,18 +35,24 @@ export default function SettingsPage() {
 
   async function checkCode(e: React.FormEvent) {
     e.preventDefault()
-    const code = input.trim()
+    const raw = input.trim()
     setError(null)
-    if (!DEVICE_ID_PATTERN.test(code)) {
-      setError('복구 코드 형식이 아니에요. 다른 기기의 설정 화면에 보이는 코드를 그대로 붙여넣어 주세요.')
-      return
-    }
-    if (code === myCode) {
-      setError('지금 이 기기의 코드예요.')
+    const short = normalizeShortCode(raw)
+    if (!short && !DEVICE_ID_PATTERN.test(raw)) {
+      setError('복구 코드 형식이 아니에요. 다른 기기의 설정 화면에 보이는 8자리 코드를 입력해 주세요.')
       return
     }
     setChecking(true)
     try {
+      const code = short ? await resolveShortCode(short) : raw
+      if (!code) {
+        setError('이 코드로 저장된 기록이 없어요. 코드를 다시 확인해 주세요.')
+        return
+      }
+      if (code === myCode) {
+        setError('지금 이 기기의 코드예요.')
+        return
+      }
       const remote = await fetchRemoteLocker<{ items: unknown[] }>(code)
       if (!remote) setError('이 코드로 저장된 기록이 없어요. 코드를 다시 확인해 주세요.')
       else setFound({ code, itemCount: remote.state.items.length, updatedAt: remote.updatedAt })
@@ -73,9 +86,17 @@ export default function SettingsPage() {
           기록은 이 코드로 서버에 저장돼요. 브라우저 데이터를 지우거나 기기를 바꿀 때 이 코드로 기록을
           불러올 수 있어요. 코드를 아는 사람은 기록을 볼 수 있으니 다른 사람에게 알려주지 마세요.
         </p>
-        <p className="break-all rounded-lg bg-surface-container-low p-2.5 font-mono text-body-md tabular-nums text-on-surface">
-          {myCode}
+        <p className="rounded-lg bg-surface-container-low p-space-md text-center font-mono text-stat-counter tracking-widest text-on-surface">
+          {shortCode ?? '········'}
         </p>
+        <details>
+          <summary className="inline-flex min-h-11 cursor-pointer items-center text-label-md text-on-surface-variant underline underline-offset-4">
+            긴 코드 보기
+          </summary>
+          <p className="break-all rounded-lg bg-surface-container-low p-2.5 font-mono text-body-sm text-on-surface-variant">
+            {myCode}
+          </p>
+        </details>
         <button
           type="button"
           onClick={copyCode}
@@ -102,7 +123,7 @@ export default function SettingsPage() {
               aria-describedby={error ? 'restore-error' : undefined}
               autoComplete="off"
               spellCheck={false}
-              placeholder="예: 3f2a9c1e-…"
+              placeholder="예: ABCD-2345"
               className="mt-1 w-full rounded-lg border-2 border-transparent bg-surface-container-low p-2.5 font-mono text-body-md text-on-surface focus:border-primary focus:outline-none"
             />
           </label>

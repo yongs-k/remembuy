@@ -9,10 +9,12 @@ import { handleAdminRequest } from './game/adminRoutes.js'
 import { handlePhotoRequest } from './photoRoutes.js'
 import { handleImageSearchRequest } from './imageSearchRoute.js'
 import { ensureLockerTable, handleLockerRequest } from './locker.js'
+import { ensureRecoveryTable, handleRecoveryRequest } from './recovery.js'
 
 const PORT = 8787
 const db = openDb(path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', 'game.sqlite'))
 ensureLockerTable(db)
+ensureRecoveryTable(db)
 
 function sendJson(res, status, body) {
   res.writeHead(status, { 'Content-Type': 'application/json' })
@@ -20,6 +22,11 @@ function sendJson(res, status, body) {
 }
 
 const server = createServer((req, res) => {
+  if (req.url?.startsWith('/api/recovery-code')) {
+    handleRecoveryRequest(req, res, db)
+    return
+  }
+
   if (req.url === '/api/locker') {
     handleLockerRequest(req, res, db)
     return
