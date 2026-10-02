@@ -4,8 +4,8 @@ import { useModalDialog } from './Sheet'
 
 const CONFETTI = [
   { left: '20%', color: '#ffb95f', delay: '0s' },
-  { left: '70%', color: '#cc482b', delay: '0.3s' },
-  { left: '40%', color: '#48645d', delay: '0.6s' },
+  { left: '70%', color: '#f9eeec', delay: '0.3s' },
+  { left: '40%', color: '#ffddb8', delay: '0.6s' },
   { left: '85%', color: '#ffb95f', delay: '0.9s' },
 ]
 
@@ -45,7 +45,7 @@ export function CompletionCelebration({
         e.preventDefault()
         onDismiss()
       }}
-      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none cursor-pointer overflow-y-auto bg-[#1e1512] text-white"
+      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none cursor-pointer overflow-y-auto bg-inverse-surface text-inverse-on-surface"
     >
       <div className="relative mx-auto flex min-h-full w-full max-w-sm flex-col items-center justify-center gap-space-sm p-margin">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -61,8 +61,8 @@ export function CompletionCelebration({
         <div className="relative h-[180px] w-[180px] shrink-0">
           <div className="absolute inset-0 animate-burst-pop rounded-full bg-[radial-gradient(circle,rgba(255,185,95,0.35),transparent_65%)]" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex h-[72px] w-[72px] animate-badge-bounce items-center justify-center rounded-full bg-gradient-to-br from-primary-container to-tertiary-fixed-dim shadow-[0_0_30px_rgba(255,185,95,0.5)]">
-              <Icon name={icon} className="text-[34px] text-white" />
+            <div className="flex h-[72px] w-[72px] animate-badge-bounce items-center justify-center rounded-full bg-tertiary-fixed-dim text-on-tertiary-fixed shadow-[0_0_30px_rgba(255,185,95,0.5)]">
+              <Icon name={icon} className="text-[34px]" />
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export function CompletionCelebration({
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-white/10">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-primary-container to-tertiary-fixed-dim transition-[width] duration-1000 ease-out"
+                className="h-full rounded-full bg-tertiary-fixed-dim transition-[width] duration-1000 ease-out"
                 style={{ width: `${barGrown ? dexAfter : dexBefore}%` }}
               />
             </div>

@@ -2,25 +2,32 @@ import { useEffect, useState } from 'react'
 import { useLocker } from '../state/LockerContext'
 import { Sheet } from './Sheet'
 
-const VISIBLE_MS = 6000
+// Long enough to read and reach; paused while hovered or focused (WCAG 2.2.1).
+const VISIBLE_MS = 10000
 
 type Editing = { id: string; name: string; date: string; price: string; place: string }
 
 /**
- * After each recorded purchase: "재구매로 기록했어요 · 가격 입력 · 되돌리기".
+ * After each recorded purchase: "다시 산 걸로 기록했어요 · 가격 입력 · 되돌리기".
  * Undo keeps stray taps out of the learned cycle; 가격 입력 optionally adds the
  * price and store for that purchase without slowing down the one-tap record.
  */
 export function PurchaseUndoToast() {
   const { items, lastPurchase, undoLastPurchase, dismissLastPurchase, recordPurchaseDetails } = useLocker()
   const [editing, setEditing] = useState<Editing | null>(null)
+  const [paused, setPaused] = useState(false)
+
+  // A toast removed while hovered (e.g. by 되돌리기) must not leave the next one paused.
+  useEffect(() => {
+    if (!lastPurchase) setPaused(false)
+  }, [lastPurchase])
 
   useEffect(() => {
-    if (!lastPurchase) return
+    if (!lastPurchase || paused) return
     const timer = setTimeout(dismissLastPurchase, VISIBLE_MS)
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastPurchase])
+  }, [lastPurchase, paused])
 
   function openDetails() {
     if (!lastPurchase) return
@@ -58,11 +65,16 @@ export function PurchaseUndoToast() {
         className="pointer-events-none fixed inset-x-0 bottom-24 z-50 mx-auto flex max-w-3xl justify-center px-margin"
       >
         {lastPurchase && (
-          <div className="pointer-events-auto flex w-full max-w-md items-center gap-1 rounded-xl bg-on-surface py-1 pl-space-md pr-1 text-surface shadow-float">
+          <div
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onFocus={() => setPaused(true)}
+            onBlur={() => setPaused(false)}
+            className="pointer-events-auto flex w-full max-w-md items-center gap-1 rounded-xl bg-on-surface py-1 pl-space-md pr-1 text-surface shadow-float">
             {/* Two lines so the item name isn't cut off beside the two actions. */}
             <span className="flex min-w-0 flex-1 flex-col py-1">
               <span className="truncate text-label-lg">{lastPurchase.name}</span>
-              <span className="text-body-sm text-surface/70">재구매로 기록했어요</span>
+              <span className="text-body-sm text-surface/70">다시 산 걸로 기록했어요</span>
             </span>
             <button
               type="button"

@@ -15,7 +15,7 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
   const remaining = getSoonestRemaining(item)
   const dueSoon = remaining !== undefined && remaining <= 7
   // Items with a purchase link are only recorded after the link was used (구매 완료);
-  // items without one keep the plain 재구매함.
+  // items without one keep the plain 다시 샀어요.
   const awaitingConfirm = Boolean(item.affiliateUrl) && pendingPurchases.isPending(item.id)
   const canRestock = dueSoon && !item.affiliateUrl
   const lastPurchase = [item.price !== undefined && `${item.price.toLocaleString()}원`, item.place]
@@ -46,7 +46,7 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
           onClick={() => recordPurchase(item.id)}
           className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
         >
-          재구매함
+          다시 샀어요
         </button>
       )}
       {awaitingConfirm && (

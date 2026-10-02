@@ -38,7 +38,7 @@ export function LocationDexCard({
           </span>
         </div>
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
-          <div className="h-full rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
+          <div className="h-full rounded-full bg-secondary" style={{ width: `${percent}%` }} />
         </div>
       </div>
       <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />

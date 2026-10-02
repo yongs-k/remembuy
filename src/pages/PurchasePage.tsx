@@ -48,7 +48,7 @@ export default function PurchasePage() {
               onClick={() => navigate('/new')}
               className="min-h-11 rounded-lg bg-primary px-4 text-label-md text-on-primary active:scale-[0.98]"
             >
-              상품 기록하기
+              기록하기
             </button>
           </div>
         ) : (

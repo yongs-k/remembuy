@@ -53,19 +53,19 @@ export default function DexPage() {
       )}
 
       {selected && (
-        <Sheet labelledBy="dex-sheet-title" onClose={() => setSelected(null)}>
-          <h2 id="dex-sheet-title" className="text-center font-heading text-headline-md text-on-surface">
+        <Sheet labelledBy="dex-sheet-title" onClose={() => setSelected(null)} tone="cabinet">
+          <h2 id="dex-sheet-title" className="text-center font-heading text-headline-md">
             {selected.name}
           </h2>
-          <p className="text-center text-body-sm text-on-surface-variant">{gradeLabel(selected.grade)}</p>
-          <p className="text-center text-body-sm tabular-nums text-on-surface-variant">
+          <p className="text-center text-body-sm text-inverse-on-surface/70">{gradeLabel(selected.grade)}</p>
+          <p className="text-center text-body-sm tabular-nums text-inverse-on-surface/70">
             {selected.fragmentCount} / {selected.fragmentsRequired} 조각
           </p>
           <button
             type="button"
             data-autofocus
             onClick={() => setSelected(null)}
-            className="min-h-11 w-full text-center text-body-md text-on-surface-variant"
+            className="min-h-11 w-full text-center text-body-md text-inverse-on-surface/70"
           >
             닫기
           </button>

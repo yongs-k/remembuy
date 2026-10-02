@@ -32,7 +32,7 @@ export function AppLayout() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-container text-on-primary-container">
               <Icon name="token" className="text-[20px]" />
             </div>
-            <span className="font-heading text-lg text-primary">REMEMBUY</span>
+            <span className="font-heading text-lg text-on-surface">REMEMBUY</span>
           </div>
           <div className="-my-2 -mr-2 ml-auto flex">
             <button

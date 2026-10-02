@@ -176,8 +176,8 @@ Rooms each carry their own muted hue (욕실 #6E8F87, 주방 #C98F2B, 세탁실 
 **Character:** A compact geometric display face for titles and numbers against a neutral humanist body. Hangul always falls through to Noto Sans KR, so Korean text reads as one family.
 
 ### Hierarchy
-- **Display** (800, 28px, 36px): one per screen. Tab titles (다시 살 상품, 알림, 내 공간 랭킹, 컬렉션) and the home lead "곧 떨어질 상품". Also the Store and 아이템 수집함 headers on espresso.
-- **Headline** (700, 18px, 24px): section titles (장소별 보관함, 무엇을 기록할까요?) and item names on the podium.
+- **Display** (800, 28px, 36px): one per screen. Tab titles (다시 살 상품, 내 장소 랭킹, 컬렉션, 상자), the bell page and home lead "곧 떨어질 상품". Also the Store and 아이템 수집함 headers on espresso.
+- **Headline** (700, 18px, 24px): section titles (장소별 도감, 무엇을 기록할까요?) and item names on the podium.
 - **Stat** (800, 24px, tabular): points and dex counts on the game surface.
 - **Body** (400, 14px, 20px): paragraphs, input text, empty states.
 - **Label** (700, 12–14px): buttons, chips, item names in lists, D-days (tabular).
@@ -238,7 +238,7 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 ### Navigation
 - Bottom tab bar with five tabs (홈 · 랭킹 · 구매 · 상자 · 컬렉션), white with a hairline top edge. The active tab is terracotta and bold. The header bell opens 곧 떨어질 상품 (the full list behind home's top three), where a terracotta dot marks unread items.
 - Header icons (bell, settings) turn terracotta with `aria-current="page"` on their own page, and those pages carry a back pill. On phones, home's 기록하기 is a floating button that hides while the purchase toast is showing (same spot) and while the game card passes under it. On wide screens (md+) it is an inline button beside the 곧 떨어질 상품 title instead.
-- Vocabulary: 장소 for rooms, 상자 for the box game, 기록하기 for adding an item, 도감 for the real-item collection, 아이템 수집함 for the game's, 추천해요/추천한 상품 for the buy-again signal, and 내 1위 for the podium's first place.
+- Vocabulary: 장소 for rooms, 상자 for the box game, 기록하기 for adding an item, 도감 for the real-item collection, 아이템 수집함 for the game's, 추천해요/추천한 상품 for the buy-again signal, 내 1위 for the podium's first place, 다시 샀어요 for recording a repurchase, and 도감 품목 for a standard item in a category.
 - Drill-downs (room → category) live in the URL query (`?loc=`, `?cat=`, `?room=`) so the phone's back gesture steps out one level. In-app back pills step back through history.
 
 ### Sheets

@@ -95,8 +95,8 @@ export function CollectionDetail({
         </div>
         <p className="text-body-sm text-on-surface-variant">
           {counts.owned >= counts.total
-            ? `표준 소모품 ${counts.total}종을 모두 모았어요`
-            : `표준 소모품 ${counts.total}종 중 ${counts.owned}종 · ${counts.total - counts.owned}종 더 모으면 완성`}
+            ? `도감 품목 ${counts.total}종을 모두 모았어요`
+            : `도감 품목 ${counts.total}종 중 ${counts.owned}종 · ${counts.total - counts.owned}종 더 모으면 완성`}
         </p>
       </section>
 

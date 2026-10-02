@@ -3,13 +3,7 @@ import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
 import { Badge, DdayLabel } from './Badge'
 import { ItemThumb } from './ItemThumb'
-import { getRemainingDays } from '../state/selectors'
-
-const RANK_CHIP = [
-  'bg-tertiary text-on-tertiary',
-  'bg-secondary text-on-secondary',
-  'bg-tertiary-container text-on-tertiary-container',
-]
+import { getSoonestRemaining } from '../state/selectors'
 
 export function PodiumItemCard({
   item,
@@ -25,8 +19,7 @@ export function PodiumItemCard({
   // The ranking sorts recommended items first; only call it 추천 1위 when it really is recommended.
   const isFirst = index === 0 && item.recommendation === 'recommend'
   const compact = index >= 3
-  const remaining = getRemainingDays(item)
-  const chip = RANK_CHIP[index] ?? 'bg-surface-container-high text-outline'
+  const remaining = getSoonestRemaining(item)
 
   return (
     <div
@@ -39,7 +32,7 @@ export function PodiumItemCard({
       {isFirst && (
         <div className="flex items-center gap-1.5 bg-primary-container px-space-md py-1.5 text-on-primary-container">
           <Icon name="workspace_premium" className="text-[18px] text-tertiary-fixed" />
-          <span className="text-label-md tracking-wider">추천 순 1위</span>
+          <span className="text-label-md tracking-wider">추천한 상품</span>
         </div>
       )}
       <button
@@ -52,12 +45,8 @@ export function PodiumItemCard({
             compact ? 'h-12 w-12' : isFirst ? 'h-24 w-20' : 'h-20 w-16'
           }`}
         >
+          {/* No positional number here: the user's own 순위 지정 below is the rank that matters. */}
           <ItemThumb item={item} className="h-full w-full" />
-          <span
-            className={`absolute left-1 top-1 flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-label-sm ${chip}`}
-          >
-            {index + 1}
-          </span>
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div className="flex flex-wrap items-center gap-1.5">

@@ -401,7 +401,7 @@ export default function NewItemPage() {
         {selectedCategory && (
           <div>
             <label className={labelCls}>
-              어떤 종류의 상품인가요? (선택)
+              도감 품목 (선택)
               <select
                 value={masterItemId}
                 onChange={(e) => setMasterItemId(e.target.value)}
@@ -524,7 +524,7 @@ export default function NewItemPage() {
               ? `${locationName} 도감 수집률 ${gain.before}% → ${gain.after}%`
               : masterItemId
                 ? '이번 등록으로는 수집률이 그대로예요'
-                : '표준 품목을 연결하면 도감 수집률이 올라가요'}
+                : '도감 품목을 고르면 도감 수집률이 올라가요'}
           </p>
           <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
             <div
@@ -538,7 +538,7 @@ export default function NewItemPage() {
           className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
         >
           <Icon name="check_circle" className="text-[20px]" />
-          {existing ? '저장하기' : `${locationName} 도감에 등록하기`}
+          {existing ? '저장하기' : `${locationName} 도감에 기록하기`}
         </button>
       </div>
 

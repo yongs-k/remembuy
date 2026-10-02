@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import { getLocationCompletion, getRemainingDays, getUpcomingNotifications } from '../state/selectors'
+import { getLocationCompletion, getSoonestRemaining, getUpcomingNotifications } from '../state/selectors'
 import { ItemCard } from '../components/ItemCard'
 import { RestockCard } from '../components/RestockCard'
 import { HomeLocationTile } from '../components/HomeLocationTile'
@@ -46,7 +46,7 @@ export default function HomePage() {
     return items.filter((item) => {
       if (item.categoryId !== selectedCategoryId) return false
       if (filter === 'urgent') {
-        const remaining = getRemainingDays(item)
+        const remaining = getSoonestRemaining(item)
         if (!(remaining !== undefined && remaining <= 7)) return false
       }
       if (filter === 'recommended' && item.recommendation !== 'recommend') return false
@@ -319,7 +319,7 @@ export default function HomePage() {
                   onClick={() => cameraInputRef.current?.click()}
                   className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
-                  <Icon name="photo_camera" className="text-[20px] text-primary" />
+                  <Icon name="photo_camera" className="text-[20px] text-on-surface-variant" />
                   <span>카메라로 촬영</span>
                 </button>
                 <input
@@ -335,7 +335,7 @@ export default function HomePage() {
                   onClick={() => galleryInputRef.current?.click()}
                   className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
-                  <Icon name="image" className="text-[20px] text-primary" />
+                  <Icon name="image" className="text-[20px] text-on-surface-variant" />
                   <span>사진 선택</span>
                 </button>
                 <input
@@ -353,7 +353,7 @@ export default function HomePage() {
                   }}
                   className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
-                  <Icon name="link" className="text-[20px] text-primary" />
+                  <Icon name="link" className="text-[20px] text-on-surface-variant" />
                   <span>링크로 가져오기</span>
                 </button>
                 <button
@@ -361,12 +361,12 @@ export default function HomePage() {
                   onClick={() => navigate('/new')}
                   className="flex w-full items-center gap-3 rounded-xl border border-hairline p-3 text-left text-on-surface transition-colors hover:bg-surface-container-low"
                 >
-                  <Icon name="edit_note" className="text-[20px] text-primary" />
+                  <Icon name="edit_note" className="text-[20px] text-on-surface-variant" />
                   <span>직접 입력</span>
                 </button>
                 {analyzeError && (
                   <>
-                    <p role="alert" className="text-body-sm text-primary">
+                    <p role="alert" className="text-body-sm text-error">
                       {analyzeError}
                     </p>
                     <button
@@ -405,7 +405,7 @@ export default function HomePage() {
                   disabled={isAnalyzing}
                 />
                 {analyzeError && (
-                  <p role="alert" className="text-body-sm text-primary">
+                  <p role="alert" className="text-body-sm text-error">
                     {analyzeError}
                   </p>
                 )}

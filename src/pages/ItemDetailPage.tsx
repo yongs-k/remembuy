@@ -11,7 +11,7 @@ import { Icon } from '../data/materialIcons'
 import {
   getObservedCycleDays,
   getPurchaseDates,
-  getRemainingDays,
+  getSoonestRemaining,
   MIN_OBSERVED_GAPS,
   parseRestockCycleDays,
 } from '../state/selectors'
@@ -46,9 +46,9 @@ export default function ItemDetailPage() {
   const relatedItems = items
     .filter((i) => i.categoryId === item.categoryId && i.id !== item.id)
     .slice(0, 4)
-  const remaining = getRemainingDays(item)
+  const remaining = getSoonestRemaining(item)
   const tracksSupply = parseRestockCycleDays(item.restockCycle) !== undefined || item.daysUntilEmpty !== undefined
-  // Link items are recorded via 구매 완료 after the link was opened; others via 재구매함.
+  // Link items are recorded via 구매 완료 after the link was opened; others via 다시 샀어요.
   const canRestock = tracksSupply && !item.affiliateUrl
   const awaitingConfirm = Boolean(item.affiliateUrl) && pendingPurchases.isPending(item.id)
   const repurchases = getPurchaseDates(item).length - 1
@@ -139,7 +139,7 @@ export default function ItemDetailPage() {
           {canRestock && (
             <button type="button" onClick={() => recordPurchase(item.id)} className={quietBtn}>
               <Icon name="restart_alt" className="text-[18px]" />
-              재구매함
+              다시 샀어요
             </button>
           )}
           {awaitingConfirm && (

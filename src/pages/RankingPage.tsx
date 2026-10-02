@@ -206,7 +206,7 @@ export default function RankingPage() {
         className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
       >
         <Icon name="add" className="text-[20px]" />
-        이 카테고리에 상품 추가
+        이 카테고리에 기록하기
       </button>
 
       <section className="space-y-space-sm rounded-2xl border border-hairline bg-surface-container-lowest p-space-md shadow-card">

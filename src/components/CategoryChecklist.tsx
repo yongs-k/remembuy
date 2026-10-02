@@ -1,6 +1,6 @@
 import type { Category, Item } from '../types'
 import { DdayLabel } from './Badge'
-import { getCategoryCompletion, getMissingMasterItems, getRemainingDays } from '../state/selectors'
+import { getCategoryCompletion, getMissingMasterItems, getSoonestRemaining } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
 export function CategoryChecklist({
@@ -60,7 +60,7 @@ export function CategoryChecklist({
           const item = owned
             ? items.find((i) => i.categoryId === category.id && i.masterItemId === m.id)
             : undefined
-          const remaining = item ? getRemainingDays(item) : undefined
+          const remaining = item ? getSoonestRemaining(item) : undefined
           const rowCls = 'flex min-h-14 w-full items-center gap-2.5 px-space-md py-2 text-left'
           const content = (
             <>
@@ -113,7 +113,7 @@ export function CategoryChecklist({
           )
         })}
         {category.masterItems.length === 0 && (
-          <li className="px-space-md py-3 text-body-sm text-on-surface-variant">표준 품목이 아직 없는 카테고리예요.</li>
+          <li className="px-space-md py-3 text-body-sm text-on-surface-variant">도감 품목이 아직 없는 카테고리예요.</li>
         )}
       </ul>
     </section>

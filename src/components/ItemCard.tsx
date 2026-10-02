@@ -3,10 +3,10 @@ import { ItemThumb } from './ItemThumb'
 import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
-import { getRemainingDays } from '../state/selectors'
+import { getSoonestRemaining } from '../state/selectors'
 
 export function ItemCard({ item, onClick }: { item: Item; onClick: () => void }) {
-  const remaining = getRemainingDays(item)
+  const remaining = getSoonestRemaining(item)
   return (
     <button
       type="button"
