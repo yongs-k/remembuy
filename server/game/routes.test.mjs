@@ -122,7 +122,12 @@ test('boxes and dex endpoints respond', async () => {
     assert.equal(boxes.boxes[0].id, 'box-starter')
     const dex = await (await call(base, '/api/game/dex')).json()
     assert.equal(dex.items.length, 59)
-    assert.deepEqual(dex.rooms, [{ spaceId: 'bathroom', stage: 'COMMON', count: 0, completedGrades: [] }])
+    assert.deepEqual(dex.rooms, [{ spaceId: 'bathroom', stage: 'COMMON', pieces: [0, 0, 0, 0], count: 0, completedGrades: [] }])
+    assert.deepEqual(dex.duplicates, { COMMON: 0, ADVANCED: 0, RARE: 0, LEGENDARY: 0 })
+    const combine = await call(base, '/api/game/combine', { method: 'POST', body: { grade: 'COMMON' } })
+    assert.equal(combine.status, 409)
+    const bad = await call(base, '/api/game/combine', { method: 'POST', body: { grade: 'LEGENDARY' } })
+    assert.equal(bad.status, 400)
     assert.ok(dex.items.every((item) => item.status === 'LOCKED'))
   } finally {
     await close()

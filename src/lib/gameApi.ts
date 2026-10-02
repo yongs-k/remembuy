@@ -100,13 +100,31 @@ export type DexEntry = {
   fragmentCount: number
 }
 
-/** A 장소's stage: 4 fragments of the current grade complete it and open the next (null when 전설 is done). */
-export type RoomStage = { spaceId: string; stage: string | null; count: number; completedGrades: string[] }
+/**
+ * A 장소's stage: its four puzzle pieces of the current grade (null once 전설 is complete).
+ * `pieces` are the copies held per slot (top-left, top-right, bottom-right, bottom-left);
+ * `count` is how many slots are owned.
+ */
+export type RoomStage = { spaceId: string; stage: string | null; pieces: number[]; count: number; completedGrades: string[] }
+
+/** One piece landing in a 장소: `copies` > 1 means it was a duplicate. */
+export type PieceResult = {
+  spaceId: string
+  grade: string
+  slot: number
+  copies: number
+  pieces: number[]
+  count: number
+  completed: boolean
+}
+
+/** Spare copies per grade, the currency of 조합. */
+export type Duplicates = Record<string, number>
 
 export type OpenBoxResult = {
   result: { type: 'FRAGMENT' | 'FULL_ITEM'; itemId: string; itemName: string; grade: string }
   /** The 장소 stage the fragment went to, after this open. */
-  room?: { spaceId: string; grade: string; count: number; completed: boolean }
+  room?: PieceResult
   pointsSpent: number
   pointsBalance: number
   dexEntry: DexEntry
@@ -114,7 +132,15 @@ export type OpenBoxResult = {
 
 export const fetchBoxes = () => request<{ boxes: Box[] }>('/api/game/boxes')
 
-export const fetchDex = () => request<{ items: DexEntry[]; rooms?: RoomStage[] }>('/api/game/dex')
+export const fetchDex = () =>
+  request<{ items: DexEntry[]; rooms?: RoomStage[]; duplicates?: Duplicates }>('/api/game/dex')
+
+/** 조합: ten spare pieces of `grade` become one piece of the next grade. */
+export const combinePieces = (grade: string) =>
+  request<{ piece: PieceResult; duplicates: Duplicates }>('/api/game/combine', {
+    method: 'POST',
+    body: JSON.stringify({ grade }),
+  })
 
 export const openBox = (boxId: string) =>
   request<OpenBoxResult>(`/api/game/boxes/${encodeURIComponent(boxId)}/open`, { method: 'POST' })

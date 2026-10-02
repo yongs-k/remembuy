@@ -8,20 +8,13 @@ import { AttendanceCard } from '../components/AttendanceBox'
 import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
 import type { OpenBoxResult } from '../lib/gameApi'
+import { PuzzlePiece } from '../components/Puzzle'
 
 const STEPS = [
   { icon: 'task_alt', text: '퀘스트로\n포인트 모으기' },
   { icon: 'redeem', text: '상자 열고\n장소 조각 받기' },
   { icon: 'cottage', text: '조각 4개면\n장소 등급 상승' },
 ]
-
-// Decorative only: each grade's card shows a symbol, not a specific item.
-const GRADE_ICON: Record<string, string> = {
-  COMMON: 'soap',
-  ADVANCED: 'potted_plant',
-  RARE: 'auto_awesome',
-  LEGENDARY: 'bathtub',
-}
 
 // How long the hero box takes to open before the result sheet rises (index.css hero-* timings).
 const HERO_OPEN_MS = 1500
@@ -330,7 +323,7 @@ export default function StorePage() {
                   <span className="text-label-sm font-bold" style={{ color: hex }}>
                     {gradeLabel(grade)}
                   </span>
-                  <Icon name={GRADE_ICON[grade]} className="text-[30px] text-inverse-on-surface/90" />
+                  <PuzzlePiece grade={grade} slot={GRADE_ORDER.indexOf(grade)} className="h-10 w-10" />
                   <span className="text-label-sm tabular-nums text-inverse-on-surface/70">{kinds}종</span>
                 </li>
               )

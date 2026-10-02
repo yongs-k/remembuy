@@ -3,6 +3,7 @@ import { gradeColor, gradeLabel } from '../data/gradeColors'
 import type { OpenBoxResult } from '../lib/gameApi'
 import { placeName } from '../state/gameProgress'
 import { Sheet } from './Sheet'
+import { CopiesBadge, PuzzlePiece } from './Puzzle'
 
 /** Several boxes at once (10개 한번에 열기): every draw as a grade tile, stages completed called out. */
 export function BoxMultiResultModal({
@@ -42,12 +43,17 @@ export function BoxMultiResultModal({
             return (
               <li
                 key={i}
-                className={`animate-badge-bounce flex flex-col items-center gap-0.5 rounded-lg px-0.5 py-1.5 ${color.bg}`}
+                className="animate-badge-bounce relative flex flex-col items-center gap-0.5 rounded-lg bg-white/[0.05] px-0.5 pb-1.5 pt-2"
                 style={{ animationDelay: `${i * 70}ms` }}
-                aria-label={`${gradeLabel(r.result.grade)} ${place} 조각, ${r.result.itemName}${r.room?.completed ? ', 등급 완성' : ''}`}
+                aria-label={`${gradeLabel(r.result.grade)} ${place} 조각${r.room && r.room.copies > 1 ? ` x${r.room.copies}` : ''}, ${r.result.itemName}${r.room?.completed ? ', 등급 완성' : ''}`}
               >
-                <Icon name={r.room?.completed ? 'military_tech' : 'diamond'} className={`text-[22px] ${color.text}`} />
-                <span className={`w-full truncate text-center text-[11px] font-bold leading-tight ${color.text}`}>
+                {r.room && <CopiesBadge copies={r.room.copies} className="absolute -top-1.5 right-0 z-10" />}
+                {r.room ? (
+                  <PuzzlePiece grade={r.room.grade} slot={r.room.slot} className="h-9 w-9" />
+                ) : (
+                  <Icon name="diamond" className={`text-[22px] ${color.text}`} />
+                )}
+                <span className="w-full truncate text-center text-[11px] font-bold leading-tight" style={{ color: color.hex }}>
                   {place.split('/')[0]}
                 </span>
               </li>

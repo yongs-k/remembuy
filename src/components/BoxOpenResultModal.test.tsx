@@ -42,7 +42,7 @@ describe('BoxOpenResultModal', () => {
   })
 
   it('shows the 장소 stage, and the next grade once the stage completes', () => {
-    const room = { spaceId: 'bathroom', grade: 'COMMON', count: 2, completed: false }
+    const room = { spaceId: 'bathroom', grade: 'COMMON', slot: 1, copies: 1, pieces: [1, 1, 0, 0], count: 2, completed: false }
     const { unmount } = render(
       <BoxOpenResultModal result={{ ...FRAGMENT_RESULT, room }} onClose={() => {}} onViewCollection={() => {}} />
     )
@@ -51,7 +51,7 @@ describe('BoxOpenResultModal', () => {
     unmount()
     render(
       <BoxOpenResultModal
-        result={{ ...FRAGMENT_RESULT, room: { ...room, count: 4, completed: true } }}
+        result={{ ...FRAGMENT_RESULT, room: { ...room, slot: 3, pieces: [1, 1, 1, 1], count: 4, completed: true } }}
         onClose={() => {}}
         onViewCollection={() => {}}
       />

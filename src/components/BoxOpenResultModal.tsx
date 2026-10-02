@@ -1,6 +1,7 @@
 import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
 import { STAGE_SIZE, placeName } from '../state/gameProgress'
+import { CopiesBadge, PuzzleBoard, PuzzlePiece } from './Puzzle'
 import type { OpenBoxResult } from '../lib/gameApi'
 import { Sheet } from './Sheet'
 
@@ -82,10 +83,22 @@ export function BoxOpenResultModal({
         <div className={`relative flex justify-center ${intro ? 'h-44 items-end' : ''}`}>
           {intro && <OpeningBox />}
           <div
-            className={`${intro ? 'box-open-item absolute top-0' : 'animate-badge-bounce'} flex flex-col items-center gap-1 rounded-xl ${color.bg} px-space-md py-space-sm shadow-float`}
+            className={`${intro ? 'box-open-item absolute top-0' : 'animate-badge-bounce'} relative flex flex-col items-center`}
           >
-            <Icon name={completed ? 'military_tech' : 'diamond'} className={`text-[36px] ${color.text}`} />
-            <span className={`text-label-md font-bold ${color.text}`}>{gradeLabel(result.result.grade)}</span>
+            {room ? (
+              <>
+                <CopiesBadge copies={room.copies} className="absolute -top-1 right-0 z-10 px-2 text-label-md leading-6" />
+                <PuzzlePiece grade={room.grade} slot={room.slot} className="h-24 w-24 drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]" />
+              </>
+            ) : (
+              <span className={`flex flex-col items-center gap-1 rounded-xl ${color.bg} px-space-md py-space-sm shadow-float`}>
+                <Icon name={completed ? 'military_tech' : 'diamond'} className={`text-[36px] ${color.text}`} />
+              </span>
+            )}
+            <span className="mt-1 text-label-md font-bold" style={{ color: color.hex }}>
+              {gradeLabel(result.result.grade)}
+              {room && room.copies > 1 && ' · 중복'}
+            </span>
           </div>
         </div>
 
@@ -104,19 +117,11 @@ export function BoxOpenResultModal({
 
         {room && (
           <div className={`${intro ? 'box-open-text' : ''} space-y-1.5`}>
-            <div className="mx-auto grid w-16 grid-cols-2 gap-1" aria-hidden>
-              {/* Clockwise from top-left, like the 장소 tile. */}
-              {[0, 1, 3, 2].map((piece) => (
-                <span
-                  key={piece}
-                  className="aspect-square rounded-sm"
-                  style={{ backgroundColor: piece < room.count ? gradeColor(room.grade).hex : 'rgb(255 255 255 / 0.15)' }}
-                />
-              ))}
-            </div>
+            <PuzzleBoard grade={room.grade} pieces={room.pieces} className="mx-auto h-20 w-20 text-inverse-on-surface" />
             <p className="text-center text-label-sm tabular-nums text-inverse-on-surface/70">
               {gradeLabel(room.grade)} {placeName(room.spaceId)} 조각 {room.count} / {STAGE_SIZE}
               {completed && (nextGrade ? ` · 이제 ${gradeLabel(nextGrade)} 조각이 나와요` : ' · 전설까지 모두 모았어요')}
+              {!completed && room.copies > 1 && ' · 중복 조각은 10개 모아 조합할 수 있어요'}
             </p>
           </div>
         )}

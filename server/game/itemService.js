@@ -35,22 +35,110 @@ export function getDex(db, userId) {
 }
 
 export const GRADES = ['COMMON', 'ADVANCED', 'RARE', 'LEGENDARY']
+/** Puzzle pieces per grade per 장소; owning all four completes the stage (e.g. 일반 욕실). */
 export const STAGE_SIZE = 4
+/** Duplicate pieces of one grade that 조합 turns into one piece of the next grade. */
+export const COMBINE_COST = 10
 
-/** Each 장소's stage: the first grade with fewer than 4 fragments (null once 전설 is done). */
+const owned = (pieces) => pieces.filter((n) => n > 0).length
+
+/** Piece counts per 장소 and grade: { [spaceId]: { [grade]: [n0, n1, n2, n3] } }. */
+function pieceTable(db, userId) {
+  const table = {}
+  for (const row of plain(db.prepare('SELECT space_id, grade, slot, count FROM user_room_pieces WHERE user_id = ?').all(userId))) {
+    const byGrade = (table[row.space_id] ??= {})
+    const pieces = (byGrade[row.grade] ??= [0, 0, 0, 0])
+    if (row.slot >= 0 && row.slot < STAGE_SIZE) pieces[row.slot] = row.count
+  }
+  return table
+}
+
+/**
+ * Each 장소's stage: the first grade with a missing piece (null once 전설 is complete).
+ * `pieces` are that grade's four slot counts, `count` how many slots are owned.
+ */
 export function getRoomStages(db, userId) {
   const spaces = plain(db.prepare('SELECT id FROM spaces WHERE active = 1 ORDER BY sort, id').all())
-  const rows = plain(db.prepare('SELECT space_id, grade, count FROM user_room_fragments WHERE user_id = ?').all(userId))
+  const table = pieceTable(db, userId)
   return spaces.map(({ id }) => {
-    const counts = Object.fromEntries(GRADES.map((grade) => [grade, 0]))
-    for (const row of rows) if (row.space_id === id && row.grade in counts) counts[row.grade] = row.count
-    const stage = GRADES.find((grade) => counts[grade] < STAGE_SIZE) ?? null
+    const piecesOf = (grade) => table[id]?.[grade] ?? [0, 0, 0, 0]
+    const stage = GRADES.find((grade) => owned(piecesOf(grade)) < STAGE_SIZE) ?? null
+    const pieces = piecesOf(stage ?? 'LEGENDARY')
     return {
       spaceId: id,
       stage,
-      count: stage ? counts[stage] : STAGE_SIZE,
-      completedGrades: GRADES.filter((grade) => counts[grade] >= STAGE_SIZE),
+      pieces,
+      count: owned(pieces),
+      completedGrades: GRADES.filter((grade) => owned(piecesOf(grade)) === STAGE_SIZE),
     }
+  })
+}
+
+/** Spare copies per grade across every 장소 (a piece's first copy is never spare). */
+export function getDuplicates(db, userId) {
+  const duplicates = Object.fromEntries(GRADES.map((grade) => [grade, 0]))
+  for (const row of plain(db.prepare('SELECT grade, count FROM user_room_pieces WHERE user_id = ?').all(userId))) {
+    if (row.grade in duplicates) duplicates[row.grade] += Math.max(0, row.count - 1)
+  }
+  return duplicates
+}
+
+/** Adds one piece and says what it did to that 장소's stage. */
+function addPiece(db, userId, spaceId, grade, slot) {
+  const before = pieceTable(db, userId)[spaceId]?.[grade] ?? [0, 0, 0, 0]
+  db.prepare(
+    `INSERT INTO user_room_pieces (user_id, space_id, grade, slot, count) VALUES (?, ?, ?, ?, 1)
+     ON CONFLICT (user_id, space_id, grade, slot) DO UPDATE SET count = count + 1`
+  ).run(userId, spaceId, grade, slot)
+  const after = before.map((n, i) => (i === slot ? n + 1 : n))
+  return {
+    spaceId,
+    grade,
+    slot,
+    copies: after[slot],
+    pieces: after,
+    count: owned(after),
+    // Only the piece that fills the last gap completes the stage.
+    completed: before[slot] === 0 && owned(after) === STAGE_SIZE,
+  }
+}
+
+/**
+ * 조합: ten spare pieces of one grade become one piece of the next grade. It goes to a
+ * 장소 still missing that grade (one already working on it first), into an empty slot.
+ */
+export function combinePieces(db, userId, grade, randomFn = Math.random) {
+  const index = GRADES.indexOf(grade)
+  if (index < 0 || index === GRADES.length - 1) throw new Error('invalid grade')
+  const next = GRADES[index + 1]
+  return transaction(db, () => {
+    if (getDuplicates(db, userId)[grade] < COMBINE_COST) throw new Error('not enough duplicates')
+    // Spend from the most-duplicated pieces first; never a piece's last copy.
+    let left = COMBINE_COST
+    const rows = plain(
+      db
+        .prepare('SELECT space_id, slot, count FROM user_room_pieces WHERE user_id = ? AND grade = ? AND count > 1 ORDER BY count DESC, space_id, slot')
+        .all(userId, grade)
+    )
+    const spend = db.prepare('UPDATE user_room_pieces SET count = count - ? WHERE user_id = ? AND space_id = ? AND grade = ? AND slot = ?')
+    for (const row of rows) {
+      if (left === 0) break
+      const take = Math.min(left, row.count - 1)
+      spend.run(take, userId, row.space_id, grade, row.slot)
+      left -= take
+    }
+
+    const rooms = getRoomStages(db, userId)
+    const table = pieceTable(db, userId)
+    const missing = (spaceId) => (table[spaceId]?.[next] ?? [0, 0, 0, 0]).flatMap((n, i) => (n === 0 ? [i] : []))
+    const working = rooms.filter((room) => room.stage === next)
+    const lacking = rooms.filter((room) => missing(room.spaceId).length > 0)
+    const pool = working.length ? working : lacking.length ? lacking : rooms
+    const room = pool[Math.min(pool.length - 1, Math.floor(randomFn() * pool.length))]
+    const gaps = missing(room.spaceId)
+    const slot = gaps.length ? gaps[Math.min(gaps.length - 1, Math.floor(randomFn() * gaps.length))] : Math.floor(randomFn() * STAGE_SIZE) % STAGE_SIZE
+    const piece = addPiece(db, userId, room.spaceId, next, slot)
+    return { piece, duplicates: getDuplicates(db, userId) }
   })
 }
 
@@ -119,11 +207,9 @@ function openBoxIn(db, userId, box, nowIso, randomFn, cost) {
   const picked = pickWeighted(pool, randomFn)
   const item = { ...db.prepare('SELECT id, name, grade, fragments_required, room_type FROM virtual_items WHERE id = ?').get(picked.item_id) }
 
-  db.prepare(
-    `INSERT INTO user_room_fragments (user_id, space_id, grade, count) VALUES (?, ?, ?, 1)
-     ON CONFLICT (user_id, space_id, grade) DO UPDATE SET count = count + 1`
-  ).run(userId, room.spaceId, room.stage)
-  const stageCount = room.count + 1
+  // One of the stage's four pieces at random: owned ones come again as duplicates.
+  const slot = Math.min(STAGE_SIZE - 1, Math.floor(randomFn() * STAGE_SIZE))
+  const piece = addPiece(db, userId, room.spaceId, room.stage, slot)
 
   // The item gets the fragment too, for the 아이템 수집함.
   const status = itemStatus(db, userId, item.id)
@@ -149,7 +235,7 @@ function openBoxIn(db, userId, box, nowIso, randomFn, cost) {
 
   return {
     result: { type: 'FRAGMENT', itemId: item.id, itemName: item.name, grade: item.grade },
-    room: { spaceId: room.spaceId, grade: room.stage, count: Math.min(stageCount, STAGE_SIZE), completed: stageCount >= STAGE_SIZE },
+    room: piece,
     pointsSpent: cost,
     pointsBalance: balance - cost,
     dexEntry: dexEntryFor(db, userId, item),

@@ -4,6 +4,7 @@ import { getLocationCompletion, getMasterItemCounts } from '../state/selectors'
 import { useGame } from '../state/GameContext'
 import { HomeLocationTile } from './HomeLocationTile'
 import { TitleManager } from './TitleManager'
+import { PieceCombine } from './PieceCombine'
 
 type Filter = 'all' | 'progress' | 'almost' | 'none'
 
@@ -120,6 +121,8 @@ export function CollectionOverview({
           </div>
         )}
       </section>
+
+      <PieceCombine />
     </div>
   )
 }

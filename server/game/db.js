@@ -136,6 +136,16 @@ CREATE TABLE IF NOT EXISTS user_room_fragments (
   count INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (user_id, space_id, grade)
 );
+-- 장소 puzzle pieces: four slots per grade (0 top-left, 1 top-right, 2 bottom-right,
+-- 3 bottom-left). count > 1 means duplicates, which 조합 turns into a higher grade.
+CREATE TABLE IF NOT EXISTS user_room_pieces (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  space_id TEXT NOT NULL,
+  grade TEXT NOT NULL,
+  slot INTEGER NOT NULL,
+  count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, space_id, grade, slot)
+);
 -- Quest rewards claimed; period is 'once' or the KST day for daily quests.
 CREATE TABLE IF NOT EXISTS quest_claims (
   user_id TEXT NOT NULL REFERENCES users(id),
@@ -311,8 +321,24 @@ function seedCatalog(db, catalog) {
   })
 }
 
+// The first stage model counted fragments per grade; each became one puzzle slot.
+function migrateRoomFragmentsToPieces(db) {
+  if (db.prepare('SELECT COUNT(*) AS n FROM user_room_fragments').get().n === 0) return
+  transaction(db, () => {
+    const insert = db.prepare(
+      `INSERT INTO user_room_pieces (user_id, space_id, grade, slot, count) VALUES (?, ?, ?, ?, 1)
+       ON CONFLICT (user_id, space_id, grade, slot) DO UPDATE SET count = count + 1`
+    )
+    for (const row of db.prepare('SELECT user_id, space_id, grade, count FROM user_room_fragments').all()) {
+      for (let i = 0; i < row.count; i++) insert.run(row.user_id, row.space_id, row.grade, Math.min(i, 3))
+    }
+    db.exec('DELETE FROM user_room_fragments')
+  })
+}
+
 export function migrate(db, { catalog } = {}) {
   db.exec(SCHEMA)
+  migrateRoomFragmentsToPieces(db)
   db.prepare("INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', ?)").run(SCHEMA_VERSION)
   seedConfig(db)
   if (catalog) seedCatalog(db, catalog)

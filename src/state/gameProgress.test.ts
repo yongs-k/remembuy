@@ -10,7 +10,7 @@ describe('earnedTitles', () => {
       benefits: [],
       titles: [{ spaceId: 'kitchen', tierCode: 'SPROUT', earnedAt: '2026-10-01' }],
     } as GameState
-    const rooms = [{ spaceId: 'bathroom', stage: 'RARE', count: 1, completedGrades: ['COMMON', 'ADVANCED'] }]
+    const rooms = [{ spaceId: 'bathroom', stage: 'RARE', pieces: [1, 0, 0, 0], count: 1, completedGrades: ['COMMON', 'ADVANCED'] }]
     expect(earnedTitles(state, rooms)).toEqual([
       { key: 'grade:bathroom:ADVANCED', label: '고급 욕실' },
       { key: 'grade:bathroom:COMMON', label: '일반 욕실' },

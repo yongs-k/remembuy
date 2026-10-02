@@ -1,5 +1,16 @@
 import { getCatalog, getState, claimSlots, getHistory } from './service.js'
-import { getBoxes, getDex, getRoomStages, openBox, openBoxes, MAX_OPEN_COUNT, getAttendance, claimAttendance } from './itemService.js'
+import {
+  getBoxes,
+  getDex,
+  getRoomStages,
+  getDuplicates,
+  combinePieces,
+  openBox,
+  openBoxes,
+  MAX_OPEN_COUNT,
+  getAttendance,
+  claimAttendance,
+} from './itemService.js'
 import { getQuests, claimQuest } from './quests.js'
 
 const DEVICE_ID = /^[A-Za-z0-9-]{8,64}$/
@@ -114,7 +125,29 @@ export async function handleGameRequest(req, res, db) {
     }
 
     if (route === 'GET /api/game/dex') {
-      sendJson(res, 200, { items: getDex(db, deviceId), rooms: getRoomStages(db, deviceId) })
+      sendJson(res, 200, {
+        items: getDex(db, deviceId),
+        rooms: getRoomStages(db, deviceId),
+        duplicates: getDuplicates(db, deviceId),
+      })
+      return
+    }
+
+    if (route === 'POST /api/game/combine') {
+      let body
+      try {
+        body = JSON.parse((await readBody(req)) ?? '')
+      } catch {
+        sendJson(res, 400, invalid)
+        return
+      }
+      try {
+        sendJson(res, 200, combinePieces(db, deviceId, body?.grade))
+      } catch (error) {
+        if (error.message === 'invalid grade') sendJson(res, 400, invalid)
+        else if (error.message === 'not enough duplicates') sendJson(res, 409, { error: error.message })
+        else throw error
+      }
       return
     }
 

@@ -25,6 +25,8 @@ function mockGame(dex: DexEntry[], catalogError = false) {
     boxes: [],
     dex,
     rooms: [],
+    duplicates: {},
+    combine: vi.fn(),
     catalogError,
     attendance: null,
     claimAttendance: vi.fn(),

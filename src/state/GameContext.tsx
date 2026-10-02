@@ -11,6 +11,7 @@ import {
   claimQuest as claimQuestApi,
   openBox as openBoxApi,
   openBoxes as openBoxesApi,
+  combinePieces as combinePiecesApi,
   type GameState,
   type Box,
   type DexEntry,
@@ -18,6 +19,8 @@ import {
   type Attendance,
   type Quest,
   type RoomStage,
+  type Duplicates,
+  type PieceResult,
 } from '../lib/gameApi'
 
 type GameContextValue = {
@@ -26,6 +29,10 @@ type GameContextValue = {
   dex: DexEntry[]
   /** Each 장소's grade stage; empty until loaded. */
   rooms: RoomStage[]
+  /** Spare pieces per grade (조합 currency). */
+  duplicates: Duplicates
+  /** 조합: ten spares of a grade into one piece of the next; undefined if it failed. */
+  combine: (grade: string) => Promise<PieceResult | undefined>
   catalogError: boolean
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<number>
@@ -50,6 +57,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [boxes, setBoxes] = useState<Box[]>([])
   const [dex, setDex] = useState<DexEntry[]>([])
   const [rooms, setRooms] = useState<RoomStage[]>([])
+  const [duplicates, setDuplicates] = useState<Duplicates>({})
   const [attendance, setAttendance] = useState<Attendance | null>(null)
   const [quests, setQuests] = useState<Quest[]>([])
   const [catalogError, setCatalogError] = useState(false)
@@ -61,6 +69,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setBoxes(boxList.boxes)
       setDex(dexList.items)
       setRooms(dexList.rooms ?? [])
+      setDuplicates(dexList.duplicates ?? {})
       // Attendance is a nice-to-have; its failure must not mark the whole catalog broken.
       fetchAttendance().then(setAttendance, (error) => console.warn('attendance unavailable', error))
       loadQuests()
@@ -103,7 +112,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // A stage can roll over to the next grade: take the server's word rather than guess.
   const reloadRooms = useCallback(() => {
     fetchDex().then(
-      (data) => setRooms(data.rooms ?? []),
+      (data) => {
+        setRooms(data.rooms ?? [])
+        setDuplicates(data.duplicates ?? {})
+      },
       (error) => console.warn('rooms unavailable', error)
     )
   }, [])
@@ -133,6 +145,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return results
       } catch (error) {
         console.warn('open boxes failed', error)
+        return undefined
+      }
+    },
+    [reloadRooms]
+  )
+
+  const combine = useCallback(
+    async (grade: string) => {
+      try {
+        const { piece, duplicates: left } = await combinePiecesApi(grade)
+        setDuplicates(left)
+        reloadRooms()
+        return piece
+      } catch (error) {
+        console.warn('combine failed', error)
         return undefined
       }
     },
@@ -198,7 +225,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, rooms, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, rooms, duplicates, combine, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
   )
 }
 

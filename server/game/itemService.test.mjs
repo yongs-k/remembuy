@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { openDb, transaction, migrate } from './db.js'
-import { getDex, getBoxes, openBox, openBoxes, getRoomStages, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
+import { getDex, getBoxes, openBox, openBoxes, getRoomStages, getDuplicates, combinePieces, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
 
 const DEVICE = 'device-aaaa1111'
 const NOW = new Date('2026-09-22T00:00:00.000Z')
@@ -63,20 +63,61 @@ test('a fragment result increments the count without completing early', () => {
   assert.equal(dex.fragmentCount, 1)
 })
 
-test('four fragments complete a 장소 stage and open the next grade', () => {
+// A box draws the 장소, then the item, then the piece slot. This lands on 욕실,
+// its first item, and the given slot.
+const onSlot = (slot) => {
+  const seq = [0, 0, (slot + 0.5) / 4]
+  let i = 0
+  return () => seq[i++ % seq.length]
+}
+
+test('four different pieces complete a 장소 stage; a repeat is a duplicate', () => {
   const db = freshDbWithPoints(5000)
-  // randomFn 0: the first 장소 (욕실) and its first item of the current grade.
-  for (let i = 1; i <= 3; i++) {
-    const r = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-    assert.deepEqual(r.room, { spaceId: 'bathroom', grade: 'COMMON', count: i, completed: false })
-  }
-  const fourth = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-  assert.deepEqual(fourth.room, { spaceId: 'bathroom', grade: 'COMMON', count: 4, completed: true })
-  const fifth = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-  assert.equal(fifth.room.grade, 'ADVANCED')
-  assert.equal(fifth.result.grade, 'ADVANCED')
+  const first = openBox(db, DEVICE, 'box-starter', NOW, onSlot(0))
+  assert.deepEqual(first.room, { spaceId: 'bathroom', grade: 'COMMON', slot: 0, copies: 1, pieces: [1, 0, 0, 0], count: 1, completed: false })
+  const again = openBox(db, DEVICE, 'box-starter', NOW, onSlot(0))
+  assert.deepEqual(again.room, { spaceId: 'bathroom', grade: 'COMMON', slot: 0, copies: 2, pieces: [2, 0, 0, 0], count: 1, completed: false })
+  openBox(db, DEVICE, 'box-starter', NOW, onSlot(1))
+  openBox(db, DEVICE, 'box-starter', NOW, onSlot(2))
+  const last = openBox(db, DEVICE, 'box-starter', NOW, onSlot(3))
+  assert.equal(last.room.count, 4)
+  assert.equal(last.room.completed, true)
+  const next = openBox(db, DEVICE, 'box-starter', NOW, onSlot(0))
+  assert.equal(next.room.grade, 'ADVANCED')
   const bathroom = getRoomStages(db, DEVICE).find((room) => room.spaceId === 'bathroom')
-  assert.deepEqual(bathroom, { spaceId: 'bathroom', stage: 'ADVANCED', count: 1, completedGrades: ['COMMON'] })
+  assert.deepEqual(bathroom, { spaceId: 'bathroom', stage: 'ADVANCED', pieces: [1, 0, 0, 0], count: 1, completedGrades: ['COMMON'] })
+  assert.equal(getDuplicates(db, DEVICE).COMMON, 1)
+})
+
+test('조합 turns ten spare pieces of a grade into one piece of the next grade', () => {
+  const db = freshDbWithPoints(0)
+  db.prepare("INSERT INTO users (id, created_at) VALUES (?, ?) ON CONFLICT DO NOTHING").run(DEVICE, NOW.toISOString())
+  const put = db.prepare('INSERT INTO user_room_pieces (user_id, space_id, grade, slot, count) VALUES (?, ?, ?, ?, ?)')
+  put.run(DEVICE, 'kitchen', 'COMMON', 0, 7) // 6 spare
+  put.run(DEVICE, 'car', 'COMMON', 2, 5) // 4 spare
+  assert.equal(getDuplicates(db, DEVICE).COMMON, 10)
+  const { piece, duplicates } = combinePieces(db, DEVICE, 'COMMON', () => 0)
+  assert.equal(piece.grade, 'ADVANCED')
+  assert.equal(piece.copies, 1)
+  assert.equal(duplicates.COMMON, 0)
+  // The first copies stay: no 장소 loses a piece it had.
+  const pieces = (space) => getRoomStages(db, DEVICE).find((room) => room.spaceId === space).pieces
+  assert.deepEqual(pieces('kitchen'), [1, 0, 0, 0])
+  assert.deepEqual(pieces('car'), [0, 0, 1, 0])
+  assert.throws(() => combinePieces(db, DEVICE, 'COMMON'), /not enough duplicates/)
+  assert.throws(() => combinePieces(db, DEVICE, 'LEGENDARY'), /invalid grade/)
+  assert.throws(() => combinePieces(db, DEVICE, 'NOPE'), /invalid grade/)
+})
+
+test('the old per-grade fragment counts become puzzle pieces', () => {
+  const db = openDb(':memory:')
+  db.prepare('INSERT INTO users (id, created_at) VALUES (?, ?)').run(DEVICE, NOW.toISOString())
+  db.prepare("INSERT INTO user_room_fragments (user_id, space_id, grade, count) VALUES (?, 'bathroom', 'COMMON', 4), (?, 'kitchen', 'COMMON', 2)").run(DEVICE, DEVICE)
+  migrate(db)
+  const rooms = getRoomStages(db, DEVICE)
+  assert.deepEqual(rooms.find((room) => room.spaceId === 'bathroom').completedGrades, ['COMMON'])
+  assert.deepEqual(rooms.find((room) => room.spaceId === 'kitchen').pieces, [1, 1, 0, 0])
+  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM user_room_fragments').get().n, 0)
 })
 
 test('the drawn item still collects fragments toward completion', () => {
@@ -106,17 +147,15 @@ test('with nothing left to draw the open fails and spends nothing', () => {
   assert.equal(pointsOf(db, DEVICE), 5000)
 })
 
-test('opening ten at once spends ten costs and walks the stages like ten single opens', () => {
+test('opening ten at once spends ten costs; repeats of a piece pile up as duplicates', () => {
   const db = freshDbWithPoints(5000)
   const { results, pointsBalance } = openBoxes(db, DEVICE, 'box-starter', 10, NOW, () => 0)
   assert.equal(results.length, 10)
   assert.equal(pointsBalance, 0)
   assert.equal(pointsOf(db, DEVICE), 0)
-  // randomFn 0 keeps drawing 욕실: 4 일반, 4 고급, then 레어.
-  assert.deepEqual(
-    results.map((r) => r.room.grade),
-    ['COMMON', 'COMMON', 'COMMON', 'COMMON', 'ADVANCED', 'ADVANCED', 'ADVANCED', 'ADVANCED', 'RARE', 'RARE']
-  )
+  // randomFn 0: 욕실's top-left 일반 piece ten times.
+  assert.deepEqual(results.map((r) => r.room.copies), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  assert.equal(getDuplicates(db, DEVICE).COMMON, 9)
 })
 
 test('ten opens without points for all ten open none', () => {

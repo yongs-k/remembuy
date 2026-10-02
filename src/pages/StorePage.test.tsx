@@ -25,6 +25,8 @@ function mockGame(overrides: {
     boxes: overrides.boxes ?? [BOX],
     dex: [],
     rooms: [],
+    duplicates: {},
+    combine: vi.fn(),
     catalogError: false,
     attendance: null,
     claimAttendance: vi.fn(),
@@ -73,7 +75,7 @@ describe('StorePage', () => {
   it('opens ten at once when the points cover it, and shows every result', async () => {
     const one: OpenBoxResult = {
       result: { type: 'FRAGMENT', itemId: 'item-x', itemName: 'X', grade: 'COMMON' },
-      room: { spaceId: 'bathroom', grade: 'COMMON', count: 1, completed: false },
+      room: { spaceId: 'bathroom', grade: 'COMMON', slot: 0, copies: 1, pieces: [1, 0, 0, 0], count: 1, completed: false },
       pointsSpent: 500,
       pointsBalance: 0,
       dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, roomType: 'bathroom', status: 'COLLECTING', fragmentCount: 1 },
