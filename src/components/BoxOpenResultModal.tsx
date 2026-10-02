@@ -45,18 +45,26 @@ function OpeningBox() {
   )
 }
 
-/** Box-opening result: a cabinet-toned sheet, since it belongs to the game layer. */
+/** Box-opening result: a cabinet-toned card in the middle of the screen (the game layer). */
 export function BoxOpenResultModal({
   result,
   intro = true,
   onClose,
-  onViewDex,
+  onViewCollection,
+  onReopen,
+  canReopen = true,
 }: {
   result: OpenBoxResult
   /** Play the box-opening scene first; false when the page already opened its own box. */
   intro?: boolean
+  /** 확인: close. */
   onClose: () => void
-  onViewDex: () => void
+  /** 도감 보기: the 컬렉션, where each 장소's grade stage shows. */
+  onViewCollection: () => void
+  /** 다시 열기: open the same box again; omitted where a box can't be reopened (출석). */
+  onReopen?: () => void
+  /** False when there aren't enough points for another one. */
+  canReopen?: boolean
 }) {
   const color = gradeColor(result.result.grade)
   const room = result.room
@@ -69,7 +77,7 @@ export function BoxOpenResultModal({
   )
 
   return (
-    <Sheet labelledBy="box-result-title" onClose={onClose} tone="cabinet">
+    <Sheet labelledBy="box-result-title" onClose={onClose} tone="cabinet" placement="center">
       <div className="space-y-4">
         <div className={`relative flex justify-center ${intro ? 'h-44 items-end' : ''}`}>
           {intro && <OpeningBox />}
@@ -124,21 +132,33 @@ export function BoxOpenResultModal({
           </div>
         )}
 
-        <div className="flex items-stretch gap-2">
+        <div className="space-y-2 pt-1">
+          <div className="flex items-stretch gap-2">
+            <button
+              type="button"
+              onClick={onViewCollection}
+              className="min-h-12 flex-1 rounded-xl border border-tertiary-fixed-dim/50 text-label-lg text-tertiary-fixed transition-colors hover:bg-white/[0.06]"
+            >
+              도감 보기
+            </button>
+            {onReopen && (
+              <button
+                type="button"
+                disabled={!canReopen}
+                onClick={onReopen}
+                className="min-h-12 flex-1 rounded-xl bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] text-label-lg font-bold text-on-tertiary-fixed active:scale-[0.98] disabled:from-white/[0.12] disabled:to-white/[0.12] disabled:font-normal disabled:text-inverse-on-surface/60"
+              >
+                {canReopen ? '다시 열기' : '포인트 부족'}
+              </button>
+            )}
+          </div>
           <button
             type="button"
             data-autofocus
             onClick={onClose}
-            className="min-h-11 flex-1 rounded-xl border border-inverse-on-surface/20 text-label-lg text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/10"
+            className="min-h-12 w-full rounded-xl bg-white/[0.08] text-label-lg text-inverse-on-surface transition-colors hover:bg-white/[0.12]"
           >
-            닫기
-          </button>
-          <button
-            type="button"
-            onClick={onViewDex}
-            className="min-h-11 flex-1 rounded-xl bg-tertiary-fixed-dim text-label-lg text-on-tertiary-fixed active:scale-[0.98]"
-          >
-            아이템 수집함 보기
+            확인
           </button>
         </div>
       </div>

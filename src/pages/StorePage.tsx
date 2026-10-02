@@ -309,10 +309,18 @@ export default function StorePage() {
             setResult(null)
             setHeroOpen(false)
           }}
-          onViewDex={() => {
+          onViewCollection={() => {
             setResult(null)
-            navigate('/dex')
+            navigate('/collection')
           }}
+          onReopen={() => {
+            const boxId = boxes.find((box) => box.costPoints <= result.pointsBalance)?.id
+            setResult(null)
+            setHeroOpen(false)
+            // Let the lid settle back for a frame so the opening plays again from the start.
+            if (boxId) window.setTimeout(() => void handleOpen(boxId), 60)
+          }}
+          canReopen={boxes.some((box) => box.costPoints <= result.pointsBalance)}
         />
       )}
     </div>

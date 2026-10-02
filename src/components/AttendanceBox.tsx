@@ -29,9 +29,9 @@ export function useAttendanceBox() {
     <BoxOpenResultModal
       result={result}
       onClose={() => setResult(null)}
-      onViewDex={() => {
+      onViewCollection={() => {
         setResult(null)
-        navigate('/dex')
+        navigate('/collection')
       }}
     />
   )
