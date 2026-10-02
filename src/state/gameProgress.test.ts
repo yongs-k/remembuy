@@ -21,8 +21,8 @@ describe('roomFragments', () => {
       entry('d', null, 5),
     ])
     expect(result).toEqual({
-      bathroom: { fragments: 13, completed: 1, total: 2 },
-      kitchen: { fragments: 0, completed: 0, total: 1 },
+      bathroom: { fragments: 13, completed: 1, total: 2, progress: 0.65 },
+      kitchen: { fragments: 0, completed: 0, total: 1, progress: 0 },
     })
   })
 })

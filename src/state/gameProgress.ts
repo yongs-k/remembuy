@@ -11,18 +11,23 @@ export const TIER_NAMES: Record<string, string> = {
 
 export const tierName = (code: string) => TIER_NAMES[code] ?? code
 
-export type RoomFragments = { fragments: number; completed: number; total: number }
+/** progress: 0..1, the mean of each item's completion (a finished item counts as 1). */
+export type RoomFragments = { fragments: number; completed: number; total: number; progress: number }
 
 /** 아이템 수집함 progress per 장소: fragments collected, items completed, items in the 장소. */
 export function roomFragments(dex: DexEntry[]): Record<string, RoomFragments> {
   const byRoom: Record<string, RoomFragments> = {}
   for (const entry of dex) {
     if (!entry.roomType) continue
-    const room = (byRoom[entry.roomType] ??= { fragments: 0, completed: 0, total: 0 })
+    const room = (byRoom[entry.roomType] ??= { fragments: 0, completed: 0, total: 0, progress: 0 })
+    const done = entry.status === 'COMPLETE'
     room.fragments += entry.fragmentCount
     room.total += 1
-    if (entry.status === 'COMPLETE') room.completed += 1
+    if (done) room.completed += 1
+    // Sum for now; divided by total below.
+    room.progress += done ? 1 : Math.min(1, entry.fragmentCount / entry.fragmentsRequired)
   }
+  for (const room of Object.values(byRoom)) room.progress /= room.total
   return byRoom
 }
 
