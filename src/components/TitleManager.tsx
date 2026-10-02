@@ -35,7 +35,7 @@ export function TitleManager() {
           </span>
         </p>
         <p className="text-body-sm text-inverse-on-surface/70">
-          받은 칭호 {earned.length}개 · 장소를 25% 모을 때마다 받아요
+          받은 칭호 {earned.length}개 · 직접 기록한 상품으로 장소를 25% 채울 때마다 받아요
         </p>
       </div>
       <button
@@ -54,7 +54,7 @@ export function TitleManager() {
           <h3 className="text-label-md text-inverse-on-surface/70">받은 칭호 · 눌러서 대표로</h3>
           {earned.length === 0 ? (
             <p className="text-body-sm text-inverse-on-surface/70">
-              장소의 소모품을 25% 기록하면 첫 칭호를 받아요.
+              직접 기록한 상품으로 장소를 25% 채우면 첫 칭호를 받아요. 예시 상품은 세지 않아요.
             </p>
           ) : (
             <div className="flex flex-wrap gap-1.5">

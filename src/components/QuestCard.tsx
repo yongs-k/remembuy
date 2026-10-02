@@ -12,8 +12,8 @@ function celebrateClaim(anchor: DOMRect, points: number) {
   burst.setAttribute('role', 'status')
   burst.style.left = `${anchor.left + anchor.width / 2}px`
   burst.style.top = `${anchor.top + anchor.height / 2}px`
-  const sparks = Array.from({ length: 8 }, (_, i) => `<i style="--a:${i * 45}deg"></i>`).join('')
-  burst.innerHTML = `${sparks}<strong>+${points}P</strong><span class="sr-only">받았어요</span>`
+  const sparks = Array.from({ length: 10 }, (_, i) => `<i style="--a:${i * 36}deg"></i>`).join('')
+  burst.innerHTML = `<b></b>${sparks}<strong>+${points}P</strong><span class="sr-only">받았어요</span>`
   document.body.appendChild(burst)
   window.setTimeout(() => burst.remove(), 1400)
 }
