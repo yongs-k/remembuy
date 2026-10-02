@@ -207,7 +207,7 @@ export default function HomePage() {
             </button>
           </div>
           {/* The three closest to done, in one swipeable row. */}
-          <div className="-mx-4 flex snap-x snap-mandatory gap-space-sm overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+          <div className="-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-space-sm overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
             {easiestQuests.map((quest) => (
               <QuestCard key={quest.id} quest={quest} className="w-[72%] shrink-0 snap-start sm:w-[46%]" />
             ))}
