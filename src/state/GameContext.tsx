@@ -5,11 +5,14 @@ import {
   fetchGameState,
   fetchBoxes,
   fetchDex,
+  fetchAttendance,
+  claimAttendance as claimAttendanceApi,
   openBox as openBoxApi,
   type GameState,
   type Box,
   type DexEntry,
   type OpenBoxResult,
+  type Attendance,
 } from '../lib/gameApi'
 
 type GameContextValue = {
@@ -20,6 +23,10 @@ type GameContextValue = {
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<number>
   openBox: (boxId: string) => Promise<OpenBoxResult | undefined>
+  /** Today's 출석 state; null until loaded or when the game server is unreachable. */
+  attendance: Attendance | null
+  /** Opens today's free box; undefined if already claimed or the call failed. */
+  claimAttendance: () => Promise<OpenBoxResult | undefined>
 }
 
 const GameContext = createContext<GameContextValue | null>(null)
@@ -29,6 +36,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GameState | null>(null)
   const [boxes, setBoxes] = useState<Box[]>([])
   const [dex, setDex] = useState<DexEntry[]>([])
+  const [attendance, setAttendance] = useState<Attendance | null>(null)
   const [catalogError, setCatalogError] = useState(false)
   const reconciled = useRef(false)
 
@@ -37,6 +45,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const [boxList, dexList] = await Promise.all([fetchBoxes(), fetchDex()])
       setBoxes(boxList.boxes)
       setDex(dexList.items)
+      // Attendance is a nice-to-have; its failure must not mark the whole catalog broken.
+      fetchAttendance().then(setAttendance, (error) => console.warn('attendance unavailable', error))
       setCatalogError(false)
     } catch (error) {
       console.warn('game catalog unavailable', error)
@@ -85,6 +95,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const claimAttendance = useCallback(async () => {
+    try {
+      const result = await claimAttendanceApi()
+      setAttendance((prev) => (prev ? { ...prev, claimedToday: true } : prev))
+      setDex((prev) => prev.map((entry) => (entry.id === result.dexEntry.id ? result.dexEntry : entry)))
+      return result
+    } catch (error) {
+      console.warn('attendance claim failed', error)
+      // 409 = already claimed elsewhere (another tab or device): resync the flag.
+      fetchAttendance().then(setAttendance, () => {})
+      return undefined
+    }
+  }, [])
+
   useEffect(() => {
     if (reconciled.current) return
     reconciled.current = true
@@ -102,7 +126,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, catalogError, refresh, claim, openBox }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, catalogError, refresh, claim, openBox, attendance, claimAttendance }}>{children}</GameContext.Provider>
   )
 }
 

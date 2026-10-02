@@ -25,6 +25,8 @@ function mockGame(state: GameState | null, dex: DexEntry[], catalogError = false
     boxes: [],
     dex,
     catalogError,
+    attendance: null,
+    claimAttendance: vi.fn(),
     refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),
@@ -55,12 +57,32 @@ describe('HomeGameCard', () => {
     expect(screen.getByText('도감 수집률을 올리면 포인트가 쌓여요')).toBeInTheDocument()
   })
 
+  it('offers today\'s free attendance box first and opens it', () => {
+    const claimAttendance = vi.fn().mockResolvedValue(undefined)
+    vi.mocked(GameContextModule.useGame).mockReturnValue({
+      state: { ...STATE, points: 0 },
+      boxes: [{ id: 'b1', name: '시작 상자', costPoints: 500 }],
+      dex: DEX,
+      catalogError: false,
+      attendance: { day: '2026-10-02', claimedToday: false },
+      claimAttendance,
+      refresh: refreshMock,
+      claim: vi.fn(),
+      openBox: vi.fn(),
+    })
+    render(<HomeGameCard />)
+    fireEvent.click(screen.getByText('오늘의 출석 상자 열기'))
+    expect(claimAttendance).toHaveBeenCalled()
+  })
+
   it('sends the user to earn points when no box is affordable yet', () => {
     vi.mocked(GameContextModule.useGame).mockReturnValue({
       state: { ...STATE, points: 100 },
       boxes: [{ id: 'b1', name: '시작 상자', costPoints: 500 }],
       dex: DEX,
       catalogError: false,
+      attendance: null,
+      claimAttendance: vi.fn(),
       refresh: refreshMock,
       claim: vi.fn(),
       openBox: vi.fn(),

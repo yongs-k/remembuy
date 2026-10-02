@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { Icon } from '../data/materialIcons'
+import { useAttendanceBox } from './AttendanceBox'
 
 export function HomeGameCard() {
   const { state, dex, boxes, catalogError, refresh } = useGame()
@@ -10,10 +11,15 @@ export function HomeGameCard() {
   const cheapestBox = boxes.length ? Math.min(...boxes.map((box) => box.costPoints)) : undefined
   // Can't open anything yet: send the user to where points are earned instead of a dead end.
   const needsPoints = !catalogError && cheapestBox !== undefined && points < cheapestBox
+  const attendanceBox = useAttendanceBox()
+  // Today's free 출석 box comes first: it is the one thing a new user can always open.
+  const attendanceOpen = !catalogError && attendanceBox.available === true
 
   const primary = catalogError
     ? { label: '다시 시도', onClick: () => void refresh() }
-    : needsPoints
+    : attendanceOpen
+      ? { label: attendanceBox.opening ? '여는 중...' : '오늘의 출석 상자 열기', onClick: () => void attendanceBox.open() }
+      : needsPoints
       ? { label: '도감 채우러 가기', onClick: () => navigate('/collection') }
       : { label: '상자 열기', onClick: () => navigate('/store') }
 
@@ -25,7 +31,9 @@ export function HomeGameCard() {
           <p role={catalogError ? 'alert' : undefined} className="text-body-sm text-inverse-on-surface/70">
             {catalogError
               ? '게임 정보를 불러오지 못했어요'
-              : needsPoints
+              : attendanceOpen
+                ? '하루 한 번 상자를 무료로 열 수 있어요'
+                : needsPoints
                 ? `상자는 ${cheapestBox}P부터 열 수 있어요. 도감 수집률이 오르면 포인트가 쌓여요`
                 : points === 0
                   ? '도감 수집률을 올리면 포인트가 쌓여요'
@@ -57,6 +65,7 @@ export function HomeGameCard() {
           아이템 수집함
         </button>
       </div>
+      {attendanceBox.sheet}
     </div>
   )
 }

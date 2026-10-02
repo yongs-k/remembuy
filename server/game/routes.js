@@ -1,5 +1,5 @@
 import { getCatalog, getState, claimSlots, getHistory } from './service.js'
-import { getBoxes, getDex, openBox } from './itemService.js'
+import { getBoxes, getDex, openBox, getAttendance, claimAttendance } from './itemService.js'
 
 const DEVICE_ID = /^[A-Za-z0-9-]{8,64}$/
 const MAX_BODY_BYTES = 64 * 1024
@@ -74,6 +74,22 @@ export async function handleGameRequest(req, res, db) {
 
     if (route === 'GET /api/game/boxes') {
       sendJson(res, 200, { boxes: getBoxes(db) })
+      return
+    }
+
+    if (route === 'GET /api/game/attendance') {
+      sendJson(res, 200, getAttendance(db, deviceId))
+      return
+    }
+
+    if (route === 'POST /api/game/attendance') {
+      try {
+        sendJson(res, 200, claimAttendance(db, deviceId))
+      } catch (error) {
+        if (error.message === 'already claimed') sendJson(res, 409, { error: error.message })
+        else if (error.message === 'box not found') sendJson(res, 400, { error: error.message })
+        else throw error
+      }
       return
     }
 

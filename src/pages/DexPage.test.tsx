@@ -25,6 +25,8 @@ function mockGame(dex: DexEntry[], catalogError = false) {
     boxes: [],
     dex,
     catalogError,
+    attendance: null,
+    claimAttendance: vi.fn(),
     refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),

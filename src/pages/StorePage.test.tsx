@@ -24,6 +24,8 @@ function mockGame(overrides: {
     boxes: overrides.boxes ?? [BOX],
     dex: [],
     catalogError: false,
+    attendance: null,
+    claimAttendance: vi.fn(),
     refresh: vi.fn(),
     claim: vi.fn(),
     openBox: overrides.openBox ?? vi.fn(),

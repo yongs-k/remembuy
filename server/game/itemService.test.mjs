@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { openDb, transaction } from './db.js'
-import { getDex, getBoxes, openBox } from './itemService.js'
+import { getDex, getBoxes, openBox, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
 
 const DEVICE = 'device-aaaa1111'
 const NOW = new Date('2026-09-22T00:00:00.000Z')
@@ -118,4 +118,24 @@ test('a failed open rolls back the point deduction', () => {
   assert.throws(() => openBox(db, DEVICE, 'box-starter', NOW, () => 0))
   assert.equal(pointsOf(db, DEVICE), 5000)
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM point_history WHERE type = 'ITEM_BOX_OPEN'").get().n, 0)
+})
+
+test('attendance opens one free box per Korean day without touching points', () => {
+  const db = freshDbWithPoints(0)
+  assert.equal(getAttendance(db, DEVICE, NOW).claimedToday, false)
+  const result = claimAttendance(db, DEVICE, NOW, () => 0)
+  assert.equal(result.pointsSpent, 0)
+  assert.equal(pointsOf(db, DEVICE), 0)
+  assert.ok(result.dexEntry.fragmentCount + (result.dexEntry.status === 'COMPLETE' ? 1 : 0) > 0)
+  assert.equal(getAttendance(db, DEVICE, NOW).claimedToday, true)
+  assert.throws(() => claimAttendance(db, DEVICE, NOW, () => 0), /already claimed/)
+})
+
+test('attendance resets at midnight Korea time, not UTC', () => {
+  // 14:59 UTC is 23:59 KST; 15:00 UTC is the next KST day.
+  assert.equal(attendanceDay(new Date('2026-10-01T14:59:00.000Z')), '2026-10-01')
+  assert.equal(attendanceDay(new Date('2026-10-01T15:00:00.000Z')), '2026-10-02')
+  const db = freshDbWithPoints(0)
+  claimAttendance(db, DEVICE, new Date('2026-10-01T14:59:00.000Z'), () => 0)
+  assert.doesNotThrow(() => claimAttendance(db, DEVICE, new Date('2026-10-01T15:00:00.000Z'), () => 0))
 })

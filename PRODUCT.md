@@ -33,6 +33,7 @@ The act of recording is the game, and the records feed the AI. Logging items pow
 ## Capabilities and Constraints
 
 - **Registration pays no reward.** Points come only from slot claims. Never build a registration-reward path.
+- **출석하기 (decided 2026-10-02):** once per Korean calendar day a device opens the cheapest box for free (`/api/game/attendance`). It yields item fragments only, never points, so the points rule above still holds.
 - **The Stitch PRD is reference-only.** Vision features with no backing API (3D room placement, house tiers, gacha pulls, social room tours, receipt OCR, commerce deep-links or auto-refill, group-buy) are out of scope until a backing API exists.
 - Preference signal is binary: `Item.recommendation` ('recommend' | 'notRecommend') replaced the 1–5 star rating.
 - Storage (decided 2026-10-01): records live in a server DB keyed by the device ID (`lockers` table, `/api/locker`), with localStorage as the offline copy. There is no login yet, so a device whose storage is cleared gets a new ID and can't reach its old records until a recovery path exists.

@@ -111,3 +111,10 @@ export const fetchDex = () => request<{ items: DexEntry[] }>('/api/game/dex')
 
 export const openBox = (boxId: string) =>
   request<OpenBoxResult>(`/api/game/boxes/${encodeURIComponent(boxId)}/open`, { method: 'POST' })
+
+/** 출석하기: whether today's free box was already opened (the day is Korea time, server-side). */
+export type Attendance = { day: string; claimedToday: boolean }
+
+export const fetchAttendance = () => request<Attendance>('/api/game/attendance')
+
+export const claimAttendance = () => request<OpenBoxResult>('/api/game/attendance', { method: 'POST' })

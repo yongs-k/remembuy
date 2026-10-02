@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { BoxOpenResultModal } from '../components/BoxOpenResultModal'
 import { GameCatalogStatus } from '../components/GameCatalogStatus'
+import { AttendanceCard } from '../components/AttendanceBox'
 import { Icon } from '../data/materialIcons'
 import type { OpenBoxResult } from '../lib/gameApi'
 
@@ -40,6 +41,8 @@ export default function StorePage() {
       <p className="text-body-sm text-on-surface-variant">
         포인트로 상자를 열면 아이템 조각이 나와요. 조각을 다 모으면 아이템 수집함에 완성돼요.
       </p>
+
+      <AttendanceCard />
 
       {boxes.length === 0 ? (
         <GameCatalogStatus label="상자 정보를" />

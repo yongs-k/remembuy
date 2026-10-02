@@ -128,6 +128,14 @@ CREATE TABLE IF NOT EXISTS user_items (
   completed_at TEXT,
   PRIMARY KEY (user_id, item_id)
 );
+-- One free box per device per Korean calendar day (출석하기).
+CREATE TABLE IF NOT EXISTS attendance (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  day TEXT NOT NULL,
+  box_id TEXT NOT NULL,
+  claimed_at TEXT NOT NULL,
+  PRIMARY KEY (user_id, day)
+);
 `
 
 const DEFAULT_TIERS = [
