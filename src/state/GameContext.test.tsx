@@ -67,7 +67,7 @@ describe('GameContext', () => {
     vi.mocked(api.claimSlots).mockResolvedValue(claimResult(0))
     vi.mocked(api.fetchGameState).mockResolvedValue({ ...emptyState, points: 1000 })
     vi.mocked(api.fetchDex).mockResolvedValue({
-      items: [{ id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, status: 'LOCKED', fragmentCount: 0 }],
+      items: [{ id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'LOCKED', fragmentCount: 0 }],
     })
     const { result } = renderHook(() => useGame(), { wrapper })
     await waitFor(() => expect(result.current.dex.length).toBe(1))
@@ -75,7 +75,7 @@ describe('GameContext', () => {
       result: { type: 'FRAGMENT', itemId: 'item-x', itemName: 'X', grade: 'COMMON' },
       pointsSpent: 500,
       pointsBalance: 1500,
-      dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, status: 'COLLECTING', fragmentCount: 1 },
+      dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'COLLECTING', fragmentCount: 1 },
     }
     vi.mocked(api.openBox).mockResolvedValue(openResult)
     let returned: api.OpenBoxResult | undefined

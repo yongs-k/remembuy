@@ -7,7 +7,7 @@ const LOCKED: DexEntry = {
   id: 'item-a',
   name: '기본 세면대',
   grade: 'COMMON',
-  fragmentsRequired: 10,
+  fragmentsRequired: 10, roomType: null,
   status: 'LOCKED',
   fragmentCount: 0,
 }

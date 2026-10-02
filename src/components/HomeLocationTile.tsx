@@ -1,19 +1,23 @@
 import type { Location } from '../types'
 import { LOCATION_COLOR_HEX } from '../data/locationColors'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
+import type { RoomFragments } from '../state/gameProgress'
 
 const RING_PATH = 'M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
 
-/** Compact room tile: the collection-rate ring wraps the room icon. */
+/** Compact room tile: the collection-rate ring wraps the room icon; the 장소's game fragments sit underneath. */
 export function HomeLocationTile({
   location,
   percent,
   count,
+  game,
   onClick,
 }: {
   location: Location
   percent: number
   count: number
+  /** 아이템 수집함 progress for this 장소, once the game catalog has loaded. */
+  game?: RoomFragments
   onClick: () => void
 }) {
   const color = LOCATION_COLOR_HEX[location.colorToken] ?? '#3F6459'
@@ -24,7 +28,7 @@ export function HomeLocationTile({
     <button
       type="button"
       onClick={onClick}
-      aria-label={`${location.name}, ${count}개 등록, 수집률 ${clamped}%`}
+      aria-label={`${location.name}, ${count}개 등록, 수집률 ${clamped}%${game ? `, 조각 ${game.fragments}개, 아이템 ${game.completed}/${game.total} 완성` : ''}`}
       className="flex flex-col items-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest px-1 py-space-md text-center shadow-card transition-colors hover:border-outline-variant"
     >
       <span className="relative flex h-11 w-11 items-center justify-center" style={{ color }}>
@@ -45,6 +49,13 @@ export function HomeLocationTile({
       <span className="text-label-sm font-medium tabular-nums text-on-surface-variant">
         {count}개 · {clamped}%
       </span>
+      {game && game.total > 0 && (
+        <span className="flex items-center gap-0.5 text-label-sm tabular-nums text-on-surface-variant">
+          <Icon name="diamond" className={`text-[13px] ${game.fragments > 0 ? 'text-tertiary' : ''}`} />
+          조각 {game.fragments}
+          {game.completed > 0 && <span> · 완성 {game.completed}</span>}
+        </span>
+      )}
     </button>
   )
 }

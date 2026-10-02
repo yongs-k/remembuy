@@ -19,6 +19,7 @@ function dexEntryFor(db, userId, item) {
     name: item.name,
     grade: item.grade,
     fragmentsRequired: item.fragments_required,
+    roomType: item.room_type,
     status: itemStatus(db, userId, item.id),
     fragmentCount: fragmentCount(db, userId, item.id),
   }
@@ -27,7 +28,7 @@ function dexEntryFor(db, userId, item) {
 export function getDex(db, userId) {
   const items = plain(
     db
-      .prepare('SELECT id, name, grade, fragments_required FROM virtual_items WHERE active = 1 ORDER BY grade, id')
+      .prepare('SELECT id, name, grade, fragments_required, room_type FROM virtual_items WHERE active = 1 ORDER BY grade, id')
       .all()
   )
   return items.map((item) => dexEntryFor(db, userId, item))
@@ -75,7 +76,7 @@ function openBoxIn(db, userId, box, nowIso, randomFn, cost) {
       .all(boxId)
   )
   const picked = pickWeighted(entries, randomFn)
-  const item = { ...db.prepare('SELECT id, name, grade, fragments_required FROM virtual_items WHERE id = ?').get(picked.item_id) }
+  const item = { ...db.prepare('SELECT id, name, grade, fragments_required, room_type FROM virtual_items WHERE id = ?').get(picked.item_id) }
 
   if (picked.result_type === 'FULL_ITEM') {
     db.prepare(

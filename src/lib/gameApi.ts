@@ -94,6 +94,8 @@ export type DexEntry = {
   name: string
   grade: string
   fragmentsRequired: number
+  /** The 장소 (location id) the item belongs to. */
+  roomType: string | null
   status: 'LOCKED' | 'COLLECTING' | 'COMPLETE'
   fragmentCount: number
 }

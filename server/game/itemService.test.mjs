@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { openDb, transaction } from './db.js'
+import { openDb, transaction, migrate } from './db.js'
 import { getDex, getBoxes, openBox, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
 
 const DEVICE = 'device-aaaa1111'
@@ -29,7 +29,8 @@ test('getBoxes and getDex are read-only and never create a user', () => {
   assert.equal(boxes.length, 1)
   assert.deepEqual(boxes[0], { id: 'box-starter', name: '시작 상자', costPoints: 500 })
   const dex = getDex(db, DEVICE)
-  assert.equal(dex.length, 14)
+  assert.equal(dex.length, 50)
+  assert.ok(dex.every((entry) => entry.roomType))
   assert.ok(dex.every((entry) => entry.status === 'LOCKED' && entry.fragmentCount === 0))
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM users').get().n, 0)
 })
@@ -79,13 +80,14 @@ test('the 10th fragment completes a 10-fragment item exactly once', () => {
 
 test('a FULL_ITEM result completes an item immediately, skipping COLLECTING', () => {
   const db = freshDbWithPoints(5000)
-  // The 28 drop entries for box-starter are inserted FRAGMENT,FULL_ITEM per item in
+  // The 100 drop entries for box-starter are inserted FRAGMENT,FULL_ITEM per item in
   // DEFAULT_ITEMS order, so entry index 1 (weight-cumulative) is the FULL_ITEM row for
   // item-basin-basic once its FRAGMENT weight (40) is exceeded. total weight = (40+25+12+5)*...
   // simplest reliable way: pick randomFn that lands exactly on a FULL_ITEM row by using the
   // service's own entries. Instead, assert behavior directly via a random function that always
   // returns just past the first item's FRAGMENT share.
-  const totalWeight = 4 * 40 + 4 * 25 + 3 * 12 + 3 * 5 + 14 * 1 // 4 grades' fragment weights + 14 FULL_ITEM weight-1 rows
+  // bathroom: 4 COMMON, 4 ADVANCED, 3 RARE, 3 LEGENDARY; 9 other 장소 x (2 COMMON, 1 ADVANCED, 1 RARE); one weight-1 FULL_ITEM row each
+  const totalWeight = 4 * 40 + 4 * 25 + 3 * 12 + 3 * 5 + 9 * (2 * 40 + 25 + 12) + 50 * 1
   const firstFragmentShare = 40 / totalWeight
   const result = openBox(db, DEVICE, 'box-starter', NOW, () => firstFragmentShare + 1e-9)
   assert.equal(result.result.type, 'FULL_ITEM')
@@ -138,4 +140,19 @@ test('attendance resets at midnight Korea time, not UTC', () => {
   const db = freshDbWithPoints(0)
   claimAttendance(db, DEVICE, new Date('2026-10-01T14:59:00.000Z'), () => 0)
   assert.doesNotThrow(() => claimAttendance(db, DEVICE, new Date('2026-10-01T15:00:00.000Z'), () => 0))
+})
+
+test('an older database gains the new 장소 items and keeps its own', () => {
+  const db = openDb(':memory:')
+  // Simulate the 14-item, room-less database from before 장소 items existed.
+  db.exec("DELETE FROM box_drop_entries WHERE item_id NOT LIKE 'item-%' OR item_id IN (SELECT id FROM virtual_items WHERE room_type <> 'bathroom')")
+  db.exec("DELETE FROM virtual_items WHERE room_type <> 'bathroom'")
+  db.exec('UPDATE virtual_items SET room_type = NULL')
+  migrate(db)
+  migrate(db)
+  const dex = getDex(db, DEVICE)
+  assert.equal(dex.length, 50)
+  assert.equal(dex.find((d) => d.id === 'item-basin-basic').roomType, 'bathroom')
+  const entries = db.prepare("SELECT COUNT(*) AS n FROM box_drop_entries WHERE item_id = 'item-car-diffuser'").get().n
+  assert.equal(entries, 2)
 })

@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Category, Item, Location } from '../types'
 import { getLocationCompletion, getMasterItemCounts } from '../state/selectors'
-import { LocationDexCard } from './LocationDexCard'
+import { useGame } from '../state/GameContext'
+import { roomFragments } from '../state/gameProgress'
+import { HomeLocationTile } from './HomeLocationTile'
+import { TitleManager } from './TitleManager'
 
 type Filter = 'all' | 'progress' | 'almost' | 'none'
 
@@ -17,6 +20,9 @@ export function CollectionOverview({
   onOpen: (locationId: string) => void
 }) {
   const [filter, setFilter] = useState<Filter>('all')
+  const { dex } = useGame()
+  const fragmentsByRoom = useMemo(() => roomFragments(dex), [dex])
+  const totalFragments = dex.reduce((sum, entry) => sum + entry.fragmentCount, 0)
 
   const overall = getMasterItemCounts(items, categories)
   const overallPercent = overall.total === 0 ? 0 : Math.round((overall.owned / overall.total) * 100)
@@ -24,7 +30,7 @@ export function CollectionOverview({
   const rows = locations.map((location) => ({
     location,
     percent: getLocationCompletion(items, location.id, categories),
-    ...getMasterItemCounts(items, categories, location.id),
+    count: items.filter((i) => categories.some((c) => c.id === i.categoryId && c.locationId === location.id)).length,
   }))
   const matches: Record<Filter, (p: number) => boolean> = {
     all: () => true,
@@ -49,10 +55,11 @@ export function CollectionOverview({
 
   return (
     <div className="space-y-space-lg p-margin">
+      <TitleManager />
       <section className="space-y-space-sm">
         <h1 className="font-heading text-display-sm text-on-surface">컬렉션</h1>
         <p className="text-body-md text-on-surface-variant">
-          장소마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요.
+          장소마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크되고, 상자에서 나온 그 장소의 아이템 조각도 함께 쌓여요.
           <br />
           {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을 모았어요.
         </p>
@@ -63,7 +70,7 @@ export function CollectionOverview({
           {(
             [
               ['수집률', `${overallPercent}%`],
-              ['등록 상품', `${items.length}개`],
+              dex.length > 0 ? ['모은 조각', `${totalFragments}개`] : ['등록 상품', `${items.length}개`],
               ['완성한 장소', `${completedCount}/${locations.length}`],
             ] as const
           ).map(([label, value]) => (
@@ -101,19 +108,18 @@ export function CollectionOverview({
         {visible.length === 0 ? (
           <p className="text-body-sm text-on-surface-variant">해당하는 장소가 없어요.</p>
         ) : (
-          <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
+          <div className="grid grid-cols-3 gap-space-sm sm:grid-cols-5">
             {visible.map((row) => (
-              <li key={row.location.id}>
-                <LocationDexCard
-                  location={row.location}
-                  percent={row.percent}
-                  owned={row.owned}
-                  total={row.total}
-                  onOpen={() => onOpen(row.location.id)}
-                />
-              </li>
+              <HomeLocationTile
+                key={row.location.id}
+                location={row.location}
+                percent={row.percent}
+                count={row.count}
+                game={fragmentsByRoom[row.location.id]}
+                onClick={() => onOpen(row.location.id)}
+              />
             ))}
-          </ul>
+          </div>
         )}
       </section>
     </div>

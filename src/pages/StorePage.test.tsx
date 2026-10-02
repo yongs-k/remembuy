@@ -59,7 +59,7 @@ describe('StorePage', () => {
       result: { type: 'FRAGMENT', itemId: 'item-x', itemName: 'X', grade: 'COMMON' },
       pointsSpent: 500,
       pointsBalance: 200,
-      dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, status: 'COLLECTING', fragmentCount: 1 },
+      dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'COLLECTING', fragmentCount: 1 },
     }
     mockGame({ openBox: vi.fn().mockResolvedValue(opened) })
     render(<StorePage />)

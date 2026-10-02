@@ -13,8 +13,8 @@ vi.mock('../state/GameContext')
 
 const STATE: GameState = { points: 1250, spaces: [], titles: [], benefits: [] }
 const DEX: DexEntry[] = [
-  { id: 'a', name: 'A', grade: 'COMMON', fragmentsRequired: 10, status: 'COMPLETE', fragmentCount: 10 },
-  { id: 'b', name: 'B', grade: 'COMMON', fragmentsRequired: 10, status: 'LOCKED', fragmentCount: 0 },
+  { id: 'a', name: 'A', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'COMPLETE', fragmentCount: 10 },
+  { id: 'b', name: 'B', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'LOCKED', fragmentCount: 0 },
 ]
 
 const refreshMock = vi.fn()

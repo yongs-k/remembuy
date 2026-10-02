@@ -2,10 +2,14 @@ import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { Icon } from '../data/materialIcons'
 import { useAttendanceBox } from './AttendanceBox'
+import { LOCATIONS } from '../data/locations'
+import { tierName, useMainTitle } from '../state/gameProgress'
 
 export function HomeGameCard() {
   const { state, dex, boxes, catalogError, refresh } = useGame()
   const navigate = useNavigate()
+  const [mainTitle] = useMainTitle(state)
+  const mainTitleSpace = mainTitle && LOCATIONS.find((location) => location.id === mainTitle.spaceId)
   const points = state?.points ?? 0
   const completed = dex.filter((entry) => entry.status === 'COMPLETE').length
   const cheapestBox = boxes.length ? Math.min(...boxes.map((box) => box.costPoints)) : undefined
@@ -28,6 +32,12 @@ export function HomeGameCard() {
       <div className="flex items-start justify-between gap-space-sm">
         <div className="flex min-w-0 flex-col gap-0.5">
           <h2 className="font-heading text-headline-md">상자</h2>
+          {mainTitle && (
+            <p className="flex items-center gap-1 text-label-md text-tertiary-fixed-dim">
+              <Icon name="workspace_premium" className="text-[16px]" />
+              {mainTitleSpace?.name ?? mainTitle.spaceId} {tierName(mainTitle.tierCode)}
+            </p>
+          )}
           <p role={catalogError ? 'alert' : undefined} className="text-body-sm text-inverse-on-surface/70">
             {catalogError
               ? '게임 정보를 불러오지 못했어요'

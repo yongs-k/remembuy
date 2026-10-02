@@ -14,6 +14,7 @@ import { useBack } from '../hooks/useBack'
 import { useGame } from '../state/GameContext'
 import { pickEasiestQuests } from '../state/quests'
 import { QuestCard } from '../components/QuestCard'
+import { roomFragments } from '../state/gameProgress'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
 
@@ -21,7 +22,8 @@ const RESTOCK_PREVIEW = 3
 
 export default function HomePage() {
   const { items, locations, categories, lastPurchase } = useLocker()
-  const { quests } = useGame()
+  const { quests, dex } = useGame()
+  const fragmentsByRoom = useMemo(() => roomFragments(dex), [dex])
   const easiestQuests = pickEasiestQuests(quests)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -246,6 +248,7 @@ export default function HomePage() {
                       categories.some((c) => c.id === i.categoryId && c.locationId === location.id)
                     ).length
                   }
+                  game={fragmentsByRoom[location.id]}
                   onClick={() => setSearchParams({ loc: location.id })}
                 />
               ))}

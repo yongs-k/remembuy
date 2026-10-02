@@ -238,7 +238,7 @@ Softly rounded rectangles on a three-step scale: 12px for controls and wells, 16
 ### Navigation
 - Bottom tab bar with five tabs (홈 · 랭킹 · 구매 · 상자 · 컬렉션), white with a hairline top edge. The active tab is terracotta and bold. The header bell opens 곧 떨어질 상품 (the full list behind home's top three), where a terracotta dot marks unread items.
 - Header icons (bell, settings) turn terracotta with `aria-current="page"` on their own page, and those pages carry a back pill. On phones, home's 기록하기 is a floating button that hides while the purchase toast is showing (same spot) and while the game card passes under it. On wide screens (md+) it is an inline button beside the 곧 떨어질 상품 title instead.
-- Vocabulary: 장소 for rooms, 상자 for the box game, 기록하기 for adding an item, 도감 for the real-item collection, 아이템 수집함 for the game's, 추천해요/추천한 상품 for the buy-again signal, 내 1위 for the podium's first place, 다시 샀어요 for recording a repurchase, and 도감 품목 for a standard item in a category.
+- Vocabulary: 장소 for rooms, 상자 for the box game, 기록하기 for adding an item, 도감 for the real-item collection, 아이템 수집함 for the game's, 추천해요/추천한 상품 for the buy-again signal, 내 1위 for the podium's first place, 재구매하기 for the restock rows (a sheet with 구매하러 가기 and 재구매 완료; the item page keeps 다시 샀어요), 대표 칭호 / 칭호 관리 for the title shown on the 상자 card, and 도감 품목 for a standard item in a category.
 - Drill-downs (room → category) live in the URL query (`?loc=`, `?cat=`, `?room=`) so the phone's back gesture steps out one level. In-app back pills step back through history.
 
 ### Sheets

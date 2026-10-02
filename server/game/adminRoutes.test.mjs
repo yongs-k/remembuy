@@ -71,7 +71,7 @@ test('items: list and patch round-trip with the right key', async () => {
   const { base, close } = await start()
   try {
     const list = await (await call(base, '/api/admin/items')).json()
-    assert.equal(list.items.length, 14)
+    assert.equal(list.items.length, 50)
     const target = list.items[0]
     const res = await call(base, `/api/admin/items/${target.id}`, {
       method: 'PATCH',
@@ -114,7 +114,7 @@ test('drop-entries: list and patch round-trip with the right key', async () => {
   const { base, close } = await start()
   try {
     const list = await (await call(base, '/api/admin/drop-entries')).json()
-    assert.equal(list.entries.length, 28)
+    assert.equal(list.entries.length, 100)
     const target = list.entries[0]
     const res = await call(base, `/api/admin/drop-entries/${target.id}`, {
       method: 'PATCH',

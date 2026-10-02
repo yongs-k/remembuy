@@ -157,46 +157,89 @@ export function loadDefaultCatalog() {
   return JSON.parse(readFileSync(new URL('./catalog.seed.json', import.meta.url), 'utf-8'))
 }
 
+// roomType ties each item to a 장소 (spaces.id) so 장소 tiles can show its fragments.
 const DEFAULT_ITEMS = [
-  { id: 'item-basin-basic', name: '기본 세면대', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40 },
-  { id: 'item-towel-rack', name: '수건 선반', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40 },
-  { id: 'item-soap-dispenser', name: '비누 디스펜서', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40 },
-  { id: 'item-bath-mat', name: '욕실 매트', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40 },
-  { id: 'item-basin-modern', name: '모던 세면대', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25 },
-  { id: 'item-shower-rain', name: '레인 샤워기', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25 },
-  { id: 'item-vanity-shelf', name: '수납 선반장', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25 },
-  { id: 'item-heated-rack', name: '온열 수건걸이', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25 },
-  { id: 'item-mirror-gold', name: '골드 거울', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12 },
-  { id: 'item-tub-stone', name: '스톤 욕조', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12 },
-  { id: 'item-faucet-brass', name: '브라스 수전', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12 },
-  { id: 'item-tub-premium', name: '프리미엄 욕조', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5 },
-  { id: 'item-chandelier', name: '크리스탈 조명', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5 },
-  { id: 'item-spa-set', name: '스파 세트', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5 },
+  { id: 'item-basin-basic', name: '기본 세면대', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bathroom' },
+  { id: 'item-towel-rack', name: '수건 선반', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bathroom' },
+  { id: 'item-soap-dispenser', name: '비누 디스펜서', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bathroom' },
+  { id: 'item-bath-mat', name: '욕실 매트', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bathroom' },
+  { id: 'item-basin-modern', name: '모던 세면대', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'bathroom' },
+  { id: 'item-shower-rain', name: '레인 샤워기', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'bathroom' },
+  { id: 'item-vanity-shelf', name: '수납 선반장', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'bathroom' },
+  { id: 'item-heated-rack', name: '온열 수건걸이', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'bathroom' },
+  { id: 'item-mirror-gold', name: '골드 거울', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'bathroom' },
+  { id: 'item-tub-stone', name: '스톤 욕조', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'bathroom' },
+  { id: 'item-faucet-brass', name: '브라스 수전', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'bathroom' },
+  { id: 'item-tub-premium', name: '프리미엄 욕조', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'bathroom' },
+  { id: 'item-chandelier', name: '크리스탈 조명', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'bathroom' },
+  { id: 'item-spa-set', name: '스파 세트', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'bathroom' },
+  { id: 'item-kitchen-cutting-board', name: '원목 도마', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'kitchen' },
+  { id: 'item-kitchen-spice-rack', name: '양념 선반', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'kitchen' },
+  { id: 'item-kitchen-cast-pot', name: '무쇠 냄비', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'kitchen' },
+  { id: 'item-kitchen-marble-island', name: '대리석 아일랜드', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'kitchen' },
+  { id: 'item-laundry-laundry-basket', name: '빨래 바구니', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'laundry' },
+  { id: 'item-laundry-drying-rack', name: '빨래 건조대', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'laundry' },
+  { id: 'item-laundry-drum-washer', name: '드럼 세탁기', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'laundry' },
+  { id: 'item-laundry-steam-station', name: '스팀 다림질대', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'laundry' },
+  { id: 'item-closet-wood-hanger', name: '원목 옷걸이', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'closet' },
+  { id: 'item-closet-storage-box', name: '수납 박스', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'closet' },
+  { id: 'item-closet-full-mirror', name: '전신 거울', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'closet' },
+  { id: 'item-closet-walk-in', name: '워크인 드레스룸', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'closet' },
+  { id: 'item-vanity-brush-set', name: '메이크업 브러시', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'vanity' },
+  { id: 'item-vanity-acrylic-case', name: '아크릴 정리함', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'vanity' },
+  { id: 'item-vanity-lit-mirror', name: '조명 거울', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'vanity' },
+  { id: 'item-vanity-antique-vanity', name: '앤틱 화장대', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'vanity' },
+  { id: 'item-bedroom-linen-pillow', name: '린넨 베개', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bedroom' },
+  { id: 'item-bedroom-mood-lamp', name: '무드등', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bedroom' },
+  { id: 'item-bedroom-hotel-bedding', name: '호텔 침구 세트', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'bedroom' },
+  { id: 'item-bedroom-canopy-bed', name: '캐노피 침대', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'bedroom' },
+  { id: 'item-livingroom-cushion', name: '쿠션', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'livingroom' },
+  { id: 'item-livingroom-rug', name: '러그', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'livingroom' },
+  { id: 'item-livingroom-floor-lamp', name: '플로어 스탠드', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'livingroom' },
+  { id: 'item-livingroom-leather-sofa', name: '가죽 소파', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'livingroom' },
+  { id: 'item-entrance-umbrella-stand', name: '우산꽂이', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'entrance' },
+  { id: 'item-entrance-door-mat', name: '현관 매트', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'entrance' },
+  { id: 'item-entrance-shoe-bench', name: '슈즈 벤치', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'entrance' },
+  { id: 'item-entrance-shoe-cabinet', name: '원목 신발장', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'entrance' },
+  { id: 'item-medicine-first-aid', name: '구급 파우치', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'medicine' },
+  { id: 'item-medicine-thermometer', name: '체온계', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'medicine' },
+  { id: 'item-medicine-pill-organizer', name: '약 정리함', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'medicine' },
+  { id: 'item-medicine-antique-cabinet', name: '앤틱 약장', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'medicine' },
+  { id: 'item-car-diffuser', name: '차량용 방향제', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'car' },
+  { id: 'item-car-cushion', name: '차량용 쿠션', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'car' },
+  { id: 'item-car-trunk-organizer', name: '트렁크 정리함', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'car' },
+  { id: 'item-car-leather-seat', name: '가죽 시트 커버', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'car' },
 ]
 
 const DEFAULT_BOXES = [{ id: 'box-starter', name: '시작 상자', costPoints: 500 }]
 
+// Additive on every start: new default items join existing databases (and the
+// default boxes' drop tables); items already there only get a missing roomType.
 function seedItemsAndBoxes(db) {
-  const existing = db.prepare('SELECT COUNT(*) AS n FROM virtual_items').get().n
-  if (existing > 0) return
   transaction(db, () => {
-    const insertItem = db.prepare(
-      'INSERT INTO virtual_items (id, name, grade, fragments_required) VALUES (?, ?, ?, ?)'
+    if (db.prepare('SELECT COUNT(*) AS n FROM boxes').get().n === 0) {
+      const insertBox = db.prepare('INSERT INTO boxes (id, name, cost_points) VALUES (?, ?, ?)')
+      for (const box of DEFAULT_BOXES) insertBox.run(box.id, box.name, box.costPoints)
+    }
+    const boxIds = DEFAULT_BOXES.map((box) => box.id).filter((id) =>
+      db.prepare('SELECT 1 AS x FROM boxes WHERE id = ?').get(id)
     )
-    for (const item of DEFAULT_ITEMS) {
-      insertItem.run(item.id, item.name, item.grade, item.fragmentsRequired)
-    }
-    const insertBox = db.prepare('INSERT INTO boxes (id, name, cost_points) VALUES (?, ?, ?)')
-    for (const box of DEFAULT_BOXES) {
-      insertBox.run(box.id, box.name, box.costPoints)
-    }
+    const insertItem = db.prepare(
+      'INSERT OR IGNORE INTO virtual_items (id, name, grade, fragments_required, room_type) VALUES (?, ?, ?, ?, ?)'
+    )
+    const setRoom = db.prepare('UPDATE virtual_items SET room_type = ? WHERE id = ? AND room_type IS NULL')
     const insertEntry = db.prepare(
       'INSERT INTO box_drop_entries (box_id, item_id, result_type, weight) VALUES (?, ?, ?, ?)'
     )
-    for (const box of DEFAULT_BOXES) {
-      for (const item of DEFAULT_ITEMS) {
-        insertEntry.run(box.id, item.id, 'FRAGMENT', item.fragmentWeight)
-        insertEntry.run(box.id, item.id, 'FULL_ITEM', 1)
+    for (const item of DEFAULT_ITEMS) {
+      const inserted = insertItem.run(item.id, item.name, item.grade, item.fragmentsRequired, item.roomType).changes > 0
+      if (!inserted) {
+        setRoom.run(item.roomType, item.id)
+        continue
+      }
+      for (const boxId of boxIds) {
+        insertEntry.run(boxId, item.id, 'FRAGMENT', item.fragmentWeight)
+        insertEntry.run(boxId, item.id, 'FULL_ITEM', 1)
       }
     }
   })

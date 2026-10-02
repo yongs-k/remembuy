@@ -7,7 +7,7 @@ const FRAGMENT_RESULT: OpenBoxResult = {
   result: { type: 'FRAGMENT', itemId: 'item-a', itemName: '기본 세면대', grade: 'COMMON' },
   pointsSpent: 500,
   pointsBalance: 1000,
-  dexEntry: { id: 'item-a', name: '기본 세면대', grade: 'COMMON', fragmentsRequired: 10, status: 'COLLECTING', fragmentCount: 4 },
+  dexEntry: { id: 'item-a', name: '기본 세면대', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'COLLECTING', fragmentCount: 4 },
 }
 
 const COMPLETING_FRAGMENT_RESULT: OpenBoxResult = {
@@ -19,7 +19,7 @@ const FULL_ITEM_RESULT: OpenBoxResult = {
   result: { type: 'FULL_ITEM', itemId: 'item-b', itemName: '골드 거울', grade: 'RARE' },
   pointsSpent: 500,
   pointsBalance: 1000,
-  dexEntry: { id: 'item-b', name: '골드 거울', grade: 'RARE', fragmentsRequired: 20, status: 'COMPLETE', fragmentCount: 0 },
+  dexEntry: { id: 'item-b', name: '골드 거울', grade: 'RARE', fragmentsRequired: 20, roomType: null, status: 'COMPLETE', fragmentCount: 0 },
 }
 
 describe('BoxOpenResultModal', () => {

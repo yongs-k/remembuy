@@ -12,9 +12,9 @@ vi.mock('react-router-dom', async () => {
 vi.mock('../state/GameContext')
 
 const ENTRIES: DexEntry[] = [
-  { id: 'legendary-1', name: '전설템', grade: 'LEGENDARY', fragmentsRequired: 30, status: 'LOCKED', fragmentCount: 0 },
-  { id: 'common-1', name: '기본템', grade: 'COMMON', fragmentsRequired: 10, status: 'COLLECTING', fragmentCount: 3 },
-  { id: 'rare-1', name: '레어템', grade: 'RARE', fragmentsRequired: 20, status: 'COMPLETE', fragmentCount: 20 },
+  { id: 'legendary-1', name: '전설템', grade: 'LEGENDARY', fragmentsRequired: 30, roomType: null, status: 'LOCKED', fragmentCount: 0 },
+  { id: 'common-1', name: '기본템', grade: 'COMMON', fragmentsRequired: 10, roomType: null, status: 'COLLECTING', fragmentCount: 3 },
+  { id: 'rare-1', name: '레어템', grade: 'RARE', fragmentsRequired: 20, roomType: null, status: 'COMPLETE', fragmentCount: 20 },
 ]
 
 const refreshMock = vi.fn()

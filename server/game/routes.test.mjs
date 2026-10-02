@@ -121,7 +121,7 @@ test('boxes and dex endpoints respond', async () => {
     assert.equal(boxes.boxes.length, 1)
     assert.equal(boxes.boxes[0].id, 'box-starter')
     const dex = await (await call(base, '/api/game/dex')).json()
-    assert.equal(dex.items.length, 14)
+    assert.equal(dex.items.length, 50)
     assert.ok(dex.items.every((item) => item.status === 'LOCKED'))
   } finally {
     await close()
