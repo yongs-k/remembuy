@@ -15,7 +15,10 @@ function FragmentQuarters({ progress }: { progress: number }) {
         return (
           <span key={corner} className={`absolute h-1/2 w-1/2 ${corner}`}>
             {fill > 0 && (
-              <span className="absolute inset-x-0 bottom-0 bg-tertiary-fixed/60" style={{ height: `${fill * 100}%` }} />
+              <span
+                className="absolute inset-x-0 bottom-0 bg-tertiary-fixed-dim/55"
+                style={{ height: `${fill * 100}%` }}
+              />
             )}
           </span>
         )
