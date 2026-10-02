@@ -8,7 +8,16 @@ import { getSoonestRemaining } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 
 /** One row of a restock list; the parent <ul> draws the card and dividers. */
-export function RestockCard({ item, showLastPurchase = false }: { item: Item; showLastPurchase?: boolean }) {
+export function RestockCard({
+  item,
+  showLastPurchase = false,
+  isNew = false,
+}: {
+  item: Item
+  showLastPurchase?: boolean
+  /** Newly due since the user last looked (bell page). */
+  isNew?: boolean
+}) {
   const { recordPurchase } = useLocker()
   const pendingPurchases = usePendingPurchases()
   const navigate = useNavigate()
@@ -32,7 +41,10 @@ export function RestockCard({ item, showLastPurchase = false }: { item: Item; sh
       >
         <ItemThumb item={item} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-label-lg text-on-surface">{item.name}</span>
+          <span className="flex min-w-0 items-baseline gap-1.5">
+            {isNew && <span className="shrink-0 text-label-sm text-primary">새로</span>}
+            <span className="truncate text-label-lg text-on-surface">{item.name}</span>
+          </span>
           {showLastPurchase && lastPurchase && (
             <span className="block truncate text-body-sm text-on-surface-variant">지난 구매 {lastPurchase}</span>
           )}

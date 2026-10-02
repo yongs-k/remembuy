@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBack } from '../hooks/useBack'
 import { useLocker } from '../state/LockerContext'
@@ -6,17 +6,24 @@ import { getUpcomingNotifications } from '../state/selectors'
 import { RestockCard } from '../components/RestockCard'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
 import { Icon } from '../data/materialIcons'
+import type { Item } from '../types'
+
+const seenKey = (item: Item) => `${item.id}:${item.restockedAt ?? item.createdAt}`
 
 export default function NotificationsPage() {
   const { items } = useLocker()
   const upcoming = useMemo(() => getUpcomingNotifications(items, 7), [items])
-  const { markSeen } = useSeenNotifications()
+  const { seenIds, markSeen } = useSeenNotifications()
+  // Captured once, before this visit marks everything seen: what became due since last time.
+  const [newIds] = useState(
+    () => new Set(upcoming.filter((item) => !seenIds.includes(seenKey(item))).map((item) => item.id))
+  )
   const navigate = useNavigate()
   const goBack = useBack()
 
   useEffect(() => {
     if (upcoming.length > 0) {
-      markSeen(upcoming.map((item) => `${item.id}:${item.restockedAt ?? item.createdAt}`))
+      markSeen(upcoming.map(seenKey))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [upcoming])
@@ -51,7 +58,7 @@ export default function NotificationsPage() {
       ) : (
         <ul className="divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card">
           {upcoming.map((item) => (
-            <RestockCard key={item.id} item={item} />
+            <RestockCard key={item.id} item={item} isNew={newIds.has(item.id)} />
           ))}
         </ul>
       )}
