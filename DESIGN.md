@@ -176,7 +176,7 @@ Rooms each carry their own muted hue (욕실 #6E8F87, 주방 #C98F2B, 세탁실 
 **Character:** A compact geometric display face for titles and numbers against a neutral humanist body. Hangul always falls through to Noto Sans KR, so Korean text reads as one family.
 
 ### Hierarchy
-- **Display** (800, 28px, 36px): one per screen. Tab titles (다시 살 상품, 내 장소 랭킹, 컬렉션, 상자), the bell page and home lead "곧 떨어질 상품". Also the Store and 아이템 수집함 headers on espresso.
+- **Display** (800, 28px, 36px): one per screen. Tab titles (다시 살 상품, 랭킹, 컬렉션, 상자), the bell page and home lead "곧 떨어질 상품". Also the Store and 아이템 수집함 headers on espresso.
 - **Headline** (700, 18px, 24px): section titles (장소별 도감, 무엇을 기록할까요?) and item names on the podium.
 - **Stat** (800, 24px, tabular): points and dex counts on the game surface.
 - **Body** (400, 14px, 20px): paragraphs, input text, empty states.

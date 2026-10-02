@@ -5,8 +5,6 @@ import {
   getMissingMasterItems,
   getRankingForCategory,
   getUpcomingNotifications,
-  getLocationsRankedByItemCount,
-  getCategoriesRankedByItemCount,
   getCompletedPodium,
   getMasterItemCounts,
   getCompletionGain,
@@ -17,7 +15,7 @@ import {
   getObservedCycleDays,
   getSoonestRemaining,
 } from './selectors'
-import type { Category, Item, Location } from '../types'
+import type { Category, Item } from '../types'
 
 const category: Category = {
   id: 'cat-1',
@@ -126,6 +124,15 @@ describe('getRankingForCategory', () => {
     ]
     const ranked = getRankingForCategory(items, 'cat-1')
     expect(ranked.map((i) => i.id)).toEqual(['i2', 'i1', 'i3'])
+  })
+
+  it('puts the assigned 1·2·3 ahead of recommendation order', () => {
+    const items = [
+      makeItem({ id: 'a', categoryId: 'cat-1', recommendation: 'recommend' }),
+      makeItem({ id: 'b', categoryId: 'cat-1', podiumRank: 2 }),
+      makeItem({ id: 'c', categoryId: 'cat-1', podiumRank: 1, recommendation: 'notRecommend' }),
+    ]
+    expect(getRankingForCategory(items, 'cat-1').map((i) => i.id)).toEqual(['c', 'b', 'a'])
   })
 })
 
@@ -306,59 +313,6 @@ describe('getUpcomingNotifications', () => {
     // The item should surface because the more urgent signal wins.
     const result = getUpcomingNotifications([item], 7, '2026-09-01')
     expect(result.map((i) => i.id)).toEqual(['i1'])
-  })
-})
-
-describe('getLocationsRankedByItemCount', () => {
-  it('sorts locations by item count descending', () => {
-    const locA: Location = { id: 'loc-a', name: 'A', colorToken: 'a' }
-    const locB: Location = { id: 'loc-b', name: 'B', colorToken: 'b' }
-    const items = [
-      makeItem({ id: 'i1', locationId: 'loc-a' }),
-      makeItem({ id: 'i2', locationId: 'loc-b' }),
-      makeItem({ id: 'i3', locationId: 'loc-b' }),
-    ]
-    const ranked = getLocationsRankedByItemCount(items, [locA, locB])
-    expect(ranked.map((r) => r.location.id)).toEqual(['loc-b', 'loc-a'])
-    expect(ranked.map((r) => r.itemCount)).toEqual([2, 1])
-  })
-
-  it('includes locations with zero items at the end', () => {
-    const locA: Location = { id: 'loc-a', name: 'A', colorToken: 'a' }
-    const locB: Location = { id: 'loc-b', name: 'B', colorToken: 'b' }
-    const items = [makeItem({ id: 'i1', locationId: 'loc-a' })]
-    const ranked = getLocationsRankedByItemCount(items, [locA, locB])
-    expect(ranked.map((r) => r.location.id)).toEqual(['loc-a', 'loc-b'])
-    expect(ranked.map((r) => r.itemCount)).toEqual([1, 0])
-  })
-})
-
-describe('getCategoriesRankedByItemCount', () => {
-  it('sorts a location categories by item count descending', () => {
-    const items = [
-      makeItem({ id: 'i1', categoryId: 'cat-1' }),
-      makeItem({ id: 'i2', categoryId: 'cat-2' }),
-      makeItem({ id: 'i3', categoryId: 'cat-2' }),
-    ]
-    const ranked = getCategoriesRankedByItemCount(items, [category, category2], 'loc-1')
-    expect(ranked.map((r) => r.category.id)).toEqual(['cat-2', 'cat-1'])
-    expect(ranked.map((r) => r.itemCount)).toEqual([2, 1])
-  })
-
-  it('excludes categories belonging to a different location', () => {
-    const otherCategory: Category = {
-      id: 'cat-3',
-      locationId: 'loc-2',
-      name: '다른 장소 카테고리',
-      masterItems: [],
-    }
-    const items = [makeItem({ id: 'i1', categoryId: 'cat-3' })]
-    const ranked = getCategoriesRankedByItemCount(
-      items,
-      [category, category2, otherCategory],
-      'loc-1'
-    )
-    expect(ranked.map((r) => r.category.id)).toEqual(['cat-1', 'cat-2'])
   })
 })
 

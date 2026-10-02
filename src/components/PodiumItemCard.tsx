@@ -1,9 +1,15 @@
 import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
 import { RecommendationBadge } from './RecommendationBadge'
-import { Badge, DdayLabel } from './Badge'
+import { DdayLabel } from './Badge'
 import { ItemThumb } from './ItemThumb'
 import { getSoonestRemaining } from '../state/selectors'
+import { usePendingPurchases } from '../hooks/usePendingPurchases'
+
+/** Where 구매하기 goes: the item's own purchase link, else a shopping search for its name. */
+export function buyUrl(item: Item): string {
+  return item.affiliateUrl || `https://www.coupang.com/np/search?q=${encodeURIComponent(item.name)}`
+}
 
 export function PodiumItemCard({
   item,
@@ -12,71 +18,66 @@ export function PodiumItemCard({
   onAssign,
 }: {
   item: Item
+  /** Position in the category ranking; the first three are shown as 1등·2등·3등. */
   index: number
   onOpen: () => void
   onAssign: (rank: 1 | 2 | 3 | null) => void
 }) {
-  // The ranking sorts recommended items first; only call it 추천 1위 when it really is recommended.
-  const isFirst = index === 0 && item.recommendation === 'recommend'
-  const compact = index >= 3
+  const pendingPurchases = usePendingPurchases()
+  const place = index < 3 ? index + 1 : null
+  const compact = place === null
   const remaining = getSoonestRemaining(item)
 
   return (
-    <div
-      className={`overflow-hidden rounded-xl bg-surface-container-lowest ${
-        isFirst
-          ? 'border border-primary/30 shadow-card'
-          : 'border border-hairline shadow-card'
-      }`}
-    >
-      {isFirst && (
-        <div className="flex items-center gap-1.5 bg-primary-container px-space-md py-1.5 text-on-primary-container">
-          <Icon name="workspace_premium" className="text-[18px] text-tertiary-fixed" />
-          <span className="text-label-md tracking-wider">추천한 상품</span>
-        </div>
-      )}
+    <div className="overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest shadow-card">
       <button
         type="button"
         onClick={onOpen}
-        className={`flex w-full gap-space-md text-left transition-colors hover:bg-surface-container-low ${compact ? 'p-space-sm' : 'p-space-md'}`}
+        className={`flex w-full items-start gap-space-md text-left transition-colors hover:bg-surface-container-low ${
+          compact ? 'p-space-sm' : 'p-space-md'
+        }`}
       >
-        <div
-          className={`relative shrink-0 ${
-            compact ? 'h-12 w-12' : isFirst ? 'h-24 w-20' : 'h-20 w-16'
-          }`}
-        >
-          {/* No positional number here: the user's own 순위 지정 below is the rank that matters. */}
-          <ItemThumb item={item} className="h-full w-full" />
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <div className="flex flex-wrap items-center gap-1.5">
-            {remaining !== undefined && (
-              <DdayLabel days={remaining} />
-            )}
-            {item.podiumRank === 1 && <Badge>내 1위</Badge>}
-          </div>
-          <p
-            className={`line-clamp-2 font-heading text-on-surface ${
-              compact ? 'text-label-lg' : 'text-headline-md'
+        {place !== null && (
+          <span
+            className={`w-9 shrink-0 pt-0.5 font-heading tabular-nums text-on-surface ${
+              place === 1 ? 'text-headline-lg' : 'text-headline-md'
             }`}
           >
+            {place}등
+          </span>
+        )}
+        <ItemThumb item={item} className={compact ? 'h-12 w-12' : place === 1 ? 'h-20 w-20' : 'h-16 w-16'} />
+        <span className="flex min-w-0 flex-1 flex-col gap-1">
+          <span
+            className={`line-clamp-2 font-heading text-on-surface ${compact ? 'text-label-lg' : 'text-headline-md'}`}
+          >
             {item.name}
-          </p>
-          {item.recommendation !== undefined && (
-            <RecommendationBadge recommendation={item.recommendation} />
+          </span>
+          <span className="flex flex-wrap items-center gap-2">
+            {item.recommendation !== undefined && <RecommendationBadge recommendation={item.recommendation} />}
+            {remaining !== undefined && <DdayLabel days={remaining} />}
+          </span>
+          {!compact && item.price !== undefined && (
+            <span className="text-body-sm tabular-nums text-on-surface-variant">
+              지난 구매 {item.price.toLocaleString()}원{item.place ? ` · ${item.place}` : ''}
+            </span>
           )}
-          {!compact && (item.price !== undefined || item.restockCycle) && (
-            <p className="text-body-sm text-on-surface-variant">
-              {item.restockCycle ? `재구매 주기: ${item.restockCycle}` : ''}
-              {item.restockCycle && item.price !== undefined ? ' · ' : ''}
-              {item.price !== undefined ? `이전 구매가 ${item.price.toLocaleString()}원` : ''}
-            </p>
-          )}
-        </div>
+        </span>
       </button>
-      <div className="flex items-center justify-between border-t border-surface-container-high px-space-md py-1">
-        <span className="text-label-sm text-on-surface-variant">순위 지정</span>
-        <div className="-mr-1.5 flex">
+      <div className="flex items-center justify-between gap-2 border-t border-hairline py-1 pl-space-md pr-1">
+        <a
+          href={buyUrl(item)}
+          target="_blank"
+          rel="noopener noreferrer"
+          // Only a real purchase link can later be confirmed with 구매 완료.
+          onClick={() => item.affiliateUrl && pendingPurchases.markOpened(item.id)}
+          className="flex min-h-11 items-center gap-1 rounded-lg border border-hairline px-3 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+        >
+          <Icon name="shopping_cart" className="text-[18px]" />
+          구매하기
+        </a>
+        <div className="flex items-center">
+          <span className="mr-1 text-label-sm text-on-surface-variant">순위 지정</span>
           {([1, 2, 3] as const).map((rank) => {
             const isAssigned = item.podiumRank === rank
             return (
@@ -91,7 +92,7 @@ export function PodiumItemCard({
                 <span
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-label-md tabular-nums transition-colors ${
                     isAssigned
-                      ? 'bg-tertiary-fixed text-on-tertiary-fixed'
+                      ? 'bg-on-surface text-surface'
                       : 'border border-hairline text-on-surface-variant group-hover:bg-surface-container-low'
                   }`}
                 >

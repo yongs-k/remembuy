@@ -1,4 +1,4 @@
-import type { Category, Item, Location, MasterItem } from '../types'
+import type { Category, Item, MasterItem } from '../types'
 
 export function getCategoryCompletion(items: Item[], category: Category): number {
   if (category.masterItems.length === 0) return 0
@@ -42,11 +42,13 @@ function recommendationRank(item: Item): number {
   return 2
 }
 
+/** The user's 순위 지정 (1·2·3) first, then recommended, not recommended, unrated. */
 export function getRankingForCategory(items: Item[], categoryId: string): Item[] {
+  const podium = (item: Item) => item.podiumRank ?? 4
   return items
     .filter((i) => i.categoryId === categoryId)
     .slice()
-    .sort((a, b) => recommendationRank(a) - recommendationRank(b))
+    .sort((a, b) => podium(a) - podium(b) || recommendationRank(a) - recommendationRank(b))
 }
 
 const DAY_MS = 86_400_000
@@ -127,32 +129,6 @@ export function getUpcomingNotifications(items: Item[], thresholdDays = 7, today
     .filter((entry) => entry.remaining <= thresholdDays)
     .sort((a, b) => a.remaining - b.remaining)
     .map((entry) => entry.item)
-}
-
-export function getLocationsRankedByItemCount(
-  items: Item[],
-  locations: Location[]
-): Array<{ location: Location; itemCount: number }> {
-  return locations
-    .map((location) => ({
-      location,
-      itemCount: items.filter((i) => i.locationId === location.id).length,
-    }))
-    .sort((a, b) => b.itemCount - a.itemCount)
-}
-
-export function getCategoriesRankedByItemCount(
-  items: Item[],
-  categories: Category[],
-  locationId: string
-): Array<{ category: Category; itemCount: number }> {
-  return categories
-    .filter((c) => c.locationId === locationId)
-    .map((category) => ({
-      category,
-      itemCount: items.filter((i) => i.categoryId === category.id).length,
-    }))
-    .sort((a, b) => b.itemCount - a.itemCount)
 }
 
 export function getCompletedPodium(

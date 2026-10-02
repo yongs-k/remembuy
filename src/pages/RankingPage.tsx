@@ -1,14 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useLocker } from '../state/LockerContext'
-import {
-  getLocationsRankedByItemCount,
-  getCategoriesRankedByItemCount,
-  getRankingForCategory,
-  getCompletedPodium,
-  getLocationCompletion,
-} from '../state/selectors'
-import { RankRow } from '../components/RankRow'
+import { getRankingForCategory, getCompletedPodium } from '../state/selectors'
 import { PodiumItemCard } from '../components/PodiumItemCard'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 import { LOCATION_COLOR_HEX } from '../data/locationColors'
@@ -17,10 +10,7 @@ import { useBack } from '../hooks/useBack'
 
 type GlobalRankingEntry = { name: string; masterItemId: string | null; score: number; voters: number }
 
-type DrillLevel =
-  | { level: 'locations' }
-  | { level: 'categories'; locationId: string }
-  | { level: 'products'; locationId: string; categoryId: string }
+type DrillLevel = { level: 'categories' } | { level: 'products'; categoryId: string }
 
 function BackPill({ label, onClick }: { label: string; onClick: () => void }) {
   return (
@@ -41,26 +31,14 @@ export default function RankingPage() {
   const goBack = useBack()
   // The drill-down lives in the URL so the phone's back gesture steps out of it.
   const [searchParams, setSearchParams] = useSearchParams()
-  const loc = searchParams.get('loc')
   const cat = searchParams.get('cat')
   // Memoized: the effects below refetch whenever drill changes identity.
   const drill = useMemo<DrillLevel>(
-    () =>
-      loc && cat
-        ? { level: 'products', locationId: loc, categoryId: cat }
-        : loc
-          ? { level: 'categories', locationId: loc }
-          : { level: 'locations' },
-    [loc, cat]
+    () => (cat ? { level: 'products', categoryId: cat } : { level: 'categories' }),
+    [cat]
   )
   function setDrill(next: DrillLevel) {
-    setSearchParams(
-      next.level === 'locations'
-        ? {}
-        : next.level === 'categories'
-          ? { loc: next.locationId }
-          : { loc: next.locationId, cat: next.categoryId }
-    )
+    setSearchParams(next.level === 'products' ? { cat: next.categoryId } : {})
   }
 
   const lastSubmittedRef = useRef<string | null>(null)
@@ -108,62 +86,59 @@ export default function RankingPage() {
   const listCls =
     'divide-y divide-hairline overflow-hidden rounded-2xl border border-hairline bg-surface-container-lowest shadow-card'
 
-  if (drill.level === 'locations') {
-    const ranked = getLocationsRankedByItemCount(items, locations)
-    const totalItems = ranked.reduce((sum, r) => sum + r.itemCount, 0)
+  if (drill.level === 'categories') {
     return (
-      <div className="space-y-space-md p-margin">
+      <div className="space-y-space-lg p-margin">
         <div>
-          <h1 className="font-heading text-display-sm text-on-surface">내 장소 랭킹</h1>
+          <h1 className="font-heading text-display-sm text-on-surface">랭킹</h1>
           <p className="mt-1 text-body-sm text-on-surface-variant">
-            기록한 상품이 많은 장소 순서예요. 모두 {totalItems}개를 기록했어요.
+            카테고리마다 내가 고른 1·2·3등이에요. 눌러서 순위를 정하고 바로 구매할 수 있어요.
           </p>
         </div>
-        <ul className={listCls}>
-          {ranked.map(({ location, itemCount }, index) => (
-            <li key={location.id}>
-              <RankRow
-                rank={index + 1}
-                title={location.name}
-                subtitle={`${itemCount}개 기록 · 수집률 ${getLocationCompletion(items, location.id, categories)}%`}
-                icon={LOCATION_MATERIAL_ICON[location.colorToken] ?? 'inventory_2'}
-                color={LOCATION_COLOR_HEX[location.colorToken]}
-                onClick={() => setDrill({ level: 'categories', locationId: location.id })}
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
-    )
-  }
-
-  if (drill.level === 'categories') {
-    const location = locations.find((l) => l.id === drill.locationId)
-    const ranked = getCategoriesRankedByItemCount(items, categories, drill.locationId)
-    return (
-      <div className="flex flex-col gap-space-md p-margin">
-        <BackPill label="장소 목록" onClick={() => goBack(() => setDrill({ level: 'locations' }))} />
-        <h1 className="font-heading text-display-sm text-on-surface">{location?.name}</h1>
-        <ul className={listCls}>
-          {ranked.map(({ category, itemCount }, index) => (
-            <li key={category.id}>
-              <RankRow
-                rank={index + 1}
-                title={category.name}
-                subtitle={`${itemCount}개 기록`}
-                icon={LOCATION_MATERIAL_ICON[location?.colorToken ?? ''] ?? 'category'}
-                color={LOCATION_COLOR_HEX[location?.colorToken ?? '']}
-                onClick={() =>
-                  setDrill({
-                    level: 'products',
-                    locationId: drill.locationId,
-                    categoryId: category.id,
-                  })
-                }
-              />
-            </li>
-          ))}
-        </ul>
+        {locations.map((location) => {
+          const locationCategories = categories.filter((c) => c.locationId === location.id)
+          if (locationCategories.length === 0) return null
+          const color = LOCATION_COLOR_HEX[location.colorToken]
+          return (
+            <section key={location.id} aria-labelledby={`rank-${location.id}`} className="space-y-space-sm">
+              <h2
+                id={`rank-${location.id}`}
+                className="flex items-center gap-1.5 font-heading text-headline-md text-on-surface"
+              >
+                {location.name}
+              </h2>
+              <ul className={listCls}>
+                {locationCategories.map((category) => {
+                  const ranked = getRankingForCategory(items, category.id)
+                  return (
+                    <li key={category.id}>
+                      <button
+                        type="button"
+                        onClick={() => setDrill({ level: 'products', categoryId: category.id })}
+                        className="flex min-h-14 w-full items-center gap-3 px-space-md py-2 text-left transition-colors hover:bg-surface-container-low"
+                      >
+                        <span
+                          aria-hidden
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-container-low text-on-surface-variant"
+                          style={color ? { backgroundColor: `${color}26`, color } : undefined}
+                        >
+                          <Icon name={LOCATION_MATERIAL_ICON[location.colorToken] ?? 'category'} className="text-[20px]" />
+                        </span>
+                        <span className="flex min-w-0 flex-1 flex-col">
+                          <span className="truncate text-label-lg text-on-surface">{category.name}</span>
+                          <span className="truncate text-body-sm text-on-surface-variant">
+                            {ranked.length === 0 ? '아직 기록이 없어요' : `1등 ${ranked[0].name} · ${ranked.length}개`}
+                          </span>
+                        </span>
+                        <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+            </section>
+          )
+        })}
       </div>
     )
   }
@@ -173,11 +148,11 @@ export default function RankingPage() {
 
   return (
     <div className="flex flex-col gap-space-md p-margin">
-      <BackPill
-        label="카테고리 목록"
-        onClick={() => goBack(() => setDrill({ level: 'categories', locationId: drill.locationId }))}
-      />
+      <BackPill label="카테고리 목록" onClick={() => goBack(() => setDrill({ level: 'categories' }))} />
       <h1 className="font-heading text-display-sm text-on-surface">{category?.name}</h1>
+      <p className="-mt-2 text-body-sm text-on-surface-variant">
+        순위 지정으로 1·2·3등을 바꿀 수 있어요. 정하지 않으면 추천한 상품이 먼저 와요.
+      </p>
 
       {ranking.length === 0 ? (
         <p className="text-body-sm text-on-surface-variant">이 카테고리에는 기록된 상품이 없어요.</p>
@@ -200,7 +175,7 @@ export default function RankingPage() {
         type="button"
         onClick={() =>
           navigate('/new', {
-            state: { prefill: { manual: true, locationId: drill.locationId, categoryId: drill.categoryId } },
+            state: { prefill: { manual: true, locationId: category?.locationId, categoryId: drill.categoryId } },
           })
         }
         className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
