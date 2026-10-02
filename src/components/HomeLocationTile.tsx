@@ -49,7 +49,8 @@ export function HomeLocationTile({
       className="relative flex flex-col items-center gap-1.5 overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest px-1 py-space-md text-center shadow-card transition-colors hover:border-outline-variant"
     >
       {room && <StagePuzzle room={room} />}
-      <span className="relative flex h-11 w-11 items-center justify-center" style={{ color }}>
+      {/* Icon and text sit on Card White so the puzzle lines behind never cross them. */}
+      <span className="relative flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-lowest" style={{ color }}>
         <svg aria-hidden className="absolute inset-0 h-11 w-11 -rotate-90" viewBox="0 0 36 36">
           <path d={RING_PATH} fill="none" stroke="#e7e2db" strokeWidth="2.5" />
           <path
@@ -63,15 +64,17 @@ export function HomeLocationTile({
         </svg>
         <Icon name={icon} className="text-[20px]" />
       </span>
-      <span className="relative w-full truncate text-label-md text-on-surface">{location.name}</span>
-      <span className="relative text-label-sm font-medium tabular-nums text-on-surface-variant">
-        {count}개 · {clamped}%
-      </span>
-      {room && (
-        <span className={`relative text-label-sm font-bold tabular-nums ${gradeColor(room.stage ?? 'LEGENDARY').text}`}>
-          {room.stage ? `${gradeLabel(room.stage)} ${room.count}/${STAGE_SIZE}` : '전설 완성'}
+      <span className="relative flex max-w-full flex-col items-center rounded-lg bg-surface-container-lowest/90 px-2 py-0.5 shadow-[0_0_0_1px_rgb(0_0_0/0.04)]">
+        <span className="max-w-full truncate text-label-md font-bold text-on-surface">{location.name}</span>
+        <span className="text-label-sm font-medium tabular-nums text-on-surface-variant">
+          {count}개 · {clamped}%
         </span>
-      )}
+        {room && (
+          <span className={`text-label-sm font-bold tabular-nums ${gradeColor(room.stage ?? 'LEGENDARY').text}`}>
+            {room.stage ? `${gradeLabel(room.stage)} ${room.count}/${STAGE_SIZE}` : '전설 완성'}
+          </span>
+        )}
+      </span>
     </button>
   )
 }
