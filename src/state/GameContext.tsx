@@ -7,12 +7,15 @@ import {
   fetchDex,
   fetchAttendance,
   claimAttendance as claimAttendanceApi,
+  fetchQuests,
+  claimQuest as claimQuestApi,
   openBox as openBoxApi,
   type GameState,
   type Box,
   type DexEntry,
   type OpenBoxResult,
   type Attendance,
+  type Quest,
 } from '../lib/gameApi'
 
 type GameContextValue = {
@@ -27,16 +30,21 @@ type GameContextValue = {
   attendance: Attendance | null
   /** Opens today's free box; undefined if already claimed or the call failed. */
   claimAttendance: () => Promise<OpenBoxResult | undefined>
+  /** 퀘스트 from the server; empty until loaded or when the server is unreachable. */
+  quests: Quest[]
+  /** Claims a completed quest's points; returns the points awarded, or 0 if it failed. */
+  claimQuest: (questId: string) => Promise<number>
 }
 
 const GameContext = createContext<GameContextValue | null>(null)
 
 export function GameProvider({ children }: { children: ReactNode }) {
-  const { items } = useLocker()
+  const { items, syncedAt } = useLocker()
   const [state, setState] = useState<GameState | null>(null)
   const [boxes, setBoxes] = useState<Box[]>([])
   const [dex, setDex] = useState<DexEntry[]>([])
   const [attendance, setAttendance] = useState<Attendance | null>(null)
+  const [quests, setQuests] = useState<Quest[]>([])
   const [catalogError, setCatalogError] = useState(false)
   const reconciled = useRef(false)
 
@@ -47,6 +55,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setDex(dexList.items)
       // Attendance is a nice-to-have; its failure must not mark the whole catalog broken.
       fetchAttendance().then(setAttendance, (error) => console.warn('attendance unavailable', error))
+      loadQuests()
       setCatalogError(false)
     } catch (error) {
       console.warn('game catalog unavailable', error)
@@ -95,10 +104,37 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const loadQuests = useCallback(() => {
+    fetchQuests().then(
+      (data) => setQuests(data.quests),
+      (error) => console.warn('quests unavailable', error)
+    )
+  }, [])
+
+  // Quest progress is computed from the server's copy of the records: refetch
+  // once each record save lands there.
+  useEffect(() => {
+    if (syncedAt !== null) loadQuests()
+  }, [syncedAt, loadQuests])
+
+  const claimQuest = useCallback(async (questId: string) => {
+    try {
+      const result = await claimQuestApi(questId)
+      setQuests(result.quests)
+      setState(await fetchGameState())
+      return result.pointsAwarded
+    } catch (error) {
+      console.warn('quest claim failed', error)
+      loadQuests()
+      return 0
+    }
+  }, [loadQuests])
+
   const claimAttendance = useCallback(async () => {
     try {
       const result = await claimAttendanceApi()
       setAttendance((prev) => (prev ? { ...prev, claimedToday: true } : prev))
+      loadQuests()
       setDex((prev) => prev.map((entry) => (entry.id === result.dexEntry.id ? result.dexEntry : entry)))
       return result
     } catch (error) {
@@ -107,7 +143,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       fetchAttendance().then(setAttendance, () => {})
       return undefined
     }
-  }, [])
+  }, [loadQuests])
 
   useEffect(() => {
     if (reconciled.current) return
@@ -126,7 +162,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, catalogError, refresh, claim, openBox, attendance, claimAttendance }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, catalogError, refresh, claim, openBox, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
   )
 }
 

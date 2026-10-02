@@ -27,6 +27,8 @@ function mockGame(state: GameState | null, dex: DexEntry[], catalogError = false
     catalogError,
     attendance: null,
     claimAttendance: vi.fn(),
+    quests: [],
+    claimQuest: vi.fn(),
     refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),
@@ -54,7 +56,7 @@ describe('HomeGameCard', () => {
   it('explains how to earn points while the balance is zero', () => {
     mockGame({ ...STATE, points: 0 }, DEX)
     render(<HomeGameCard />)
-    expect(screen.getByText('도감 수집률을 올리면 포인트가 쌓여요')).toBeInTheDocument()
+    expect(screen.getByText('퀘스트를 채우면 포인트가 쌓여요')).toBeInTheDocument()
   })
 
   it('offers today\'s free attendance box first and opens it', () => {
@@ -66,6 +68,8 @@ describe('HomeGameCard', () => {
       catalogError: false,
       attendance: { day: '2026-10-02', claimedToday: false },
       claimAttendance,
+      quests: [],
+      claimQuest: vi.fn(),
       refresh: refreshMock,
       claim: vi.fn(),
       openBox: vi.fn(),
@@ -83,13 +87,15 @@ describe('HomeGameCard', () => {
       catalogError: false,
       attendance: null,
       claimAttendance: vi.fn(),
+      quests: [],
+      claimQuest: vi.fn(),
       refresh: refreshMock,
       claim: vi.fn(),
       openBox: vi.fn(),
     })
     render(<HomeGameCard />)
-    fireEvent.click(screen.getByText('도감 채우러 가기'))
-    expect(navigateMock).toHaveBeenCalledWith('/collection')
+    fireEvent.click(screen.getByText('퀘스트 보기'))
+    expect(navigateMock).toHaveBeenCalledWith('/quests')
   })
 
   it('says the game is unavailable instead of showing 0P when the catalog fails', () => {

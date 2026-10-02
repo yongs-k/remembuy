@@ -77,10 +77,10 @@ export default function StorePage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => navigate('/collection')}
+                    onClick={() => navigate('/quests')}
                     className="min-h-12 w-full rounded-xl border border-inverse-on-surface/20 text-label-lg text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/10"
                   >
-                    도감 채우러 가기
+                    퀘스트 보기
                   </button>
                 </>
               )}

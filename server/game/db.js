@@ -128,6 +128,14 @@ CREATE TABLE IF NOT EXISTS user_items (
   completed_at TEXT,
   PRIMARY KEY (user_id, item_id)
 );
+-- Quest rewards claimed; period is 'once' or the KST day for daily quests.
+CREATE TABLE IF NOT EXISTS quest_claims (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  quest_id TEXT NOT NULL,
+  period TEXT NOT NULL,
+  claimed_at TEXT NOT NULL,
+  PRIMARY KEY (user_id, quest_id, period)
+);
 -- One free box per device per Korean calendar day (출석하기).
 CREATE TABLE IF NOT EXISTS attendance (
   user_id TEXT NOT NULL REFERENCES users(id),

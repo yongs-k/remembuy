@@ -11,6 +11,9 @@ import { HomeGameCard } from '../components/HomeGameCard'
 import { Icon } from '../data/materialIcons'
 import { Sheet } from '../components/Sheet'
 import { useBack } from '../hooks/useBack'
+import { useGame } from '../state/GameContext'
+import { pickEasiestQuests } from '../state/quests'
+import { QuestCard } from '../components/QuestCard'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
 
@@ -18,6 +21,8 @@ const RESTOCK_PREVIEW = 3
 
 export default function HomePage() {
   const { items, locations, categories, lastPurchase } = useLocker()
+  const { quests } = useGame()
+  const easiestQuests = pickEasiestQuests(quests)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const selectedLocationId = searchParams.get('loc')
@@ -183,6 +188,30 @@ export default function HomePage() {
               )}
             </>
           )}
+        </section>
+      )}
+
+      {!selectedLocationId && easiestQuests.length > 0 && (
+        <section aria-labelledby="quest-title" className="space-y-space-sm">
+          <div className="flex items-baseline justify-between gap-space-sm">
+            <h2 id="quest-title" className="font-heading text-headline-md text-on-surface">
+              퀘스트
+            </h2>
+            <button
+              type="button"
+              onClick={() => navigate('/quests')}
+              className="-my-2 flex min-h-11 shrink-0 items-center gap-0.5 text-label-md text-on-surface-variant"
+            >
+              전체 보기
+              <Icon name="chevron_right" className="text-[18px]" />
+            </button>
+          </div>
+          {/* The three closest to done, in one swipeable row. */}
+          <div className="-mx-4 flex snap-x snap-mandatory gap-space-sm overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+            {easiestQuests.map((quest) => (
+              <QuestCard key={quest.id} quest={quest} className="w-[72%] shrink-0 snap-start sm:w-[46%]" />
+            ))}
+          </div>
         </section>
       )}
 

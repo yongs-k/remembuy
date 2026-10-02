@@ -13,6 +13,7 @@ import StorePage from './pages/StorePage'
 import DexPage from './pages/DexPage'
 import AdminPage from './pages/AdminPage'
 import SettingsPage from './pages/SettingsPage'
+import QuestsPage from './pages/QuestsPage'
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/store" element={<StorePage />} />
           <Route path="/dex" element={<DexPage />} />
           <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/quests" element={<QuestsPage />} />
         </Route>
       </Routes>
       </GameProvider>

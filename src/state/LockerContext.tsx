@@ -101,6 +101,8 @@ type LockerContextValue = {
   recordPurchase: (id: string) => void
   /** The most recent recordPurchase, kept so a mistaken tap can be undone. */
   lastPurchase: LastPurchase | null
+  /** Time of the last successful server save of the records; null until one happens. */
+  syncedAt: number | null
   undoLastPurchase: () => void
   dismissLastPurchase: () => void
   /** Price/store for one recorded purchase; also becomes the item's latest price/place. */
@@ -140,6 +142,8 @@ export function LockerProvider({ children }: { children: ReactNode }) {
   // local copy alone and pushes again on the next change.
   const [localUpdatedAt, setLocalUpdatedAt] = useLocalStorage<string | null>(STATE_UPDATED_KEY, null)
   const [lastPurchase, setLastPurchase] = useState<LastPurchase | null>(null)
+  // Bumped after each successful server save, so server-computed views (quests) can refetch.
+  const [syncedAt, setSyncedAt] = useState<number | null>(null)
   const syncReady = useRef(false)
   const skipNextPush = useRef(false)
   const pendingPush = useRef<{ snapshot: LockerSnapshot<State>; deviceId: string } | null>(null)
@@ -150,7 +154,9 @@ export function LockerProvider({ children }: { children: ReactNode }) {
     const pending = pendingPush.current
     if (!pending) return
     pendingPush.current = null
-    pushRemoteLocker(pending.snapshot, pending.deviceId).catch((error) => console.warn('locker sync failed', error))
+    pushRemoteLocker(pending.snapshot, pending.deviceId)
+      .then(() => setSyncedAt(Date.now()))
+      .catch((error) => console.warn('locker sync failed', error))
   }
 
   useEffect(() => {
@@ -226,6 +232,7 @@ export function LockerProvider({ children }: { children: ReactNode }) {
       })
     },
     lastPurchase,
+    syncedAt,
     undoLastPurchase: () => {
       if (!lastPurchase) return
       dispatch({ type: 'UPDATE_ITEM', id: lastPurchase.id, patch: lastPurchase.prev })

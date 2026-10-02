@@ -125,7 +125,7 @@ components:
 
 Most of REMEMBUY is a pantry ledger: warm off-white paper, hairline edges, near-black ink, and one terracotta accent kept for the few things that need a hand on them now. It should feel like a well-kept shelf, not a dashboard. The things that run out soon are the loudest thing on screen, and everything else steps back.
 
-The game layer (points, boxes, the 아이템 수집함) lives in a separate, darker place: a lit cabinet in warm espresso with gold numerals. It appears only in game surfaces: the home game card, the Store and 아이템 수집함 headers, the Store box cards, the box-result sheet and the completion celebration. Game actions (상자 열기, 1개 열기, 아이템 수집함 보기) are gold buttons on that espresso. That contrast is what makes the reward feel like a reward without dragging the utility screens toward a toy look.
+The game layer (points, boxes, the 아이템 수집함) lives in a separate, darker place: a lit cabinet in warm espresso with gold numerals. It appears only in game surfaces: the home game card, quest cards (home strip and /quests), the Store and 아이템 수집함 headers, the Store box cards, the box-result sheet and the completion celebration. Game actions (상자 열기, 1개 열기, 아이템 수집함 보기) are gold buttons on that espresso. That contrast is what makes the reward feel like a reward without dragging the utility screens toward a toy look.
 
 This world replaced the Stitch "tactile soft-brutalism" skin on 2026-09-30. The pink surface tint, ink-black 2px rules and zero-blur offset shadows are retired.
 

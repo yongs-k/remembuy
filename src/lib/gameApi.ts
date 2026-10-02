@@ -118,3 +118,22 @@ export type Attendance = { day: string; claimedToday: boolean }
 export const fetchAttendance = () => request<Attendance>('/api/game/attendance')
 
 export const claimAttendance = () => request<OpenBoxResult>('/api/game/attendance', { method: 'POST' })
+
+/** 퀘스트 progress, computed by the server from the synced records and attendance. */
+export type Quest = {
+  id: string
+  kind: 'daily' | 'once'
+  title: string
+  target: number
+  progress: number
+  reward: number
+  claimed: boolean
+  claimable: boolean
+}
+
+export const fetchQuests = () => request<{ quests: Quest[] }>('/api/game/quests')
+
+export const claimQuest = (questId: string) =>
+  request<{ pointsAwarded: number; quests: Quest[] }>(`/api/game/quests/${encodeURIComponent(questId)}/claim`, {
+    method: 'POST',
+  })

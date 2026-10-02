@@ -26,6 +26,8 @@ function mockGame(overrides: {
     catalogError: false,
     attendance: null,
     claimAttendance: vi.fn(),
+    quests: [],
+    claimQuest: vi.fn(),
     refresh: vi.fn(),
     claim: vi.fn(),
     openBox: overrides.openBox ?? vi.fn(),
@@ -48,8 +50,8 @@ describe('StorePage', () => {
     render(<StorePage />)
     expect(screen.queryByRole('button', { name: '1개 열기' })).not.toBeInTheDocument()
     expect(screen.getByText('400P 더 모으면 열 수 있어요')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: '도감 채우러 가기' }))
-    expect(navigateMock).toHaveBeenCalledWith('/collection')
+    fireEvent.click(screen.getByRole('button', { name: '퀘스트 보기' }))
+    expect(navigateMock).toHaveBeenCalledWith('/quests')
   })
 
   it('opens the box and shows the result modal on success', async () => {

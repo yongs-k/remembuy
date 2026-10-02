@@ -20,7 +20,7 @@ export function HomeGameCard() {
     : attendanceOpen
       ? { label: attendanceBox.opening ? '여는 중...' : '오늘의 출석 상자 열기', onClick: () => void attendanceBox.open() }
       : needsPoints
-      ? { label: '도감 채우러 가기', onClick: () => navigate('/collection') }
+      ? { label: '퀘스트 보기', onClick: () => navigate('/quests') }
       : { label: '상자 열기', onClick: () => navigate('/store') }
 
   return (
@@ -34,9 +34,9 @@ export function HomeGameCard() {
               : attendanceOpen
                 ? '하루 한 번 상자를 무료로 열 수 있어요'
                 : needsPoints
-                ? `상자는 ${cheapestBox}P부터 열 수 있어요. 도감 수집률이 오르면 포인트가 쌓여요`
+                ? `상자는 ${cheapestBox}P부터 열 수 있어요. 퀘스트를 채우면 포인트가 쌓여요`
                 : points === 0
-                  ? '도감 수집률을 올리면 포인트가 쌓여요'
+                  ? '퀘스트를 채우면 포인트가 쌓여요'
                   : dex.length === 0
                     ? '상자를 열어 아이템을 모아보세요'
                     : `${completed}/${dex.length} 완성`}

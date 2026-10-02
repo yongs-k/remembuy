@@ -32,7 +32,7 @@ The act of recording is the game, and the records feed the AI. Logging items pow
 
 ## Capabilities and Constraints
 
-- **Registration pays no reward.** Points come only from slot claims. Never build a registration-reward path.
+- **Registration pays no reward by itself.** Points come from slot claims (도감 tier steps) and, since 2026-10-02, from **퀘스트**: server-computed milestones and daily tasks (records, 다시 샀어요, prices, ratings, 도감 품목 links, attendance) defined in `server/game/quests.js`. A quest reward is earned by a habit, not by a single registration. Sample (`seed-`) items never count.
 - **출석하기 (decided 2026-10-02):** once per Korean calendar day a device opens the cheapest box for free (`/api/game/attendance`). It yields item fragments only, never points, so the points rule above still holds.
 - **The Stitch PRD is reference-only.** Vision features with no backing API (3D room placement, house tiers, gacha pulls, social room tours, receipt OCR, commerce deep-links or auto-refill, group-buy) are out of scope until a backing API exists.
 - Preference signal is binary: `Item.recommendation` ('recommend' | 'notRecommend') replaced the 1–5 star rating.
