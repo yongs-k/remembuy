@@ -10,6 +10,7 @@ import {
   fetchQuests,
   claimQuest as claimQuestApi,
   openBox as openBoxApi,
+  openBoxes as openBoxesApi,
   type GameState,
   type Box,
   type DexEntry,
@@ -29,6 +30,8 @@ type GameContextValue = {
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<number>
   openBox: (boxId: string) => Promise<OpenBoxResult | undefined>
+  /** Opens several boxes at once; undefined if the call failed (then none were opened). */
+  openBoxes: (boxId: string, count: number) => Promise<OpenBoxResult[] | undefined>
   /** Today's 출석 state; null until loaded or when the game server is unreachable. */
   attendance: Attendance | null
   /** Opens today's free box; undefined if already claimed or the call failed. */
@@ -118,6 +121,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [reloadRooms])
 
+  const openBoxes = useCallback(
+    async (boxId: string, count: number) => {
+      try {
+        const { results, pointsBalance } = await openBoxesApi(boxId, count)
+        setState((prev) => (prev ? { ...prev, points: pointsBalance } : prev))
+        // The last result for an item carries its latest count.
+        const latest = new Map(results.map((r) => [r.dexEntry.id, r.dexEntry]))
+        setDex((prev) => prev.map((entry) => latest.get(entry.id) ?? entry))
+        reloadRooms()
+        return results
+      } catch (error) {
+        console.warn('open boxes failed', error)
+        return undefined
+      }
+    },
+    [reloadRooms]
+  )
+
   const loadQuests = useCallback(() => {
     fetchQuests().then(
       (data) => setQuests(data.quests),
@@ -177,7 +198,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, rooms, catalogError, refresh, claim, openBox, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, rooms, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
   )
 }
 

@@ -119,6 +119,13 @@ export const fetchDex = () => request<{ items: DexEntry[]; rooms?: RoomStage[] }
 export const openBox = (boxId: string) =>
   request<OpenBoxResult>(`/api/game/boxes/${encodeURIComponent(boxId)}/open`, { method: 'POST' })
 
+/** Opens `count` boxes in one go (all or none; the server allows up to 10). */
+export const openBoxes = (boxId: string, count: number) =>
+  request<{ results: OpenBoxResult[]; pointsBalance: number }>(
+    `/api/game/boxes/${encodeURIComponent(boxId)}/open?count=${count}`,
+    { method: 'POST' }
+  )
+
 /** 출석하기: whether today's free box was already opened (the day is Korea time, server-side). */
 export type Attendance = { day: string; claimedToday: boolean }
 

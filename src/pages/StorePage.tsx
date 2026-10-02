@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { BoxOpenResultModal } from '../components/BoxOpenResultModal'
+import { BoxMultiResultModal } from '../components/BoxMultiResultModal'
 import { GameCatalogStatus } from '../components/GameCatalogStatus'
 import { AttendanceCard } from '../components/AttendanceBox'
 import { Icon } from '../data/materialIcons'
@@ -24,6 +25,9 @@ const GRADE_ICON: Record<string, string> = {
 
 // How long the hero box takes to open before the result sheet rises (index.css hero-* timings).
 const HERO_OPEN_MS = 1500
+
+/** 10개 한번에 열기. */
+const MULTI_COUNT = 10
 
 const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
 
@@ -139,30 +143,54 @@ function HeroGiftBox({ open }: { open: boolean }) {
 }
 
 export default function StorePage() {
-  const { boxes, state, dex, openBox, catalogError } = useGame()
+  const { boxes, state, dex, openBox, openBoxes, catalogError } = useGame()
   const navigate = useNavigate()
   const [opening, setOpening] = useState<string | null>(null)
-  const [result, setResult] = useState<OpenBoxResult | null>(null)
+  // One result (the single card) or several (10개 한번에 열기).
+  const [results, setResults] = useState<OpenBoxResult[] | null>(null)
+  const [lastBoxId, setLastBoxId] = useState<string | null>(null)
   const [failedBoxId, setFailedBoxId] = useState<string | null>(null)
   // The hero box stays open while its result is on screen.
   const [heroOpen, setHeroOpen] = useState(false)
   const points = state?.points ?? 0
 
-  async function handleOpen(boxId: string) {
+  async function handleOpen(boxId: string, count = 1) {
     setOpening(boxId)
     setFailedBoxId(null)
     setHeroOpen(true)
+    setLastBoxId(boxId)
     const still = !window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    // The sheet waits for the box to finish opening, and for the server.
-    const [opened] = await Promise.all([openBox(boxId), wait(still ? 0 : HERO_OPEN_MS)])
+    const request = count === 1 ? openBox(boxId).then((r) => r && [r]) : openBoxes(boxId, count)
+    // The result waits for the box to finish opening, and for the server.
+    const [opened] = await Promise.all([request, wait(still ? 0 : HERO_OPEN_MS)])
     setOpening(null)
     if (opened) {
-      setResult(opened)
+      setResults(opened)
     } else {
       setFailedBoxId(boxId)
       setHeroOpen(false)
     }
   }
+
+  function closeResults() {
+    setResults(null)
+    setHeroOpen(false)
+  }
+
+  function viewCollection() {
+    setResults(null)
+    navigate('/collection')
+  }
+
+  // 다시 열기: the same box and count again, replaying the hero from a closed lid.
+  function reopen(count: number) {
+    const boxId = lastBoxId
+    closeResults()
+    if (boxId) window.setTimeout(() => void handleOpen(boxId, count), 60)
+  }
+
+  const balanceAfter = results ? results[results.length - 1].pointsBalance : points
+  const lastCost = boxes.find((box) => box.id === lastBoxId)?.costPoints ?? Infinity
 
   return (
     // The whole store is a game surface: espresso cabinet from edge to edge (DESIGN.md Cabinet Rule).
@@ -223,6 +251,7 @@ export default function StorePage() {
                 </p>
               </div>
               {affordable ? (
+                <>
                 <button
                   type="button"
                   disabled={opening === box.id}
@@ -238,6 +267,15 @@ export default function StorePage() {
                     </>
                   )}
                 </button>
+                <button
+                  type="button"
+                  disabled={opening === box.id || points < box.costPoints * MULTI_COUNT}
+                  onClick={() => handleOpen(box.id, MULTI_COUNT)}
+                  className="min-h-12 w-full rounded-full border border-tertiary-fixed-dim/50 text-label-lg text-tertiary-fixed transition-colors hover:bg-white/[0.06] disabled:border-white/10 disabled:text-inverse-on-surface/40"
+                >
+                  {MULTI_COUNT}개 한번에 열기 · {(box.costPoints * MULTI_COUNT).toLocaleString()}P
+                </button>
+                </>
               ) : (
                 <>
                   <p className="text-center text-body-sm tabular-nums text-inverse-on-surface/70">
@@ -301,26 +339,23 @@ export default function StorePage() {
         </section>
       )}
 
-      {result && (
+      {results?.length === 1 && (
         <BoxOpenResultModal
-          result={result}
+          result={results[0]}
           intro={false}
-          onClose={() => {
-            setResult(null)
-            setHeroOpen(false)
-          }}
-          onViewCollection={() => {
-            setResult(null)
-            navigate('/collection')
-          }}
-          onReopen={() => {
-            const boxId = boxes.find((box) => box.costPoints <= result.pointsBalance)?.id
-            setResult(null)
-            setHeroOpen(false)
-            // Let the lid settle back for a frame so the opening plays again from the start.
-            if (boxId) window.setTimeout(() => void handleOpen(boxId), 60)
-          }}
-          canReopen={boxes.some((box) => box.costPoints <= result.pointsBalance)}
+          onClose={closeResults}
+          onViewCollection={viewCollection}
+          onReopen={() => reopen(1)}
+          canReopen={balanceAfter >= lastCost}
+        />
+      )}
+      {results && results.length > 1 && (
+        <BoxMultiResultModal
+          results={results}
+          onClose={closeResults}
+          onViewCollection={viewCollection}
+          onReopen={() => reopen(results.length)}
+          canReopen={balanceAfter >= lastCost * results.length}
         />
       )}
     </div>

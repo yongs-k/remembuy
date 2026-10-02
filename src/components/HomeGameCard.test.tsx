@@ -33,6 +33,7 @@ function mockGame(state: GameState | null, dex: DexEntry[], catalogError = false
     refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),
+    openBoxes: vi.fn(),
   })
 }
 
@@ -75,6 +76,7 @@ describe('HomeGameCard', () => {
       refresh: refreshMock,
       claim: vi.fn(),
       openBox: vi.fn(),
+      openBoxes: vi.fn(),
     })
     render(<HomeGameCard />)
     fireEvent.click(screen.getByText('오늘의 출석 상자 열기'))
@@ -95,6 +97,7 @@ describe('HomeGameCard', () => {
       refresh: refreshMock,
       claim: vi.fn(),
       openBox: vi.fn(),
+      openBoxes: vi.fn(),
     })
     render(<HomeGameCard />)
     fireEvent.click(screen.getByText('퀘스트 보기'))

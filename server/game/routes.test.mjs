@@ -162,6 +162,24 @@ test('opening a box with enough points succeeds and updates the dex', async () =
   }
 })
 
+test('open with ?count opens several at once and rejects a bad count', async () => {
+  const { base, close } = await start()
+  try {
+    await call(base, '/api/game/claims', { method: 'POST', body: { slotIds: ['a1', 'a2', 'a3', 'a4'] } })
+    const before = (await (await call(base, '/api/game/state')).json()).points
+    for (const bad of ['0', '11', 'x']) {
+      assert.equal((await call(base, `/api/game/boxes/box-starter/open?count=${bad}`, { method: 'POST' })).status, 400)
+    }
+    const res = await call(base, '/api/game/boxes/box-starter/open?count=2', { method: 'POST' })
+    assert.equal(res.status, 200)
+    const body = await res.json()
+    assert.equal(body.results.length, 2)
+    assert.equal(body.pointsBalance, before - 1000)
+  } finally {
+    await close()
+  }
+})
+
 test('points-history validates its query and unknown routes return 404', async () => {
   const { base, close } = await start()
   try {

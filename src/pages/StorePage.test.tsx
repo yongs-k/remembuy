@@ -18,6 +18,7 @@ function mockGame(overrides: {
   boxes?: Box[]
   state?: GameState | null
   openBox?: ReturnType<typeof vi.fn>
+  openBoxes?: ReturnType<typeof vi.fn>
 } = {}) {
   vi.mocked(GameContextModule.useGame).mockReturnValue({
     state: overrides.state ?? STATE,
@@ -32,6 +33,7 @@ function mockGame(overrides: {
     refresh: vi.fn(),
     claim: vi.fn(),
     openBox: overrides.openBox ?? vi.fn(),
+    openBoxes: overrides.openBoxes ?? vi.fn(),
   })
 }
 
@@ -66,6 +68,29 @@ describe('StorePage', () => {
     render(<StorePage />)
     fireEvent.click(screen.getByRole('button', { name: /상자 열기/ }))
     await waitFor(() => expect(screen.getByText('조각을 획득했어요!')).toBeInTheDocument())
+  })
+
+  it('opens ten at once when the points cover it, and shows every result', async () => {
+    const one: OpenBoxResult = {
+      result: { type: 'FRAGMENT', itemId: 'item-x', itemName: 'X', grade: 'COMMON' },
+      room: { spaceId: 'bathroom', grade: 'COMMON', count: 1, completed: false },
+      pointsSpent: 500,
+      pointsBalance: 0,
+      dexEntry: { id: 'item-x', name: 'X', grade: 'COMMON', fragmentsRequired: 10, roomType: 'bathroom', status: 'COLLECTING', fragmentCount: 1 },
+    }
+    const openBoxes = vi.fn().mockResolvedValue(Array.from({ length: 10 }, () => one))
+    mockGame({ state: { ...STATE, points: 5000 }, openBoxes })
+    render(<StorePage />)
+    fireEvent.click(screen.getByRole('button', { name: /10개 한번에 열기/ }))
+    await waitFor(() => expect(screen.getByText('상자 10개를 열었어요!')).toBeInTheDocument())
+    expect(openBoxes).toHaveBeenCalledWith('box-starter', 10)
+    expect(screen.getByRole('button', { name: '포인트 부족' })).toBeDisabled()
+  })
+
+  it('keeps 10개 한번에 열기 off until the points cover ten', () => {
+    mockGame({ state: { ...STATE, points: 4999 } })
+    render(<StorePage />)
+    expect(screen.getByRole('button', { name: /10개 한번에 열기/ })).toBeDisabled()
   })
 
   it('shows an inline failure message when the open call resolves undefined', async () => {

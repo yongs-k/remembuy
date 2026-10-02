@@ -69,6 +69,20 @@ export function openBox(db, userId, boxId, now = new Date(), randomFn = Math.ran
   })
 }
 
+export const MAX_OPEN_COUNT = 10
+
+/** Opens `count` boxes at once: all of them or, if points run short or a draw fails, none. */
+export function openBoxes(db, userId, boxId, count, now = new Date(), randomFn = Math.random) {
+  const nowIso = now.toISOString()
+  return transaction(db, () => {
+    const box = db.prepare('SELECT id, cost_points FROM boxes WHERE id = ? AND active = 1').get(boxId)
+    if (!box) throw new Error('box not found')
+    const results = []
+    for (let i = 0; i < count; i++) results.push(openBoxIn(db, userId, box, nowIso, randomFn, box.cost_points))
+    return { results, pointsBalance: results[results.length - 1].pointsBalance }
+  })
+}
+
 // Opens a box inside the caller's transaction (transaction() can't nest).
 // cost 0 is the free 출석 box: nothing is charged and no points are created.
 function openBoxIn(db, userId, box, nowIso, randomFn, cost) {

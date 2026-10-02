@@ -33,6 +33,7 @@ function mockGame(dex: DexEntry[], catalogError = false) {
     refresh: refreshMock,
     claim: vi.fn(),
     openBox: vi.fn(),
+    openBoxes: vi.fn(),
   })
 }
 

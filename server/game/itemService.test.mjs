@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { openDb, transaction, migrate } from './db.js'
-import { getDex, getBoxes, openBox, getRoomStages, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
+import { getDex, getBoxes, openBox, openBoxes, getRoomStages, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
 
 const DEVICE = 'device-aaaa1111'
 const NOW = new Date('2026-09-22T00:00:00.000Z')
@@ -104,6 +104,26 @@ test('with nothing left to draw the open fails and spends nothing', () => {
   db.exec('UPDATE virtual_items SET active = 0')
   assert.throws(() => openBox(db, DEVICE, 'box-starter', NOW, () => 0), /nothing to draw/)
   assert.equal(pointsOf(db, DEVICE), 5000)
+})
+
+test('opening ten at once spends ten costs and walks the stages like ten single opens', () => {
+  const db = freshDbWithPoints(5000)
+  const { results, pointsBalance } = openBoxes(db, DEVICE, 'box-starter', 10, NOW, () => 0)
+  assert.equal(results.length, 10)
+  assert.equal(pointsBalance, 0)
+  assert.equal(pointsOf(db, DEVICE), 0)
+  // randomFn 0 keeps drawing 욕실: 4 일반, 4 고급, then 레어.
+  assert.deepEqual(
+    results.map((r) => r.room.grade),
+    ['COMMON', 'COMMON', 'COMMON', 'COMMON', 'ADVANCED', 'ADVANCED', 'ADVANCED', 'ADVANCED', 'RARE', 'RARE']
+  )
+})
+
+test('ten opens without points for all ten open none', () => {
+  const db = freshDbWithPoints(4999)
+  assert.throws(() => openBoxes(db, DEVICE, 'box-starter', 10, NOW, () => 0), /insufficient points/)
+  assert.equal(pointsOf(db, DEVICE), 4999)
+  assert.equal(getRoomStages(db, DEVICE).find((room) => room.spaceId === 'bathroom').count, 0)
 })
 
 test('every open logs a negative ITEM_BOX_OPEN point-history row', () => {

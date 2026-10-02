@@ -1,5 +1,5 @@
 import { getCatalog, getState, claimSlots, getHistory } from './service.js'
-import { getBoxes, getDex, getRoomStages, openBox, getAttendance, claimAttendance } from './itemService.js'
+import { getBoxes, getDex, getRoomStages, openBox, openBoxes, MAX_OPEN_COUNT, getAttendance, claimAttendance } from './itemService.js'
 import { getQuests, claimQuest } from './quests.js'
 
 const DEVICE_ID = /^[A-Za-z0-9-]{8,64}$/
@@ -121,7 +121,18 @@ export async function handleGameRequest(req, res, db) {
     const openMatch = url.pathname.match(/^\/api\/game\/boxes\/([^/]+)\/open$/)
     if (req.method === 'POST' && openMatch) {
       try {
-        sendJson(res, 200, openBox(db, deviceId, decodeURIComponent(openMatch[1])))
+        const boxId = decodeURIComponent(openMatch[1])
+        const countRaw = url.searchParams.get('count')
+        if (countRaw === null) {
+          sendJson(res, 200, openBox(db, deviceId, boxId))
+        } else {
+          const count = Number(countRaw)
+          if (!Number.isInteger(count) || count < 1 || count > MAX_OPEN_COUNT) {
+            sendJson(res, 400, invalid)
+            return
+          }
+          sendJson(res, 200, openBoxes(db, deviceId, boxId, count))
+        }
       } catch (error) {
         if (error.message === 'box not found' || error.message === 'insufficient points') {
           sendJson(res, 400, { error: error.message })
