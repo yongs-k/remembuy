@@ -1,15 +1,33 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { Quest } from '../lib/gameApi'
 import { useGame } from '../state/GameContext'
+
+/**
+ * "+NP" rising from where the card was, with sparks (CSS in index.css). It lives
+ * on <body> because a claimed quest leaves the home row at once.
+ */
+function celebrateClaim(anchor: DOMRect, points: number) {
+  const burst = document.createElement('div')
+  burst.className = 'quest-burst'
+  burst.setAttribute('role', 'status')
+  burst.style.left = `${anchor.left + anchor.width / 2}px`
+  burst.style.top = `${anchor.top + anchor.height / 2}px`
+  const sparks = Array.from({ length: 8 }, (_, i) => `<i style="--a:${i * 45}deg"></i>`).join('')
+  burst.innerHTML = `${sparks}<strong>+${points}P</strong><span class="sr-only">받았어요</span>`
+  document.body.appendChild(burst)
+  window.setTimeout(() => burst.remove(), 1400)
+}
 
 /** One quest in the game cabinet tone: progress toward the target and a 받기 button when done. */
 export function QuestCard({ quest, className = '' }: { quest: Quest; className?: string }) {
   const { claimQuest } = useGame()
   const [claiming, setClaiming] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
   const percent = Math.round((quest.progress / quest.target) * 100)
 
   return (
     <div
+      ref={cardRef}
       className={`flex flex-col justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-md text-inverse-on-surface ${className}`}
     >
       <div className="space-y-1">
@@ -44,8 +62,10 @@ export function QuestCard({ quest, className = '' }: { quest: Quest; className?:
               disabled={claiming}
               onClick={async () => {
                 setClaiming(true)
-                await claimQuest(quest.id)
+                const rect = cardRef.current?.getBoundingClientRect()
+                const awarded = await claimQuest(quest.id)
                 setClaiming(false)
+                if (awarded > 0 && rect) celebrateClaim(rect, awarded)
               }}
               className="min-h-11 rounded-lg bg-tertiary-fixed-dim px-4 text-label-md text-on-tertiary-fixed active:scale-[0.98] disabled:opacity-70"
             >
