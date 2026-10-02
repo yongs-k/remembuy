@@ -86,6 +86,40 @@ export default function NewItemPage() {
           .join(" · ")
       : null
 
+  // Opened from photo/link analysis: mark which fields it filled ("자동") and
+  // which still need the user ("직접 입력"). Every field stays editable.
+  const fromAnalysis = Boolean(prefill && !prefill.manual)
+  const autoFilled = new Set(
+    fromAnalysis
+      ? [
+          prefill?.name && 'name',
+          prefillLocation && 'location',
+          prefillCategory && 'category',
+          prefillMasterItemId && 'masterItem',
+          prefill?.restockCycle && 'cycle',
+          prefill?.place && 'place',
+          prefill?.price != null && 'price',
+          prefill?.sourceUrl && 'link',
+        ].filter((field): field is string => typeof field === 'string')
+      : []
+  )
+  function fieldTag(field: string, needsInput: boolean) {
+    if (!fromAnalysis) return null
+    if (autoFilled.has(field)) {
+      return (
+        <span className="ml-1.5 rounded bg-secondary-container px-1.5 py-0.5 align-middle text-label-sm text-on-secondary-container">
+          자동
+        </span>
+      )
+    }
+    if (!needsInput) return null
+    return (
+      <span className="ml-1.5 rounded border border-outline-variant px-1.5 py-0.5 align-middle text-label-sm text-on-surface-variant">
+        직접 입력
+      </span>
+    )
+  }
+
   const [name, setName] = useState(existing?.name ?? prefill?.name ?? '')
   const [locationId, setLocationId] = useState(
     existing?.locationId ?? prefillLocation?.id ?? locations[0].id
@@ -240,6 +274,13 @@ export default function NewItemPage() {
         </h1>
       </div>
 
+      {fromAnalysis && (
+        <p className="rounded-xl bg-surface-container-low px-space-md py-space-sm text-body-sm text-on-surface">
+          {prefill?.sourceUrl ? '링크' : '사진'}에서 읽은 정보를 채웠어요. "직접 입력" 표시가 있는 칸은 직접
+          채워 주세요.
+        </p>
+      )}
+
       {prefillContext && (
         <p className="rounded-xl bg-surface-container-low px-space-md py-space-sm text-body-sm text-on-surface">
           <span className="text-on-surface-variant">기록할 곳 </span>
@@ -251,7 +292,7 @@ export default function NewItemPage() {
         <h2 className="font-heading text-headline-md text-on-surface">무엇을 기록할까요?</h2>
 
         <label className={labelCls}>
-          이름
+          이름{fieldTag('name', !name.trim())}
           <input
             required
             value={name}
@@ -316,7 +357,7 @@ export default function NewItemPage() {
         )}
 
         <div>
-          <span className={labelCls}>장소</span>
+          <span className={labelCls}>장소{fieldTag('location', true)}</span>
           <div className="mt-1 flex flex-wrap gap-1.5" role="group" aria-label="보관 구역">
             {locations.map((l) => (
               <button
@@ -357,7 +398,7 @@ export default function NewItemPage() {
 
         <div>
           <label className={labelCls}>
-            카테고리
+            카테고리{fieldTag('category', true)}
             <select
               value={categoryId}
               onChange={(e) => {
@@ -401,7 +442,7 @@ export default function NewItemPage() {
         {selectedCategory && (
           <div>
             <label className={labelCls}>
-              도감 품목 (선택)
+              도감 품목 (선택){fieldTag('masterItem', !masterItemId)}
               <select
                 value={masterItemId}
                 onChange={(e) => setMasterItemId(e.target.value)}
@@ -450,7 +491,7 @@ export default function NewItemPage() {
           </button>
         </div>
         <label className={labelCls}>
-          재구매 주기
+          재구매 주기{fieldTag('cycle', !restockCycle.trim())}
           <input
             ref={cycleInputRef}
             value={restockCycle}
@@ -478,7 +519,7 @@ export default function NewItemPage() {
         </label>
       </section>
 
-      <details className={`group ${cardCls}`} open={hasOptionalDetails}>
+      <details className={`group ${cardCls}`} open={hasOptionalDetails || fromAnalysis}>
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between">
           <span className="font-heading text-headline-md text-on-surface">
             구매 정보 · 메모 <span className="text-body-sm font-normal text-on-surface-variant">(선택)</span>
@@ -489,11 +530,11 @@ export default function NewItemPage() {
           />
         </summary>
         <label className={labelCls}>
-          구매처
+          구매처{fieldTag('place', !place.trim())}
           <input value={place} onChange={(e) => setPlace(e.target.value)} className={inputCls} />
         </label>
         <label className={labelCls}>
-          가격 (원)
+          가격 (원){fieldTag('price', price === '')}
           <input
             type="number"
             min={0}
@@ -503,7 +544,7 @@ export default function NewItemPage() {
           />
         </label>
         <label className={labelCls}>
-          구매 링크
+          구매 링크{fieldTag('link', !affiliateUrl)}
           <input
             value={affiliateUrl ?? ''}
             onChange={(e) => setAffiliateUrl(e.target.value)}
