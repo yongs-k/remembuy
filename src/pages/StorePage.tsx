@@ -22,10 +22,22 @@ const GRADE_ICON: Record<string, string> = {
   LEGENDARY: 'bathtub',
 }
 
-/** The store's hero: a leather gift box with a gold ribbon, floating in its own light. */
-function HeroGiftBox() {
+// How long the hero box takes to open before the result sheet rises (index.css hero-* timings).
+const HERO_OPEN_MS = 1500
+
+const wait = (ms: number) => new Promise((resolve) => window.setTimeout(resolve, ms))
+
+/**
+ * The store's hero: a leather gift box with a gold ribbon, floating in its own light.
+ * While `open`, it shakes, the lid and bow fly off and light pours out of it.
+ */
+function HeroGiftBox({ open }: { open: boolean }) {
   return (
-    <svg aria-hidden viewBox="0 0 240 220" className="store-hero-float mx-auto h-auto w-full max-w-[17rem] overflow-visible">
+    <svg
+      aria-hidden
+      viewBox="0 0 240 220"
+      className={`${open ? 'hero-shake' : 'store-hero-float'} mx-auto h-auto w-full max-w-[17rem] overflow-visible`}
+    >
       <defs>
         <radialGradient id="hero-glow">
           <stop offset="0%" stopColor="#ffd38a" stopOpacity="0.55" />
@@ -73,6 +85,22 @@ function HeroGiftBox() {
       </text>
       <rect x="95" y="168" width="48" height="1" fill="url(#hero-gold)" opacity="0.7" />
 
+      {/* light from inside, once the lid is off */}
+      {open && (
+        <g className="hero-burst">
+          <path d="M44 104 L10 0 H230 L196 104 Z" fill="url(#hero-glow)" />
+          <g stroke="#ffe3a8" strokeLinecap="round" strokeWidth="3" opacity="0.9">
+            <line x1="120" y1="96" x2="120" y2="8" />
+            <line x1="92" y1="98" x2="58" y2="20" />
+            <line x1="148" y1="98" x2="182" y2="20" />
+            <line x1="70" y1="100" x2="24" y2="50" />
+            <line x1="170" y1="100" x2="216" y2="50" />
+          </g>
+          <ellipse cx="120" cy="104" rx="76" ry="10" fill="#ffd98a" />
+        </g>
+      )}
+
+      <g className={open ? 'hero-lid-off' : undefined}>
       {/* lid */}
       <path d="M32 80 L54 66 H228 L206 80 Z" fill="url(#hero-lid-top)" />
       <path d="M32 80 H206 V108 H32 Z" fill="#2e2118" />
@@ -88,6 +116,7 @@ function HeroGiftBox() {
       <path d="M130 66 C120 76 112 88 104 96 L112 98 C118 88 124 78 130 68 Z" fill="#c8913a" />
       <path d="M130 66 C142 76 152 86 160 94 L152 97 C146 87 138 78 130 68 Z" fill="#c8913a" />
       <ellipse cx="130" cy="65" rx="8" ry="6" fill="#e9b85c" />
+      </g>
 
       {/* sparkles */}
       {[
@@ -115,17 +144,23 @@ export default function StorePage() {
   const [opening, setOpening] = useState<string | null>(null)
   const [result, setResult] = useState<OpenBoxResult | null>(null)
   const [failedBoxId, setFailedBoxId] = useState<string | null>(null)
+  // The hero box stays open while its result is on screen.
+  const [heroOpen, setHeroOpen] = useState(false)
   const points = state?.points ?? 0
 
   async function handleOpen(boxId: string) {
     setOpening(boxId)
     setFailedBoxId(null)
-    const opened = await openBox(boxId)
+    setHeroOpen(true)
+    const still = !window.matchMedia || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // The sheet waits for the box to finish opening, and for the server.
+    const [opened] = await Promise.all([openBox(boxId), wait(still ? 0 : HERO_OPEN_MS)])
     setOpening(null)
     if (opened) {
       setResult(opened)
     } else {
       setFailedBoxId(boxId)
+      setHeroOpen(false)
     }
   }
 
@@ -178,7 +213,7 @@ export default function StorePage() {
           const affordable = points >= box.costPoints
           return (
             <section key={box.id} aria-labelledby={`box-${box.id}`} className="space-y-space-md">
-              <HeroGiftBox />
+              <HeroGiftBox open={heroOpen} />
               <div className="space-y-0.5 text-center">
                 <h2 id={`box-${box.id}`} className="font-heading text-headline-md">
                   {box.name}
@@ -195,7 +230,7 @@ export default function StorePage() {
                   className="relative flex min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] text-label-lg font-bold text-on-tertiary-fixed shadow-[0_10px_30px_-10px_rgba(255,185,95,0.7)] transition-transform active:scale-[0.98] disabled:opacity-70"
                 >
                   {opening === box.id ? (
-                    '여는 중...'
+                    '상자를 여는 중...'
                   ) : (
                     <>
                       상자 열기 · {box.costPoints.toLocaleString()}P
@@ -269,7 +304,11 @@ export default function StorePage() {
       {result && (
         <BoxOpenResultModal
           result={result}
-          onClose={() => setResult(null)}
+          intro={false}
+          onClose={() => {
+            setResult(null)
+            setHeroOpen(false)
+          }}
           onViewDex={() => {
             setResult(null)
             navigate('/dex')

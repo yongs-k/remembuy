@@ -97,6 +97,29 @@ textarea::placeholder {
   50% { transform: scale(1); opacity: 1; }
 }
 
+/* Store hero opening (StorePage): shake, lid and bow fly off, light pours out (HERO_OPEN_MS). */
+.hero-shake {
+  transform-origin: 50% 90%;
+  animation: box-open-shake 0.6s ease-in-out both;
+}
+.hero-lid-off {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: hero-lid-off 0.6s 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.hero-burst {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hero-burst 0.7s 0.75s ease-out both;
+}
+@keyframes hero-lid-off {
+  to { transform: translate(-30px, -90px) rotate(-26deg); opacity: 0; }
+}
+@keyframes hero-burst {
+  from { transform: scaleY(0.15); opacity: 0; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
 /* Quest reward (QuestCard): +NP rises from the card with a few sparks. */
 .quest-burst {
   position: fixed;
@@ -161,7 +184,10 @@ textarea::placeholder {
   .quest-burst b,
   .quest-burst i,
   .store-hero-float,
-  .store-sparkle {
+  .store-sparkle,
+  .hero-shake,
+  .hero-lid-off,
+  .hero-burst {
     animation-duration: 1ms !important;
     animation-delay: 0s !important;
   }

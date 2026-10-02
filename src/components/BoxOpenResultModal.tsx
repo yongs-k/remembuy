@@ -48,10 +48,13 @@ function OpeningBox() {
 /** Box-opening result: a cabinet-toned sheet, since it belongs to the game layer. */
 export function BoxOpenResultModal({
   result,
+  intro = true,
   onClose,
   onViewDex,
 }: {
   result: OpenBoxResult
+  /** Play the box-opening scene first; false when the page already opened its own box. */
+  intro?: boolean
   onClose: () => void
   onViewDex: () => void
 }) {
@@ -68,17 +71,17 @@ export function BoxOpenResultModal({
   return (
     <Sheet labelledBy="box-result-title" onClose={onClose} tone="cabinet">
       <div className="space-y-4">
-        <div className="relative flex h-44 items-end justify-center">
-          <OpeningBox />
+        <div className={`relative flex justify-center ${intro ? 'h-44 items-end' : ''}`}>
+          {intro && <OpeningBox />}
           <div
-            className={`box-open-item absolute top-0 flex flex-col items-center gap-1 rounded-xl ${color.bg} px-space-md py-space-sm shadow-float`}
+            className={`${intro ? 'box-open-item absolute top-0' : 'animate-badge-bounce'} flex flex-col items-center gap-1 rounded-xl ${color.bg} px-space-md py-space-sm shadow-float`}
           >
             <Icon name={completed ? 'military_tech' : 'diamond'} className={`text-[36px] ${color.text}`} />
             <span className={`text-label-md font-bold ${color.text}`}>{gradeLabel(result.result.grade)}</span>
           </div>
         </div>
 
-        <div className="box-open-text space-y-1 text-center">
+        <div className={`${intro ? 'box-open-text' : ''} space-y-1 text-center`}>
           <h2 id="box-result-title" className="font-heading text-headline-md">
             {room
               ? completed
@@ -92,7 +95,7 @@ export function BoxOpenResultModal({
         </div>
 
         {room && (
-          <div className="box-open-text space-y-1.5">
+          <div className={`${intro ? 'box-open-text' : ''} space-y-1.5`}>
             <div className="mx-auto grid w-16 grid-cols-2 gap-1" aria-hidden>
               {/* Clockwise from top-left, like the 장소 tile. */}
               {[0, 1, 3, 2].map((piece) => (
@@ -111,7 +114,7 @@ export function BoxOpenResultModal({
         )}
 
         {!room && !completed && (
-          <div className="box-open-text space-y-1">
+          <div className={`${intro ? 'box-open-text' : ''} space-y-1`}>
             <div className="h-2 w-full overflow-hidden rounded-full bg-inverse-on-surface/15">
               <div className="h-full rounded-full bg-tertiary-fixed-dim" style={{ width: `${percent}%` }} />
             </div>
