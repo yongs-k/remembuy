@@ -146,6 +146,22 @@ CREATE TABLE IF NOT EXISTS user_room_pieces (
   count INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (user_id, space_id, grade, slot)
 );
+-- Each 장소's stage: the grade being collected ('DONE' after 전설) and its pieces so far.
+CREATE TABLE IF NOT EXISTS user_room_stage (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  space_id TEXT NOT NULL,
+  grade TEXT NOT NULL,
+  count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, space_id)
+);
+-- Pieces kept for 조합: other grades than the 장소's stage, and leftovers after 달성.
+CREATE TABLE IF NOT EXISTS user_piece_stock (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  space_id TEXT NOT NULL,
+  grade TEXT NOT NULL,
+  count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, space_id, grade)
+);
 -- Quest rewards claimed; period is 'once' or the KST day for daily quests.
 CREATE TABLE IF NOT EXISTS quest_claims (
   user_id TEXT NOT NULL REFERENCES users(id),
@@ -336,9 +352,49 @@ function migrateRoomFragmentsToPieces(db) {
   })
 }
 
+const STAGE_GRADES = ['COMMON', 'ADVANCED', 'RARE', 'LEGENDARY']
+
+// The puzzle-slot model became stage counts plus stock: grades whose four slots were
+// all owned count as achieved (four pieces spent, the rest to stock); the first
+// incomplete grade becomes the stage with all its pieces; anything above goes to stock.
+function migratePiecesToStages(db) {
+  if (db.prepare('SELECT COUNT(*) AS n FROM user_room_pieces').get().n === 0) return
+  transaction(db, () => {
+    const groups = {}
+    for (const row of db.prepare('SELECT user_id, space_id, grade, slot, count FROM user_room_pieces').all()) {
+      const key = row.user_id + '|' + row.space_id
+      const g = (groups[key] ??= { user: row.user_id, space: row.space_id, grades: {} })
+      const entry = (g.grades[row.grade] ??= { sum: 0, owned: 0 })
+      entry.sum += row.count
+      if (row.count > 0) entry.owned += 1
+    }
+    const stock = db.prepare(
+      `INSERT INTO user_piece_stock (user_id, space_id, grade, count) VALUES (?, ?, ?, ?)
+       ON CONFLICT (user_id, space_id, grade) DO UPDATE SET count = count + excluded.count`
+    )
+    const stage = db.prepare(
+      `INSERT INTO user_room_stage (user_id, space_id, grade, count) VALUES (?, ?, ?, ?)
+       ON CONFLICT (user_id, space_id) DO UPDATE SET grade = excluded.grade, count = excluded.count`
+    )
+    for (const g of Object.values(groups)) {
+      const at = (grade) => g.grades[grade] ?? { sum: 0, owned: 0 }
+      const current = STAGE_GRADES.find((grade) => at(grade).owned < 4) ?? 'DONE'
+      const i = current === 'DONE' ? STAGE_GRADES.length : STAGE_GRADES.indexOf(current)
+      STAGE_GRADES.forEach((grade, j) => {
+        const { sum } = at(grade)
+        if (j < i && sum > 4) stock.run(g.user, g.space, grade, sum - 4)
+        if (j > i && sum > 0) stock.run(g.user, g.space, grade, sum)
+      })
+      stage.run(g.user, g.space, current, current === 'DONE' ? 0 : at(current).sum)
+    }
+    db.exec('DELETE FROM user_room_pieces')
+  })
+}
+
 export function migrate(db, { catalog } = {}) {
   db.exec(SCHEMA)
   migrateRoomFragmentsToPieces(db)
+  migratePiecesToStages(db)
   db.prepare("INSERT OR IGNORE INTO schema_meta (key, value) VALUES ('schema_version', ?)").run(SCHEMA_VERSION)
   seedConfig(db)
   if (catalog) seedCatalog(db, catalog)

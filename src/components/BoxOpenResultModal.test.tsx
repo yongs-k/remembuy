@@ -41,23 +41,27 @@ describe('BoxOpenResultModal', () => {
     expect(screen.getByText('골드 거울')).toBeInTheDocument()
   })
 
-  it('shows the 장소 stage, and the next grade once the stage completes', () => {
-    const room = { spaceId: 'bathroom', grade: 'COMMON', slot: 1, copies: 1, pieces: [1, 1, 0, 0], count: 2, completed: false }
+  it("shows a stage piece's +N, when 달성 opens, and a kept piece", () => {
+    const room = { spaceId: 'bathroom', grade: 'COMMON', slot: 1, source: 'stage' as const, count: 2, ready: false }
     const { unmount } = render(
       <BoxOpenResultModal result={{ ...FRAGMENT_RESULT, room }} onClose={() => {}} onViewCollection={() => {}} />
     )
     expect(screen.getByText('욕실 조각을 얻었어요!')).toBeInTheDocument()
-    expect(screen.getByText(/일반 욕실 조각 2 \/ 4/)).toBeInTheDocument()
+    expect(screen.getByText(/일반 욕실 \+2 · 2개 더 모으면 달성/)).toBeInTheDocument()
     unmount()
+    const again = render(
+      <BoxOpenResultModal result={{ ...FRAGMENT_RESULT, room: { ...room, count: 4, ready: true } }} onClose={() => {}} onViewCollection={() => {}} />
+    )
+    expect(screen.getByText(/홈에서 달성할 수 있어요/)).toBeInTheDocument()
+    again.unmount()
     render(
       <BoxOpenResultModal
-        result={{ ...FRAGMENT_RESULT, room: { ...room, slot: 3, pieces: [1, 1, 1, 1], count: 4, completed: true } }}
+        result={{ ...FRAGMENT_RESULT, room: { ...room, grade: 'RARE', source: 'stock', count: 1 } }}
         onClose={() => {}}
         onViewCollection={() => {}}
       />
     )
-    expect(screen.getByText('일반 욕실 완성!')).toBeInTheDocument()
-    expect(screen.getByText(/이제 고급 조각이 나와요/)).toBeInTheDocument()
+    expect(screen.getByText(/조합 재료로 보관했어요/)).toBeInTheDocument()
   })
 
   it('확인 closes, 도감 보기 goes to the collection and 다시 열기 opens another', () => {

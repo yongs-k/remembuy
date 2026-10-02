@@ -3,7 +3,7 @@ import { gradeColor, gradeLabel } from '../data/gradeColors'
 import type { OpenBoxResult } from '../lib/gameApi'
 import { placeName } from '../state/gameProgress'
 import { Sheet } from './Sheet'
-import { CopiesBadge, PuzzlePiece } from './Puzzle'
+import { CountBadge, PuzzlePiece } from './Puzzle'
 
 /** Several boxes at once (10개 한번에 열기): every draw as a grade tile, stages completed called out. */
 export function BoxMultiResultModal({
@@ -22,9 +22,14 @@ export function BoxMultiResultModal({
   onReopen: () => void
   canReopen: boolean
 }) {
-  const completedStages = results.flatMap((r) =>
-    r.room?.completed ? [`${gradeLabel(r.room.grade)} ${placeName(r.room.spaceId)}`] : []
-  )
+  // 장소 that reached +4 in this batch: they can 달성 now.
+  const readyNow = [
+    ...new Set(
+      results.flatMap((r) =>
+        r.room?.source === 'stage' && r.room.count === 4 ? [`${gradeLabel(r.room.grade)} ${placeName(r.room.spaceId)}`] : []
+      )
+    ),
+  ]
 
   return (
     <Sheet labelledBy="box-multi-title" onClose={onClose} tone="cabinet" placement="center">
@@ -33,7 +38,7 @@ export function BoxMultiResultModal({
           <h2 id="box-multi-title" className="font-heading text-headline-md">
             상자 {results.length}개를 열었어요!
           </h2>
-          <p className="text-body-sm text-inverse-on-surface/70">장소마다 지금 등급의 조각이 쌓였어요.</p>
+          <p className="text-body-sm text-inverse-on-surface/70">장소 등급과 같은 조각은 +N으로, 다른 등급은 조합 재료로 쌓였어요.</p>
         </div>
 
         <ul className="grid grid-cols-5 gap-1.5">
@@ -45,9 +50,9 @@ export function BoxMultiResultModal({
                 key={i}
                 className="animate-badge-bounce relative flex flex-col items-center gap-0.5 rounded-lg bg-white/[0.05] px-0.5 pb-1.5 pt-2"
                 style={{ animationDelay: `${i * 70}ms` }}
-                aria-label={`${gradeLabel(r.result.grade)} ${place} 조각${r.room && r.room.copies > 1 ? ` x${r.room.copies}` : ''}, ${r.result.itemName}${r.room?.completed ? ', 등급 완성' : ''}`}
+                aria-label={`${gradeLabel(r.result.grade)} ${place} 조각 +${r.room?.count ?? 1}${r.room?.source === 'stock' ? ', 조합 재료' : ''}, ${r.result.itemName}`}
               >
-                {r.room && <CopiesBadge copies={r.room.copies} className="absolute -top-1.5 right-0 z-10" />}
+                {r.room && <CountBadge count={r.room.count} className="absolute -top-1.5 right-0 z-10" />}
                 {r.room ? (
                   <PuzzlePiece grade={r.room.grade} slot={r.room.slot} className="h-9 w-9" />
                 ) : (
@@ -61,10 +66,10 @@ export function BoxMultiResultModal({
           })}
         </ul>
 
-        {completedStages.length > 0 && (
+        {readyNow.length > 0 && (
           <p className="rounded-xl border border-tertiary-fixed-dim/40 bg-white/[0.04] px-3 py-2 text-center text-label-md text-tertiary-fixed">
             <Icon name="workspace_premium" className="mr-1 align-[-3px] text-[16px]" />
-            {completedStages.join(', ')} 완성!
+            {readyNow.join(', ')} 달성 가능!
           </p>
         )}
 

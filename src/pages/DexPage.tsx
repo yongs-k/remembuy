@@ -24,13 +24,23 @@ export default function DexPage() {
         뒤로
       </button>
 
-      <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
-        <h1 className="font-heading text-display-sm">아이템 수집함</h1>
-        {dex.length > 0 && (
-          <span className="shrink-0 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
-            {dex.filter((entry) => entry.status === 'COMPLETE').length}/{dex.length}
-          </span>
-        )}
+      <div className="space-y-3 rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
+        <div className="flex items-end justify-between gap-space-sm">
+          <h1 className="font-heading text-display-sm">아이템 수집함</h1>
+          {dex.length > 0 && (
+            <span className="shrink-0 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
+              {dex.filter((entry) => entry.status === 'COMPLETE').length}/{dex.length}
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => navigate('/dex/combine')}
+          className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] text-label-lg font-bold text-on-tertiary-fixed active:scale-[0.98]"
+        >
+          <Icon name="extension" className="text-[20px]" />
+          조각 조합
+        </button>
       </div>
 
       {dex.length === 0 ? (

@@ -1,7 +1,7 @@
 import { Icon } from '../data/materialIcons'
-import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
+import { gradeColor, gradeLabel } from '../data/gradeColors'
 import { STAGE_SIZE, placeName } from '../state/gameProgress'
-import { CopiesBadge, PuzzleBoard, PuzzlePiece } from './Puzzle'
+import { CountBadge, PuzzleBoard, PuzzlePiece, litPieces } from './Puzzle'
 import type { OpenBoxResult } from '../lib/gameApi'
 import { Sheet } from './Sheet'
 
@@ -69,9 +69,8 @@ export function BoxOpenResultModal({
 }) {
   const color = gradeColor(result.result.grade)
   const room = result.room
-  // With a 장소 stage, "completed" means the stage (e.g. 일반 욕실); otherwise the item.
-  const completed = room ? room.completed : result.result.type === 'FULL_ITEM' || result.dexEntry.status === 'COMPLETE'
-  const nextGrade = room && GRADE_ORDER[GRADE_ORDER.indexOf(room.grade as (typeof GRADE_ORDER)[number]) + 1]
+  const completed = !room && (result.result.type === 'FULL_ITEM' || result.dexEntry.status === 'COMPLETE')
+  const staged = room?.source === 'stage'
   const percent = Math.min(
     100,
     Math.round((result.dexEntry.fragmentCount / result.dexEntry.fragmentsRequired) * 100)
@@ -87,7 +86,7 @@ export function BoxOpenResultModal({
           >
             {room ? (
               <>
-                <CopiesBadge copies={room.copies} className="absolute -top-1 right-0 z-10 px-2 text-label-md leading-6" />
+                <CountBadge count={room.count} className="absolute -top-1 right-0 z-10 px-2 text-label-md leading-6" />
                 <PuzzlePiece grade={room.grade} slot={room.slot} className="h-24 w-24 drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]" />
               </>
             ) : (
@@ -97,7 +96,7 @@ export function BoxOpenResultModal({
             )}
             <span className="mt-1 text-label-md font-bold" style={{ color: color.hex }}>
               {gradeLabel(result.result.grade)}
-              {room && room.copies > 1 && ' · 중복'}
+              {room && !staged && ' · 조합 재료'}
             </span>
           </div>
         </div>
@@ -105,9 +104,7 @@ export function BoxOpenResultModal({
         <div className={`${intro ? 'box-open-text' : ''} space-y-1 text-center`}>
           <h2 id="box-result-title" className="font-heading text-headline-md">
             {room
-              ? completed
-                ? `${gradeLabel(room.grade)} ${placeName(room.spaceId)} 완성!`
-                : `${placeName(room.spaceId)} 조각을 얻었어요!`
+              ? `${placeName(room.spaceId)} 조각을 얻었어요!`
               : completed
                 ? '아이템을 완성했어요!'
                 : '조각을 획득했어요!'}
@@ -117,11 +114,14 @@ export function BoxOpenResultModal({
 
         {room && (
           <div className={`${intro ? 'box-open-text' : ''} space-y-1.5`}>
-            <PuzzleBoard grade={room.grade} pieces={room.pieces} className="mx-auto h-20 w-20 text-inverse-on-surface" />
+            {staged && (
+              <PuzzleBoard grade={room.grade} pieces={litPieces(room.count)} className="mx-auto h-20 w-20 text-inverse-on-surface" />
+            )}
             <p className="text-center text-label-sm tabular-nums text-inverse-on-surface/70">
-              {gradeLabel(room.grade)} {placeName(room.spaceId)} 조각 {room.count} / {STAGE_SIZE}
-              {completed && (nextGrade ? ` · 이제 ${gradeLabel(nextGrade)} 조각이 나와요` : ' · 전설까지 모두 모았어요')}
-              {!completed && room.copies > 1 && ' · 중복 조각은 10개 모아 조합할 수 있어요'}
+              {staged
+                ? `${gradeLabel(room.grade)} ${placeName(room.spaceId)} +${room.count}` +
+                  (room.ready ? ' · 홈에서 달성할 수 있어요!' : ` · ${STAGE_SIZE - room.count}개 더 모으면 달성`)
+                : `${placeName(room.spaceId)}은 지금 다른 등급을 모으는 중이라 조합 재료로 보관했어요 (${gradeLabel(room.grade)} ${room.count}개)`}
             </p>
           </div>
         )}

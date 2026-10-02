@@ -3,8 +3,9 @@ import {
   getBoxes,
   getDex,
   getRoomStages,
-  getDuplicates,
+  getStacks,
   combinePieces,
+  achieveStage,
   openBox,
   openBoxes,
   MAX_OPEN_COUNT,
@@ -128,7 +129,7 @@ export async function handleGameRequest(req, res, db) {
       sendJson(res, 200, {
         items: getDex(db, deviceId),
         rooms: getRoomStages(db, deviceId),
-        duplicates: getDuplicates(db, deviceId),
+        stacks: getStacks(db, deviceId),
       })
       return
     }
@@ -142,10 +143,33 @@ export async function handleGameRequest(req, res, db) {
         return
       }
       try {
-        sendJson(res, 200, combinePieces(db, deviceId, body?.grade))
+        sendJson(res, 200, combinePieces(db, deviceId, body?.grade, body?.picks))
       } catch (error) {
-        if (error.message === 'invalid grade') sendJson(res, 400, invalid)
-        else if (error.message === 'not enough duplicates') sendJson(res, 409, { error: error.message })
+        if (error.message === 'invalid grade' || error.message === 'invalid picks') sendJson(res, 400, invalid)
+        else if (error.message === 'not enough pieces' || error.message === 'nothing to draw')
+          sendJson(res, 409, { error: error.message })
+        else throw error
+      }
+      return
+    }
+
+    if (route === 'POST /api/game/achieve') {
+      let body
+      try {
+        body = JSON.parse((await readBody(req)) ?? '')
+      } catch {
+        sendJson(res, 400, invalid)
+        return
+      }
+      if (typeof body?.spaceId !== 'string') {
+        sendJson(res, 400, invalid)
+        return
+      }
+      try {
+        sendJson(res, 200, achieveStage(db, deviceId, body.spaceId))
+      } catch (error) {
+        if (error.message === 'space not found') sendJson(res, 404, { error: error.message })
+        else if (error.message === 'not ready') sendJson(res, 409, { error: error.message })
         else throw error
       }
       return

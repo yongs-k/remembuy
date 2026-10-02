@@ -122,8 +122,14 @@ test('boxes and dex endpoints respond', async () => {
     assert.equal(boxes.boxes[0].id, 'box-starter')
     const dex = await (await call(base, '/api/game/dex')).json()
     assert.equal(dex.items.length, 59)
-    assert.deepEqual(dex.rooms, [{ spaceId: 'bathroom', stage: 'COMMON', pieces: [0, 0, 0, 0], count: 0, completedGrades: [] }])
-    assert.deepEqual(dex.duplicates, { COMMON: 0, ADVANCED: 0, RARE: 0, LEGENDARY: 0 })
+    assert.deepEqual(dex.rooms, [{ spaceId: 'bathroom', stage: 'COMMON', count: 0, completedGrades: [] }])
+    assert.deepEqual(dex.stacks, [])
+    assert.equal((await call(base, '/api/game/achieve', { method: 'POST', body: { spaceId: 'bathroom' } })).status, 409)
+    assert.equal((await call(base, '/api/game/achieve', { method: 'POST', body: {} })).status, 400)
+    assert.equal(
+      (await call(base, '/api/game/combine', { method: 'POST', body: { grade: 'COMMON', picks: [{ spaceId: 'x', source: 'stock', count: 1 }] } })).status,
+      400
+    )
     const combine = await call(base, '/api/game/combine', { method: 'POST', body: { grade: 'COMMON' } })
     assert.equal(combine.status, 409)
     const bad = await call(base, '/api/game/combine', { method: 'POST', body: { grade: 'LEGENDARY' } })

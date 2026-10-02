@@ -121,17 +121,17 @@ export function PuzzleBoard({
   )
 }
 
-/** "x2", "x3"… over a piece with spare copies. */
-export function CopiesBadge({ copies, className = '' }: { copies: number; className?: string }) {
-  if (copies < 2) return null
+/** "+2", "+3"… the pieces gathered, over a piece or a 장소. */
+export function CountBadge({ count, className = '' }: { count: number; className?: string }) {
+  if (count < 1) return null
   return (
     <span
       className={`rounded-full bg-inverse-surface px-1.5 text-[11px] font-bold leading-[18px] tabular-nums text-tertiary-fixed-dim ring-1 ring-tertiary-fixed-dim/60 ${className}`}
     >
-      x{copies}
+      +{count}
     </span>
   )
 }
 
-/** Badge positions over a 2×2 board, top-centre of each slot's quarter. */
-export const SLOT_BADGE_POSITION = ['left-1/4 top-[3%]', 'left-3/4 top-[3%]', 'left-3/4 top-[53%]', 'left-1/4 top-[53%]']
+/** A board lit up to `count` pieces (clockwise from top-left), four at most. */
+export const litPieces = (count: number) => [0, 1, 2, 3].map((i) => (i < Math.min(count, 4) ? 1 : 0))

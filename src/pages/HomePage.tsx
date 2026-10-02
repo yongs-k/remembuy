@@ -14,6 +14,7 @@ import { useBack } from '../hooks/useBack'
 import { useGame } from '../state/GameContext'
 import { pickEasiestQuests } from '../state/quests'
 import { QuestCard } from '../components/QuestCard'
+import { useAchieveStage } from '../components/AchieveStage'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
 
@@ -22,6 +23,7 @@ const RESTOCK_PREVIEW = 3
 export default function HomePage() {
   const { items, locations, categories, lastPurchase } = useLocker()
   const { quests, rooms } = useGame()
+  const achieveStage = useAchieveStage()
   const easiestQuests = pickEasiestQuests(quests)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -247,11 +249,14 @@ export default function HomePage() {
                     ).length
                   }
                   room={rooms.find((room) => room.spaceId === location.id)}
+                  onAchieve={() => void achieveStage.run(location.id)}
+                  achieving={achieveStage.busy === location.id}
                   onClick={() => setSearchParams({ loc: location.id })}
                 />
               ))}
             </div>
           </section>
+          {achieveStage.sheet}
           <div ref={gameCardRef}>
             <HomeGameCard />
           </div>

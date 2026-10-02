@@ -4,7 +4,7 @@ import { getLocationCompletion, getMasterItemCounts } from '../state/selectors'
 import { useGame } from '../state/GameContext'
 import { HomeLocationTile } from './HomeLocationTile'
 import { TitleManager } from './TitleManager'
-import { PieceCombine } from './PieceCombine'
+import { useAchieveStage } from './AchieveStage'
 
 type Filter = 'all' | 'progress' | 'almost' | 'none'
 
@@ -21,6 +21,7 @@ export function CollectionOverview({
 }) {
   const [filter, setFilter] = useState<Filter>('all')
   const { dex, rooms } = useGame()
+  const achieveStage = useAchieveStage()
   const totalFragments = dex.reduce((sum, entry) => sum + entry.fragmentCount, 0)
 
   const overall = getMasterItemCounts(items, categories)
@@ -55,10 +56,11 @@ export function CollectionOverview({
   return (
     <div className="space-y-space-lg p-margin">
       <TitleManager />
+      {achieveStage.sheet}
       <section className="space-y-space-sm">
         <h1 className="font-heading text-display-sm text-on-surface">컬렉션</h1>
         <p className="text-body-md text-on-surface-variant">
-          장소마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요. 상자에서 그 장소 조각이 4개 모이면 등급이 올라가요 (일반 → 고급 → 레어 → 전설).
+          장소마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요. 상자에서 그 장소 등급 조각을 +4 모아 달성하면 등급이 올라가요 (일반 → 고급 → 레어 → 전설).
           <br />
           {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을 모았어요.
         </p>
@@ -115,14 +117,14 @@ export function CollectionOverview({
                 percent={row.percent}
                 count={row.count}
                 room={rooms.find((room) => room.spaceId === row.location.id)}
+                onAchieve={() => void achieveStage.run(row.location.id)}
+                achieving={achieveStage.busy === row.location.id}
                 onClick={() => onOpen(row.location.id)}
               />
             ))}
           </div>
         )}
       </section>
-
-      <PieceCombine />
     </div>
   )
 }

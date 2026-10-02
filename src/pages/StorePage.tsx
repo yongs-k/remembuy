@@ -13,7 +13,7 @@ import { PuzzlePiece } from '../components/Puzzle'
 const STEPS = [
   { icon: 'task_alt', text: '퀘스트로\n포인트 모으기' },
   { icon: 'redeem', text: '상자 열고\n장소 조각 받기' },
-  { icon: 'cottage', text: '조각 4개면\n장소 등급 상승' },
+  { icon: 'cottage', text: '+4 모아 달성하면\n장소 등급 상승' },
 ]
 
 // How long the hero box takes to open before the result sheet rises (index.css hero-* timings).
@@ -240,7 +240,7 @@ export default function StorePage() {
                   {box.name}
                 </h2>
                 <p className="text-body-sm text-inverse-on-surface/70">
-                  열 때마다 장소 하나의 지금 등급 조각이 나와요.
+                  일반·고급·레어·전설 조각 중 하나가 나와요.
                 </p>
               </div>
               {affordable ? (

@@ -101,25 +101,29 @@ export type DexEntry = {
 }
 
 /**
- * A 장소's stage: its four puzzle pieces of the current grade (null once 전설 is complete).
- * `pieces` are the copies held per slot (top-left, top-right, bottom-right, bottom-left);
- * `count` is how many slots are owned.
+ * A 장소's stage: the grade it is collecting (null once 전설 is achieved) and `count`,
+ * that grade's pieces so far (the tile's +N, no limit). 4 or more lets 달성 happen.
  */
-export type RoomStage = { spaceId: string; stage: string | null; pieces: number[]; count: number; completedGrades: string[] }
+export type RoomStage = { spaceId: string; stage: string | null; count: number; completedGrades: string[] }
 
-/** One piece landing in a 장소: `copies` > 1 means it was a duplicate. */
+/**
+ * One piece arriving. `source` 'stage' when it is the 장소's grade (count = its +N),
+ * 'stock' when it was kept for 조합 instead (count = that pile). `slot` only picks the shape.
+ */
 export type PieceResult = {
   spaceId: string
   grade: string
   slot: number
-  copies: number
-  pieces: number[]
+  source: 'stage' | 'stock'
   count: number
-  completed: boolean
+  ready: boolean
 }
 
-/** Spare copies per grade, the currency of 조합. */
-export type Duplicates = Record<string, number>
+/** A pile of pieces that 조합 can draw from. */
+export type PieceStack = { spaceId: string; grade: string; source: 'stage' | 'stock'; count: number }
+
+/** Pieces chosen for 조합, per pile. */
+export type CombinePick = { spaceId: string; source: 'stage' | 'stock'; count: number }
 
 export type OpenBoxResult = {
   result: { type: 'FRAGMENT' | 'FULL_ITEM'; itemId: string; itemName: string; grade: string }
@@ -133,13 +137,20 @@ export type OpenBoxResult = {
 export const fetchBoxes = () => request<{ boxes: Box[] }>('/api/game/boxes')
 
 export const fetchDex = () =>
-  request<{ items: DexEntry[]; rooms?: RoomStage[]; duplicates?: Duplicates }>('/api/game/dex')
+  request<{ items: DexEntry[]; rooms?: RoomStage[]; stacks?: PieceStack[] }>('/api/game/dex')
 
-/** 조합: ten spare pieces of `grade` become one piece of the next grade. */
-export const combinePieces = (grade: string) =>
-  request<{ piece: PieceResult; duplicates: Duplicates }>('/api/game/combine', {
+/** 조합: ten pieces of `grade` (these `picks`) become one random piece of the next grade. */
+export const combinePieces = (grade: string, picks: CombinePick[]) =>
+  request<{ piece: PieceResult; itemName: string; rooms: RoomStage[]; stacks: PieceStack[] }>('/api/game/combine', {
     method: 'POST',
-    body: JSON.stringify({ grade }),
+    body: JSON.stringify({ grade, picks }),
+  })
+
+/** 달성: spend four of the 장소's grade and move it to the next grade. */
+export const achieveStage = (spaceId: string) =>
+  request<{ achieved: { spaceId: string; grade: string }; rooms: RoomStage[]; stacks: PieceStack[] }>('/api/game/achieve', {
+    method: 'POST',
+    body: JSON.stringify({ spaceId }),
   })
 
 export const openBox = (boxId: string) =>

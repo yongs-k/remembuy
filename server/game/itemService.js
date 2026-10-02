@@ -35,111 +35,189 @@ export function getDex(db, userId) {
 }
 
 export const GRADES = ['COMMON', 'ADVANCED', 'RARE', 'LEGENDARY']
-/** Puzzle pieces per grade per 장소; owning all four completes the stage (e.g. 일반 욕실). */
+/** Pieces of a 장소's current grade needed to press 달성 (e.g. 일반 욕실). */
 export const STAGE_SIZE = 4
-/** Duplicate pieces of one grade that 조합 turns into one piece of the next grade. */
+/** Pieces of one grade that 조합 turns into one piece of the next grade. */
 export const COMBINE_COST = 10
-
-const owned = (pieces) => pieces.filter((n) => n > 0).length
-
-/** Piece counts per 장소 and grade: { [spaceId]: { [grade]: [n0, n1, n2, n3] } }. */
-function pieceTable(db, userId) {
-  const table = {}
-  for (const row of plain(db.prepare('SELECT space_id, grade, slot, count FROM user_room_pieces WHERE user_id = ?').all(userId))) {
-    const byGrade = (table[row.space_id] ??= {})
-    const pieces = (byGrade[row.grade] ??= [0, 0, 0, 0])
-    if (row.slot >= 0 && row.slot < STAGE_SIZE) pieces[row.slot] = row.count
-  }
-  return table
-}
+/** 자동 넣기 only draws from stacks at least this tall; smaller ones need picking by hand. */
+export const AUTO_MIN_STACK = 4
 
 /**
- * Each 장소's stage: the first grade with a missing piece (null once 전설 is complete).
- * `pieces` are that grade's four slot counts, `count` how many slots are owned.
+ * Each 장소's stage: the grade it is collecting (null once 전설 is achieved) and
+ * `count`, the pieces of that grade gathered so far (the tile's +N; no upper limit).
  */
 export function getRoomStages(db, userId) {
   const spaces = plain(db.prepare('SELECT id FROM spaces WHERE active = 1 ORDER BY sort, id').all())
-  const table = pieceTable(db, userId)
+  const rows = Object.fromEntries(
+    plain(db.prepare('SELECT space_id, grade, count FROM user_room_stage WHERE user_id = ?').all(userId)).map((row) => [
+      row.space_id,
+      row,
+    ])
+  )
   return spaces.map(({ id }) => {
-    const piecesOf = (grade) => table[id]?.[grade] ?? [0, 0, 0, 0]
-    const stage = GRADES.find((grade) => owned(piecesOf(grade)) < STAGE_SIZE) ?? null
-    const pieces = piecesOf(stage ?? 'LEGENDARY')
+    const row = rows[id] ?? { grade: 'COMMON', count: 0 }
+    const stage = GRADES.includes(row.grade) ? row.grade : null
     return {
       spaceId: id,
       stage,
-      pieces,
-      count: owned(pieces),
-      completedGrades: GRADES.filter((grade) => owned(piecesOf(grade)) === STAGE_SIZE),
+      count: stage ? row.count : 0,
+      completedGrades: GRADES.slice(0, stage ? GRADES.indexOf(stage) : GRADES.length),
     }
   })
 }
 
-/** Spare copies per grade across every 장소 (a piece's first copy is never spare). */
-export function getDuplicates(db, userId) {
-  const duplicates = Object.fromEntries(GRADES.map((grade) => [grade, 0]))
-  for (const row of plain(db.prepare('SELECT grade, count FROM user_room_pieces WHERE user_id = ?').all(userId))) {
-    if (row.grade in duplicates) duplicates[row.grade] += Math.max(0, row.count - 1)
-  }
-  return duplicates
+/**
+ * Every pile of pieces the user can put into 조합: a 장소's stage pieces (source
+ * 'stage') and pieces kept aside because their grade wasn't that 장소's stage ('stock').
+ */
+export function getStacks(db, userId) {
+  const stage = getRoomStages(db, userId)
+    .filter((room) => room.stage && room.count > 0)
+    .map((room) => ({ spaceId: room.spaceId, grade: room.stage, source: 'stage', count: room.count }))
+  const stock = plain(
+    db.prepare('SELECT space_id, grade, count FROM user_piece_stock WHERE user_id = ? AND count > 0 ORDER BY grade, space_id').all(userId)
+  ).map((row) => ({ spaceId: row.space_id, grade: row.grade, source: 'stock', count: row.count }))
+  return [...stage, ...stock]
 }
 
-/** Adds one piece and says what it did to that 장소's stage. */
-function addPiece(db, userId, spaceId, grade, slot) {
-  const before = pieceTable(db, userId)[spaceId]?.[grade] ?? [0, 0, 0, 0]
+function addToStock(db, userId, spaceId, grade, n) {
   db.prepare(
-    `INSERT INTO user_room_pieces (user_id, space_id, grade, slot, count) VALUES (?, ?, ?, ?, 1)
-     ON CONFLICT (user_id, space_id, grade, slot) DO UPDATE SET count = count + 1`
-  ).run(userId, spaceId, grade, slot)
-  const after = before.map((n, i) => (i === slot ? n + 1 : n))
-  return {
-    spaceId,
-    grade,
-    slot,
-    copies: after[slot],
-    pieces: after,
-    count: owned(after),
-    // Only the piece that fills the last gap completes the stage.
-    completed: before[slot] === 0 && owned(after) === STAGE_SIZE,
-  }
+    `INSERT INTO user_piece_stock (user_id, space_id, grade, count) VALUES (?, ?, ?, ?)
+     ON CONFLICT (user_id, space_id, grade) DO UPDATE SET count = count + excluded.count`
+  ).run(userId, spaceId, grade, n)
+  return db.prepare('SELECT count FROM user_piece_stock WHERE user_id = ? AND space_id = ? AND grade = ?').get(userId, spaceId, grade).count
 }
 
 /**
- * 조합: ten spare pieces of one grade become one piece of the next grade. It goes to a
- * 장소 still missing that grade (one already working on it first), into an empty slot.
+ * One piece arrives: it counts toward the 장소's stage when it is that grade (+1),
+ * otherwise it is kept for 조합.
  */
-export function combinePieces(db, userId, grade, randomFn = Math.random) {
+function addPiece(db, userId, spaceId, grade, slot) {
+  const room = getRoomStages(db, userId).find((r) => r.spaceId === spaceId)
+  if (room && room.stage === grade) {
+    db.prepare(
+      `INSERT INTO user_room_stage (user_id, space_id, grade, count) VALUES (?, ?, ?, 1)
+       ON CONFLICT (user_id, space_id) DO UPDATE SET count = count + 1`
+    ).run(userId, spaceId, grade)
+    const count = room.count + 1
+    return { spaceId, grade, slot, source: 'stage', count, ready: count >= STAGE_SIZE }
+  }
+  return { spaceId, grade, slot, source: 'stock', count: addToStock(db, userId, spaceId, grade, 1), ready: false }
+}
+
+/** 달성: spend four pieces of the 장소's grade and move on to the next grade (its title is earned). */
+export function achieveStage(db, userId, spaceId) {
+  return transaction(db, () => {
+    const room = getRoomStages(db, userId).find((r) => r.spaceId === spaceId)
+    if (!room) throw new Error('space not found')
+    if (!room.stage || room.count < STAGE_SIZE) throw new Error('not ready')
+    // Pieces past the four stay, as 조합 material.
+    const leftover = room.count - STAGE_SIZE
+    if (leftover > 0) addToStock(db, userId, spaceId, room.stage, leftover)
+    const next = GRADES[GRADES.indexOf(room.stage) + 1] ?? 'DONE'
+    db.prepare(
+      `INSERT INTO user_room_stage (user_id, space_id, grade, count) VALUES (?, ?, ?, 0)
+       ON CONFLICT (user_id, space_id) DO UPDATE SET grade = excluded.grade, count = 0`
+    ).run(userId, spaceId, next)
+    return { achieved: { spaceId, grade: room.stage }, rooms: getRoomStages(db, userId), stacks: getStacks(db, userId) }
+  })
+}
+
+/** Weighted FRAGMENT entries of a box (or of every box) whose item belongs to a 장소. */
+function dropEntries(db, boxId) {
+  return plain(
+    db
+      .prepare(
+        `SELECT e.item_id AS item_id, e.weight AS weight, i.room_type AS room_type, i.grade AS grade
+         FROM box_drop_entries e
+         JOIN virtual_items i ON i.id = e.item_id
+         WHERE (? IS NULL OR e.box_id = ?) AND e.active = 1 AND i.active = 1
+           AND e.result_type = 'FRAGMENT' AND i.room_type IS NOT NULL`
+      )
+      .all(boxId, boxId)
+  )
+}
+
+/**
+ * 조합: ten pieces of one grade become one random piece of the next grade.
+ * Without `picks` (자동 넣기) the ten come from stacks of at least four, tallest first;
+ * `picks` ([{ spaceId, source, count }]) choose them by hand.
+ */
+export function combinePieces(db, userId, grade, picks, randomFn = Math.random, nowIso = new Date().toISOString()) {
   const index = GRADES.indexOf(grade)
   if (index < 0 || index === GRADES.length - 1) throw new Error('invalid grade')
   const next = GRADES[index + 1]
   return transaction(db, () => {
-    if (getDuplicates(db, userId)[grade] < COMBINE_COST) throw new Error('not enough duplicates')
-    // Spend from the most-duplicated pieces first; never a piece's last copy.
-    let left = COMBINE_COST
-    const rows = plain(
-      db
-        .prepare('SELECT space_id, slot, count FROM user_room_pieces WHERE user_id = ? AND grade = ? AND count > 1 ORDER BY count DESC, space_id, slot')
-        .all(userId, grade)
-    )
-    const spend = db.prepare('UPDATE user_room_pieces SET count = count - ? WHERE user_id = ? AND space_id = ? AND grade = ? AND slot = ?')
-    for (const row of rows) {
-      if (left === 0) break
-      const take = Math.min(left, row.count - 1)
-      spend.run(take, userId, row.space_id, grade, row.slot)
-      left -= take
+    const stacks = getStacks(db, userId).filter((stack) => stack.grade === grade)
+    const find = (spaceId, source) => stacks.find((stack) => stack.spaceId === spaceId && stack.source === source)
+    let take
+    if (picks === undefined) {
+      take = []
+      let left = COMBINE_COST
+      for (const stack of [...stacks].filter((s) => s.count >= AUTO_MIN_STACK).sort((a, b) => b.count - a.count)) {
+        if (left === 0) break
+        const n = Math.min(left, stack.count)
+        take.push({ spaceId: stack.spaceId, source: stack.source, count: n })
+        left -= n
+      }
+      if (left > 0) throw new Error('not enough pieces')
+    } else {
+      const valid =
+        Array.isArray(picks) &&
+        picks.every(
+          (p) => p && typeof p.spaceId === 'string' && (p.source === 'stage' || p.source === 'stock') && Number.isInteger(p.count) && p.count > 0
+        ) &&
+        picks.reduce((sum, p) => sum + p.count, 0) === COMBINE_COST
+      if (!valid) throw new Error('invalid picks')
+      for (const p of picks) {
+        const stack = find(p.spaceId, p.source)
+        const already = picks.filter((q) => q.spaceId === p.spaceId && q.source === p.source).reduce((sum, q) => sum + q.count, 0)
+        if (!stack || already > stack.count) throw new Error('not enough pieces')
+      }
+      take = picks
+    }
+    for (const p of take) {
+      const table = p.source === 'stage' ? 'user_room_stage' : 'user_piece_stock'
+      db.prepare(`UPDATE ${table} SET count = count - ? WHERE user_id = ? AND space_id = ? AND grade = ?`).run(
+        p.count,
+        userId,
+        p.spaceId,
+        grade
+      )
     }
 
-    const rooms = getRoomStages(db, userId)
-    const table = pieceTable(db, userId)
-    const missing = (spaceId) => (table[spaceId]?.[next] ?? [0, 0, 0, 0]).flatMap((n, i) => (n === 0 ? [i] : []))
-    const working = rooms.filter((room) => room.stage === next)
-    const lacking = rooms.filter((room) => missing(room.spaceId).length > 0)
-    const pool = working.length ? working : lacking.length ? lacking : rooms
-    const room = pool[Math.min(pool.length - 1, Math.floor(randomFn() * pool.length))]
-    const gaps = missing(room.spaceId)
-    const slot = gaps.length ? gaps[Math.min(gaps.length - 1, Math.floor(randomFn() * gaps.length))] : Math.floor(randomFn() * STAGE_SIZE) % STAGE_SIZE
-    const piece = addPiece(db, userId, room.spaceId, next, slot)
-    return { piece, duplicates: getDuplicates(db, userId) }
+    const pool = dropEntries(db, null).filter((e) => e.grade === next)
+    if (pool.length === 0) throw new Error('nothing to draw')
+    const picked = pickWeighted(pool, randomFn)
+    const slot = Math.min(STAGE_SIZE - 1, Math.floor(randomFn() * STAGE_SIZE))
+    const item = { ...db.prepare('SELECT id, name, grade, fragments_required, room_type FROM virtual_items WHERE id = ?').get(picked.item_id) }
+    const piece = addPiece(db, userId, item.room_type, next, slot)
+    giveItemFragment(db, userId, item, nowIso)
+    return { piece, itemName: item.name, rooms: getRoomStages(db, userId), stacks: getStacks(db, userId) }
   })
+}
+
+/** The 아이템 수집함 side of a draw: the item gains a fragment and may complete. */
+function giveItemFragment(db, userId, item, nowIso) {
+  const status = itemStatus(db, userId, item.id)
+  const before = fragmentCount(db, userId, item.id)
+  db.prepare(
+    `INSERT INTO user_item_fragments (user_id, item_id, count) VALUES (?, ?, 1)
+     ON CONFLICT (user_id, item_id) DO UPDATE SET count = count + 1`
+  ).run(userId, item.id)
+  if (status === 'COMPLETE') return
+  const { justCompleted } = applyFragment(before, item.fragments_required)
+  if (justCompleted) {
+    db.prepare(
+      `INSERT INTO user_items (user_id, item_id, status, completed_at) VALUES (?, ?, 'COMPLETE', ?)
+       ON CONFLICT (user_id, item_id) DO UPDATE SET status = 'COMPLETE', completed_at = excluded.completed_at`
+    ).run(userId, item.id, nowIso)
+  } else if (status === 'LOCKED') {
+    db.prepare("INSERT INTO user_items (user_id, item_id, status, completed_at) VALUES (?, ?, 'COLLECTING', NULL)").run(
+      userId,
+      item.id
+    )
+  }
 }
 
 export function getBoxes(db) {
@@ -187,51 +265,15 @@ function openBoxIn(db, userId, box, nowIso, randomFn, cost) {
     ).run(userId, -cost, boxId, nowIso)
   }
 
-  // A 장소 at random among those whose current stage has something to drop; then an
-  // item of that 장소 and grade, weighted by the box's FRAGMENT entries (admin-tunable).
-  const entries = plain(
-    db
-      .prepare(
-        `SELECT e.item_id AS item_id, e.weight AS weight, i.room_type AS room_type, i.grade AS grade
-         FROM box_drop_entries e
-         JOIN virtual_items i ON i.id = e.item_id
-         WHERE e.box_id = ? AND e.active = 1 AND i.active = 1 AND e.result_type = 'FRAGMENT'`
-      )
-      .all(boxId)
-  )
-  const open = getRoomStages(db, userId)
-    .map((room) => ({ room, pool: entries.filter((e) => e.room_type === room.spaceId && e.grade === room.stage) }))
-    .filter(({ room, pool }) => room.stage && pool.length > 0)
-  if (open.length === 0) throw new Error('nothing to draw')
-  const { room, pool } = open[Math.min(open.length - 1, Math.floor(randomFn() * open.length))]
+  // Any grade can drop, weighted by the box's FRAGMENT entries (admin-tunable); the
+  // item decides the 장소. The slot only picks which puzzle shape is shown.
+  const pool = dropEntries(db, boxId)
+  if (pool.length === 0) throw new Error('nothing to draw')
   const picked = pickWeighted(pool, randomFn)
   const item = { ...db.prepare('SELECT id, name, grade, fragments_required, room_type FROM virtual_items WHERE id = ?').get(picked.item_id) }
-
-  // One of the stage's four pieces at random: owned ones come again as duplicates.
   const slot = Math.min(STAGE_SIZE - 1, Math.floor(randomFn() * STAGE_SIZE))
-  const piece = addPiece(db, userId, room.spaceId, room.stage, slot)
-
-  // The item gets the fragment too, for the 아이템 수집함.
-  const status = itemStatus(db, userId, item.id)
-  const before = fragmentCount(db, userId, item.id)
-  db.prepare(
-    `INSERT INTO user_item_fragments (user_id, item_id, count) VALUES (?, ?, 1)
-     ON CONFLICT (user_id, item_id) DO UPDATE SET count = count + 1`
-  ).run(userId, item.id)
-  if (status !== 'COMPLETE') {
-    const { justCompleted } = applyFragment(before, item.fragments_required)
-    if (justCompleted) {
-      db.prepare(
-        `INSERT INTO user_items (user_id, item_id, status, completed_at) VALUES (?, ?, 'COMPLETE', ?)
-         ON CONFLICT (user_id, item_id) DO UPDATE SET status = 'COMPLETE', completed_at = excluded.completed_at`
-      ).run(userId, item.id, nowIso)
-    } else if (status === 'LOCKED') {
-      db.prepare(
-        "INSERT INTO user_items (user_id, item_id, status, completed_at) VALUES (?, ?, 'COLLECTING', NULL)"
-      ).run(userId, item.id)
-    }
-  }
-
+  const piece = addPiece(db, userId, item.room_type, item.grade, slot)
+  giveItemFragment(db, userId, item, nowIso)
 
   return {
     result: { type: 'FRAGMENT', itemId: item.id, itemName: item.name, grade: item.grade },
