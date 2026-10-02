@@ -1,28 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { roomFragments } from './gameProgress'
-import type { DexEntry } from '../lib/gameApi'
+import { earnedTitles } from './gameProgress'
+import type { GameState } from '../lib/gameApi'
 
-const entry = (id: string, roomType: string | null, fragmentCount: number, status: DexEntry['status'] = 'COLLECTING'): DexEntry => ({
-  id,
-  name: id,
-  grade: 'COMMON',
-  fragmentsRequired: 10,
-  roomType,
-  status,
-  fragmentCount,
-})
-
-describe('roomFragments', () => {
-  it('sums fragments and completed items per 장소, skipping room-less items', () => {
-    const result = roomFragments([
-      entry('a', 'bathroom', 3),
-      entry('b', 'bathroom', 10, 'COMPLETE'),
-      entry('c', 'kitchen', 0, 'LOCKED'),
-      entry('d', null, 5),
+describe('earnedTitles', () => {
+  it('lists grade titles (newest grade first) before record titles', () => {
+    const state = {
+      points: 0,
+      spaces: [],
+      benefits: [],
+      titles: [{ spaceId: 'kitchen', tierCode: 'SPROUT', earnedAt: '2026-10-01' }],
+    } as GameState
+    const rooms = [{ spaceId: 'bathroom', stage: 'RARE', count: 1, completedGrades: ['COMMON', 'ADVANCED'] }]
+    expect(earnedTitles(state, rooms)).toEqual([
+      { key: 'grade:bathroom:ADVANCED', label: '고급 욕실' },
+      { key: 'grade:bathroom:COMMON', label: '일반 욕실' },
+      { key: 'kitchen:SPROUT', label: '주방 새싹' },
     ])
-    expect(result).toEqual({
-      bathroom: { fragments: 13, completed: 1, total: 2, progress: 0.65 },
-      kitchen: { fragments: 0, completed: 0, total: 1, progress: 0 },
-    })
   })
 })

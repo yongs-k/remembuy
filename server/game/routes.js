@@ -1,5 +1,5 @@
 import { getCatalog, getState, claimSlots, getHistory } from './service.js'
-import { getBoxes, getDex, openBox, getAttendance, claimAttendance } from './itemService.js'
+import { getBoxes, getDex, getRoomStages, openBox, getAttendance, claimAttendance } from './itemService.js'
 import { getQuests, claimQuest } from './quests.js'
 
 const DEVICE_ID = /^[A-Za-z0-9-]{8,64}$/
@@ -107,13 +107,14 @@ export async function handleGameRequest(req, res, db) {
       } catch (error) {
         if (error.message === 'already claimed') sendJson(res, 409, { error: error.message })
         else if (error.message === 'box not found') sendJson(res, 400, { error: error.message })
+        else if (error.message === 'nothing to draw') sendJson(res, 409, { error: error.message })
         else throw error
       }
       return
     }
 
     if (route === 'GET /api/game/dex') {
-      sendJson(res, 200, { items: getDex(db, deviceId) })
+      sendJson(res, 200, { items: getDex(db, deviceId), rooms: getRoomStages(db, deviceId) })
       return
     }
 
@@ -124,6 +125,8 @@ export async function handleGameRequest(req, res, db) {
       } catch (error) {
         if (error.message === 'box not found' || error.message === 'insufficient points') {
           sendJson(res, 400, { error: error.message })
+        } else if (error.message === 'nothing to draw') {
+          sendJson(res, 409, { error: error.message })
         } else {
           throw error
         }

@@ -14,7 +14,7 @@ test('adminListItems returns every item including inactive ones', () => {
   const db = openDb(':memory:')
   db.prepare("UPDATE virtual_items SET active = 0 WHERE id = 'item-basin-basic'").run()
   const items = adminListItems(db)
-  assert.equal(items.length, 50)
+  assert.equal(items.length, 59)
   const basin = items.find((i) => i.id === 'item-basin-basic')
   assert.equal(basin.active, false)
   assert.deepEqual(Object.keys(basin).sort(), ['active', 'fragmentsRequired', 'grade', 'id', 'name'].sort())
@@ -61,7 +61,7 @@ test('adminUpdateBox throws for an unknown id', () => {
 test('adminListDropEntries returns every entry with the item name joined', () => {
   const db = openDb(':memory:')
   const entries = adminListDropEntries(db)
-  assert.equal(entries.length, 100)
+  assert.equal(entries.length, 118)
   const first = entries[0]
   assert.deepEqual(
     Object.keys(first).sort(),

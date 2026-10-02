@@ -41,6 +41,25 @@ describe('BoxOpenResultModal', () => {
     expect(screen.getByText('골드 거울')).toBeInTheDocument()
   })
 
+  it('shows the 장소 stage, and the next grade once the stage completes', () => {
+    const room = { spaceId: 'bathroom', grade: 'COMMON', count: 2, completed: false }
+    const { unmount } = render(
+      <BoxOpenResultModal result={{ ...FRAGMENT_RESULT, room }} onClose={() => {}} onViewDex={() => {}} />
+    )
+    expect(screen.getByText('욕실 조각을 얻었어요!')).toBeInTheDocument()
+    expect(screen.getByText(/일반 욕실 조각 2 \/ 4/)).toBeInTheDocument()
+    unmount()
+    render(
+      <BoxOpenResultModal
+        result={{ ...FRAGMENT_RESULT, room: { ...room, count: 4, completed: true } }}
+        onClose={() => {}}
+        onViewDex={() => {}}
+      />
+    )
+    expect(screen.getByText('일반 욕실 완성!')).toBeInTheDocument()
+    expect(screen.getByText(/이제 고급 조각이 나와요/)).toBeInTheDocument()
+  })
+
   it('calls onClose from the backdrop and the 닫기 button, and onViewDex from 아이템 수집함 보기', () => {
     const onClose = vi.fn()
     const onViewDex = vi.fn()

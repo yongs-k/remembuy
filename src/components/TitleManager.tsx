@@ -1,20 +1,19 @@
 import { useState } from 'react'
 import { useGame } from '../state/GameContext'
-import { LOCATIONS } from '../data/locations'
-import { tierName, useMainTitle } from '../state/gameProgress'
+import { earnedTitles, placeName, tierName, useMainTitle } from '../state/gameProgress'
+import { gradeColor, gradeLabel } from '../data/gradeColors'
 import { Icon } from '../data/materialIcons'
 import { Sheet } from './Sheet'
 
 /** 칭호 관리: the 대표 칭호 on top of 컬렉션, and a sheet to pick it and see the next ones. */
 export function TitleManager() {
-  const { state } = useGame()
-  const [mainTitle, setMainTitle] = useMainTitle(state)
+  const { state, rooms } = useGame()
+  const earned = earnedTitles(state, rooms)
+  const [mainTitle, setMainTitle] = useMainTitle(earned)
   const [open, setOpen] = useState(false)
   if (!state) return null
 
-  const placeName = (spaceId: string) => LOCATIONS.find((location) => location.id === spaceId)?.name ?? spaceId
   const label = (spaceId: string, tierCode: string) => `${placeName(spaceId)} ${tierName(tierCode)}`
-  const earned = [...state.titles].sort((a, b) => b.earnedAt.localeCompare(a.earnedAt))
   const upcoming = state.spaces
     .filter((space) => space.nextTier && space.total > 0)
     .sort((a, b) => a.percentToNext - b.percentToNext)
@@ -31,11 +30,11 @@ export function TitleManager() {
         <p className="flex items-center gap-1 font-heading text-headline-md text-tertiary-fixed-dim">
           <Icon name="workspace_premium" className="text-[22px]" />
           <span className="truncate">
-            {mainTitle ? label(mainTitle.spaceId, mainTitle.tierCode) : earned.length ? '골라보세요' : '아직 없어요'}
+            {mainTitle ? mainTitle.label : earned.length ? '골라보세요' : '아직 없어요'}
           </span>
         </p>
         <p className="text-body-sm text-inverse-on-surface/70">
-          받은 칭호 {earned.length}개 · 직접 기록한 상품으로 장소를 25% 채울 때마다 받아요
+          받은 칭호 {earned.length}개 · 장소 등급을 올리거나 기록을 25% 채우면 받아요
         </p>
       </div>
       <button
@@ -54,34 +53,56 @@ export function TitleManager() {
           <h3 className="text-label-md text-inverse-on-surface/70">받은 칭호 · 눌러서 대표로</h3>
           {earned.length === 0 ? (
             <p className="text-body-sm text-inverse-on-surface/70">
-              직접 기록한 상품으로 장소를 25% 채우면 첫 칭호를 받아요. 예시 상품은 세지 않아요.
+              상자에서 한 장소의 조각 4개를 모으면 등급 칭호(예: 일반 욕실)를, 직접 기록한 상품으로 장소를 25% 채우면 기록 칭호(예: 욕실 새싹)를 받아요.
             </p>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {earned.map((title) => {
-                const selected = mainTitle?.spaceId === title.spaceId && mainTitle.tierCode === title.tierCode
+                const selected = mainTitle?.key === title.key
                 return (
                   <button
-                    key={`${title.spaceId}:${title.tierCode}`}
+                    key={title.key}
                     type="button"
                     aria-pressed={selected}
-                    onClick={() => setMainTitle(selected ? null : `${title.spaceId}:${title.tierCode}`)}
+                    onClick={() => setMainTitle(selected ? null : title.key)}
                     className={`min-h-9 rounded-full px-3 text-label-md transition-colors ${
                       selected
                         ? 'bg-tertiary-fixed-dim text-on-tertiary-fixed'
                         : 'border border-inverse-on-surface/20 hover:bg-inverse-on-surface/10'
                     }`}
                   >
-                    {label(title.spaceId, title.tierCode)}
+                    {title.label}
                   </button>
                 )
               })}
             </div>
           )}
 
+          {rooms.some((room) => room.stage) && (
+            <>
+              <h3 className="pt-2 text-label-md text-inverse-on-surface/70">다음 등급 · 조각 4개면 올라가요</h3>
+              <ul className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-body-sm">
+                {rooms
+                  .filter((room) => room.stage)
+                  .map((room) => (
+                    <li key={room.spaceId} className="flex items-baseline justify-between gap-2">
+                      <span className="truncate">
+                        {/* The grade's swatch reads on espresso; its paper text colour would not. */}
+                        <span className="font-bold" style={{ color: gradeColor(room.stage!).hex }}>
+                          {gradeLabel(room.stage!)}
+                        </span>{' '}
+                        {placeName(room.spaceId)}
+                      </span>
+                      <span className="shrink-0 tabular-nums text-inverse-on-surface/70">{room.count}/4</span>
+                    </li>
+                  ))}
+              </ul>
+            </>
+          )}
+
           {upcoming.length > 0 && (
             <>
-              <h3 className="pt-2 text-label-md text-inverse-on-surface/70">다음 칭호</h3>
+              <h3 className="pt-2 text-label-md text-inverse-on-surface/70">다음 기록 칭호</h3>
               <ul className="space-y-2">
                 {upcoming.map((space) => (
                   <li key={space.spaceId} className="space-y-1">

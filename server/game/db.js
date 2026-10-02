@@ -128,6 +128,14 @@ CREATE TABLE IF NOT EXISTS user_items (
   completed_at TEXT,
   PRIMARY KEY (user_id, item_id)
 );
+-- 장소 stages: 4 fragments of a grade complete it (e.g. 일반 욕실) and open the next grade.
+CREATE TABLE IF NOT EXISTS user_room_fragments (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  space_id TEXT NOT NULL,
+  grade TEXT NOT NULL,
+  count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, space_id, grade)
+);
 -- Quest rewards claimed; period is 'once' or the KST day for daily quests.
 CREATE TABLE IF NOT EXISTS quest_claims (
   user_id TEXT NOT NULL REFERENCES users(id),
@@ -177,38 +185,47 @@ const DEFAULT_ITEMS = [
   { id: 'item-kitchen-spice-rack', name: '양념 선반', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'kitchen' },
   { id: 'item-kitchen-cast-pot', name: '무쇠 냄비', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'kitchen' },
   { id: 'item-kitchen-marble-island', name: '대리석 아일랜드', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'kitchen' },
+  { id: 'item-kitchen-chef-oven', name: '셰프의 오븐', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'kitchen' },
   { id: 'item-laundry-laundry-basket', name: '빨래 바구니', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'laundry' },
   { id: 'item-laundry-drying-rack', name: '빨래 건조대', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'laundry' },
   { id: 'item-laundry-drum-washer', name: '드럼 세탁기', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'laundry' },
   { id: 'item-laundry-steam-station', name: '스팀 다림질대', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'laundry' },
+  { id: 'item-laundry-silk-styler', name: '실크 케어 스타일러', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'laundry' },
   { id: 'item-closet-wood-hanger', name: '원목 옷걸이', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'closet' },
   { id: 'item-closet-storage-box', name: '수납 박스', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'closet' },
   { id: 'item-closet-full-mirror', name: '전신 거울', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'closet' },
   { id: 'item-closet-walk-in', name: '워크인 드레스룸', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'closet' },
+  { id: 'item-closet-heritage-trunk', name: '헤리티지 트렁크', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'closet' },
   { id: 'item-vanity-brush-set', name: '메이크업 브러시', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'vanity' },
   { id: 'item-vanity-acrylic-case', name: '아크릴 정리함', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'vanity' },
   { id: 'item-vanity-lit-mirror', name: '조명 거울', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'vanity' },
   { id: 'item-vanity-antique-vanity', name: '앤틱 화장대', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'vanity' },
+  { id: 'item-vanity-crystal-perfume', name: '크리스탈 향수 컬렉션', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'vanity' },
   { id: 'item-bedroom-linen-pillow', name: '린넨 베개', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bedroom' },
   { id: 'item-bedroom-mood-lamp', name: '무드등', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'bedroom' },
   { id: 'item-bedroom-hotel-bedding', name: '호텔 침구 세트', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'bedroom' },
   { id: 'item-bedroom-canopy-bed', name: '캐노피 침대', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'bedroom' },
+  { id: 'item-bedroom-suite-bed', name: '스위트 킹 침대', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'bedroom' },
   { id: 'item-livingroom-cushion', name: '쿠션', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'livingroom' },
   { id: 'item-livingroom-rug', name: '러그', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'livingroom' },
   { id: 'item-livingroom-floor-lamp', name: '플로어 스탠드', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'livingroom' },
   { id: 'item-livingroom-leather-sofa', name: '가죽 소파', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'livingroom' },
+  { id: 'item-livingroom-grand-piano', name: '그랜드 피아노', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'livingroom' },
   { id: 'item-entrance-umbrella-stand', name: '우산꽂이', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'entrance' },
   { id: 'item-entrance-door-mat', name: '현관 매트', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'entrance' },
   { id: 'item-entrance-shoe-bench', name: '슈즈 벤치', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'entrance' },
   { id: 'item-entrance-shoe-cabinet', name: '원목 신발장', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'entrance' },
+  { id: 'item-entrance-marble-foyer', name: '대리석 현관', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'entrance' },
   { id: 'item-medicine-first-aid', name: '구급 파우치', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'medicine' },
   { id: 'item-medicine-thermometer', name: '체온계', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'medicine' },
   { id: 'item-medicine-pill-organizer', name: '약 정리함', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'medicine' },
   { id: 'item-medicine-antique-cabinet', name: '앤틱 약장', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'medicine' },
+  { id: 'item-medicine-master-apothecary', name: '명의의 약상자', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'medicine' },
   { id: 'item-car-diffuser', name: '차량용 방향제', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'car' },
   { id: 'item-car-cushion', name: '차량용 쿠션', grade: 'COMMON', fragmentsRequired: 10, fragmentWeight: 40, roomType: 'car' },
   { id: 'item-car-trunk-organizer', name: '트렁크 정리함', grade: 'ADVANCED', fragmentsRequired: 15, fragmentWeight: 25, roomType: 'car' },
   { id: 'item-car-leather-seat', name: '가죽 시트 커버', grade: 'RARE', fragmentsRequired: 20, fragmentWeight: 12, roomType: 'car' },
+  { id: 'item-car-classic-key', name: '클래식카 키', grade: 'LEGENDARY', fragmentsRequired: 30, fragmentWeight: 5, roomType: 'car' },
 ]
 
 const DEFAULT_BOXES = [{ id: 'box-starter', name: '시작 상자', costPoints: 500 }]

@@ -8,7 +8,7 @@ const slot = (id) => ({ id, name: id })
 const CATALOG = {
   spaces: [
     {
-      id: 'sp1',
+      id: 'bathroom',
       name: '공간1',
       groups: [{ id: 'g1', name: '그룹1', slots: ['a1', 'a2', 'a3', 'a4'].map(slot) }],
     },
@@ -121,7 +121,8 @@ test('boxes and dex endpoints respond', async () => {
     assert.equal(boxes.boxes.length, 1)
     assert.equal(boxes.boxes[0].id, 'box-starter')
     const dex = await (await call(base, '/api/game/dex')).json()
-    assert.equal(dex.items.length, 50)
+    assert.equal(dex.items.length, 59)
+    assert.deepEqual(dex.rooms, [{ spaceId: 'bathroom', stage: 'COMMON', count: 0, completedGrades: [] }])
     assert.ok(dex.items.every((item) => item.status === 'LOCKED'))
   } finally {
     await close()
@@ -146,7 +147,7 @@ test('opening an unknown box or one that costs too much returns 400', async () =
 test('opening a box with enough points succeeds and updates the dex', async () => {
   const { base, close } = await start()
   try {
-    // this fixture's catalog has only sp1's 4 slots, so claim them all to raise points to 1200
+    // this fixture's catalog has only one space's 4 slots, so claim them all to raise points to 1200
     await call(base, '/api/game/claims', { method: 'POST', body: { slotIds: ['a1', 'a2', 'a3', 'a4'] } })
     const opened = await call(base, '/api/game/boxes/box-starter/open', { method: 'POST' })
     assert.equal(opened.status, 200)

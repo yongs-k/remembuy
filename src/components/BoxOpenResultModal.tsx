@@ -1,5 +1,6 @@
 import { Icon } from '../data/materialIcons'
-import { gradeColor, gradeLabel } from '../data/gradeColors'
+import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
+import { STAGE_SIZE, placeName } from '../state/gameProgress'
 import type { OpenBoxResult } from '../lib/gameApi'
 import { Sheet } from './Sheet'
 
@@ -55,7 +56,10 @@ export function BoxOpenResultModal({
   onViewDex: () => void
 }) {
   const color = gradeColor(result.result.grade)
-  const completed = result.result.type === 'FULL_ITEM' || result.dexEntry.status === 'COMPLETE'
+  const room = result.room
+  // With a 장소 stage, "completed" means the stage (e.g. 일반 욕실); otherwise the item.
+  const completed = room ? room.completed : result.result.type === 'FULL_ITEM' || result.dexEntry.status === 'COMPLETE'
+  const nextGrade = room && GRADE_ORDER[GRADE_ORDER.indexOf(room.grade as (typeof GRADE_ORDER)[number]) + 1]
   const percent = Math.min(
     100,
     Math.round((result.dexEntry.fragmentCount / result.dexEntry.fragmentsRequired) * 100)
@@ -76,12 +80,37 @@ export function BoxOpenResultModal({
 
         <div className="box-open-text space-y-1 text-center">
           <h2 id="box-result-title" className="font-heading text-headline-md">
-            {completed ? '아이템을 완성했어요!' : '조각을 획득했어요!'}
+            {room
+              ? completed
+                ? `${gradeLabel(room.grade)} ${placeName(room.spaceId)} 완성!`
+                : `${placeName(room.spaceId)} 조각을 얻었어요!`
+              : completed
+                ? '아이템을 완성했어요!'
+                : '조각을 획득했어요!'}
           </h2>
           <p className="text-body-md text-inverse-on-surface/70">{result.result.itemName}</p>
         </div>
 
-        {!completed && (
+        {room && (
+          <div className="box-open-text space-y-1.5">
+            <div className="mx-auto grid w-16 grid-cols-2 gap-1" aria-hidden>
+              {/* Clockwise from top-left, like the 장소 tile. */}
+              {[0, 1, 3, 2].map((piece) => (
+                <span
+                  key={piece}
+                  className="aspect-square rounded-sm"
+                  style={{ backgroundColor: piece < room.count ? gradeColor(room.grade).hex : 'rgb(255 255 255 / 0.15)' }}
+                />
+              ))}
+            </div>
+            <p className="text-center text-label-sm tabular-nums text-inverse-on-surface/70">
+              {gradeLabel(room.grade)} {placeName(room.spaceId)} 조각 {room.count} / {STAGE_SIZE}
+              {completed && (nextGrade ? ` · 이제 ${gradeLabel(nextGrade)} 조각이 나와요` : ' · 전설까지 모두 모았어요')}
+            </p>
+          </div>
+        )}
+
+        {!room && !completed && (
           <div className="box-open-text space-y-1">
             <div className="h-2 w-full overflow-hidden rounded-full bg-inverse-on-surface/15">
               <div className="h-full rounded-full bg-tertiary-fixed-dim" style={{ width: `${percent}%` }} />

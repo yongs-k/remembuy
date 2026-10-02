@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { openDb, transaction, migrate } from './db.js'
-import { getDex, getBoxes, openBox, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
+import { getDex, getBoxes, openBox, getRoomStages, getAttendance, claimAttendance, attendanceDay } from './itemService.js'
 
 const DEVICE = 'device-aaaa1111'
 const NOW = new Date('2026-09-22T00:00:00.000Z')
@@ -29,7 +29,7 @@ test('getBoxes and getDex are read-only and never create a user', () => {
   assert.equal(boxes.length, 1)
   assert.deepEqual(boxes[0], { id: 'box-starter', name: '시작 상자', costPoints: 500 })
   const dex = getDex(db, DEVICE)
-  assert.equal(dex.length, 50)
+  assert.equal(dex.length, 59)
   assert.ok(dex.every((entry) => entry.roomType))
   assert.ok(dex.every((entry) => entry.status === 'LOCKED' && entry.fragmentCount === 0))
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM users').get().n, 0)
@@ -63,48 +63,47 @@ test('a fragment result increments the count without completing early', () => {
   assert.equal(dex.fragmentCount, 1)
 })
 
-test('the 10th fragment completes a 10-fragment item exactly once', () => {
-  const db = freshDbWithPoints(5500)
-  for (let i = 0; i < 9; i++) {
-    const r = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-    assert.equal(r.dexEntry.status, 'COLLECTING')
-  }
-  const tenth = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-  assert.equal(tenth.dexEntry.status, 'COMPLETE')
-  assert.equal(tenth.dexEntry.fragmentCount, 10)
-  const eleventh = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-  assert.equal(eleventh.result.type, 'FRAGMENT')
-  assert.equal(eleventh.dexEntry.status, 'COMPLETE')
-  assert.equal(eleventh.dexEntry.fragmentCount, 11)
-})
-
-test('a FULL_ITEM result completes an item immediately, skipping COLLECTING', () => {
+test('four fragments complete a 장소 stage and open the next grade', () => {
   const db = freshDbWithPoints(5000)
-  // The 100 drop entries for box-starter are inserted FRAGMENT,FULL_ITEM per item in
-  // DEFAULT_ITEMS order, so entry index 1 (weight-cumulative) is the FULL_ITEM row for
-  // item-basin-basic once its FRAGMENT weight (40) is exceeded. total weight = (40+25+12+5)*...
-  // simplest reliable way: pick randomFn that lands exactly on a FULL_ITEM row by using the
-  // service's own entries. Instead, assert behavior directly via a random function that always
-  // returns just past the first item's FRAGMENT share.
-  // bathroom: 4 COMMON, 4 ADVANCED, 3 RARE, 3 LEGENDARY; 9 other 장소 x (2 COMMON, 1 ADVANCED, 1 RARE); one weight-1 FULL_ITEM row each
-  const totalWeight = 4 * 40 + 4 * 25 + 3 * 12 + 3 * 5 + 9 * (2 * 40 + 25 + 12) + 50 * 1
-  const firstFragmentShare = 40 / totalWeight
-  const result = openBox(db, DEVICE, 'box-starter', NOW, () => firstFragmentShare + 1e-9)
-  assert.equal(result.result.type, 'FULL_ITEM')
-  assert.equal(result.result.itemId, 'item-basin-basic')
-  assert.equal(result.dexEntry.status, 'COMPLETE')
-  assert.equal(result.dexEntry.fragmentCount, 0)
+  // randomFn 0: the first 장소 (욕실) and its first item of the current grade.
+  for (let i = 1; i <= 3; i++) {
+    const r = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
+    assert.deepEqual(r.room, { spaceId: 'bathroom', grade: 'COMMON', count: i, completed: false })
+  }
+  const fourth = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
+  assert.deepEqual(fourth.room, { spaceId: 'bathroom', grade: 'COMMON', count: 4, completed: true })
+  const fifth = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
+  assert.equal(fifth.room.grade, 'ADVANCED')
+  assert.equal(fifth.result.grade, 'ADVANCED')
+  const bathroom = getRoomStages(db, DEVICE).find((room) => room.spaceId === 'bathroom')
+  assert.deepEqual(bathroom, { spaceId: 'bathroom', stage: 'ADVANCED', count: 1, completedGrades: ['COMMON'] })
 })
 
-test('a fragment against an already-complete item accumulates without changing status', () => {
-  const db = freshDbWithPoints(20000)
-  for (let i = 0; i < 10; i++) openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-  const afterComplete = getDex(db, DEVICE).find((d) => d.id === 'item-basin-basic')
-  assert.equal(afterComplete.status, 'COMPLETE')
-  const again = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
-  assert.equal(again.result.type, 'FRAGMENT')
-  assert.equal(again.dexEntry.status, 'COMPLETE')
-  assert.equal(again.dexEntry.fragmentCount, 11)
+test('the drawn item still collects fragments toward completion', () => {
+  const db = freshDbWithPoints(5000)
+  db.prepare("UPDATE virtual_items SET fragments_required = 2 WHERE id = 'item-basin-basic'").run()
+  assert.equal(openBox(db, DEVICE, 'box-starter', NOW, () => 0).dexEntry.status, 'COLLECTING')
+  const second = openBox(db, DEVICE, 'box-starter', NOW, () => 0)
+  assert.equal(second.dexEntry.status, 'COMPLETE')
+  assert.equal(second.dexEntry.fragmentCount, 2)
+})
+
+test('a 장소 never drops a grade above its current stage', () => {
+  const db = freshDbWithPoints(50000)
+  for (let i = 0; i < 40; i++) {
+    const r = openBox(db, DEVICE, 'box-starter', NOW, Math.random)
+    assert.equal(r.result.grade, r.room.grade)
+  }
+  for (const room of getRoomStages(db, DEVICE)) {
+    assert.ok(room.completedGrades.every((grade, i) => grade === ['COMMON', 'ADVANCED', 'RARE', 'LEGENDARY'][i]))
+  }
+})
+
+test('with nothing left to draw the open fails and spends nothing', () => {
+  const db = freshDbWithPoints(5000)
+  db.exec('UPDATE virtual_items SET active = 0')
+  assert.throws(() => openBox(db, DEVICE, 'box-starter', NOW, () => 0), /nothing to draw/)
+  assert.equal(pointsOf(db, DEVICE), 5000)
 })
 
 test('every open logs a negative ITEM_BOX_OPEN point-history row', () => {
@@ -151,7 +150,7 @@ test('an older database gains the new 장소 items and keeps its own', () => {
   migrate(db)
   migrate(db)
   const dex = getDex(db, DEVICE)
-  assert.equal(dex.length, 50)
+  assert.equal(dex.length, 59)
   assert.equal(dex.find((d) => d.id === 'item-basin-basic').roomType, 'bathroom')
   const entries = db.prepare("SELECT COUNT(*) AS n FROM box_drop_entries WHERE item_id = 'item-car-diffuser'").get().n
   assert.equal(entries, 2)

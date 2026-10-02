@@ -100,8 +100,13 @@ export type DexEntry = {
   fragmentCount: number
 }
 
+/** A 장소's stage: 4 fragments of the current grade complete it and open the next (null when 전설 is done). */
+export type RoomStage = { spaceId: string; stage: string | null; count: number; completedGrades: string[] }
+
 export type OpenBoxResult = {
   result: { type: 'FRAGMENT' | 'FULL_ITEM'; itemId: string; itemName: string; grade: string }
+  /** The 장소 stage the fragment went to, after this open. */
+  room?: { spaceId: string; grade: string; count: number; completed: boolean }
   pointsSpent: number
   pointsBalance: number
   dexEntry: DexEntry
@@ -109,7 +114,7 @@ export type OpenBoxResult = {
 
 export const fetchBoxes = () => request<{ boxes: Box[] }>('/api/game/boxes')
 
-export const fetchDex = () => request<{ items: DexEntry[] }>('/api/game/dex')
+export const fetchDex = () => request<{ items: DexEntry[]; rooms?: RoomStage[] }>('/api/game/dex')
 
 export const openBox = (boxId: string) =>
   request<OpenBoxResult>(`/api/game/boxes/${encodeURIComponent(boxId)}/open`, { method: 'POST' })

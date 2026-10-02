@@ -2,14 +2,12 @@ import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { Icon } from '../data/materialIcons'
 import { useAttendanceBox } from './AttendanceBox'
-import { LOCATIONS } from '../data/locations'
-import { tierName, useMainTitle } from '../state/gameProgress'
+import { earnedTitles, useMainTitle } from '../state/gameProgress'
 
 export function HomeGameCard() {
-  const { state, dex, boxes, catalogError, refresh } = useGame()
+  const { state, dex, rooms, boxes, catalogError, refresh } = useGame()
   const navigate = useNavigate()
-  const [mainTitle] = useMainTitle(state)
-  const mainTitleSpace = mainTitle && LOCATIONS.find((location) => location.id === mainTitle.spaceId)
+  const [mainTitle] = useMainTitle(earnedTitles(state, rooms))
   const points = state?.points ?? 0
   const completed = dex.filter((entry) => entry.status === 'COMPLETE').length
   const cheapestBox = boxes.length ? Math.min(...boxes.map((box) => box.costPoints)) : undefined
@@ -35,7 +33,7 @@ export function HomeGameCard() {
           {mainTitle && (
             <p className="flex items-center gap-1 text-label-md text-tertiary-fixed-dim">
               <Icon name="workspace_premium" className="text-[16px]" />
-              {mainTitleSpace?.name ?? mainTitle.spaceId} {tierName(mainTitle.tierCode)}
+              {mainTitle.label}
             </p>
           )}
           <p role={catalogError ? 'alert' : undefined} className="text-body-sm text-inverse-on-surface/70">

@@ -1,5 +1,7 @@
-import type { DexEntry, GameState } from '../lib/gameApi'
+import type { GameState, RoomStage } from '../lib/gameApi'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { LOCATIONS } from '../data/locations'
+import { gradeLabel } from '../data/gradeColors'
 
 // Mirrors the server's default title_tiers (server/game/db.js DEFAULT_TIERS).
 export const TIER_NAMES: Record<string, string> = {
@@ -11,30 +13,36 @@ export const TIER_NAMES: Record<string, string> = {
 
 export const tierName = (code: string) => TIER_NAMES[code] ?? code
 
-/** progress: 0..1, the mean of each item's completion (a finished item counts as 1). */
-export type RoomFragments = { fragments: number; completed: number; total: number; progress: number }
+/** Fragments of one grade that complete a 장소 stage (server/game/itemService.js STAGE_SIZE). */
+export const STAGE_SIZE = 4
 
-/** 아이템 수집함 progress per 장소: fragments collected, items completed, items in the 장소. */
-export function roomFragments(dex: DexEntry[]): Record<string, RoomFragments> {
-  const byRoom: Record<string, RoomFragments> = {}
-  for (const entry of dex) {
-    if (!entry.roomType) continue
-    const room = (byRoom[entry.roomType] ??= { fragments: 0, completed: 0, total: 0, progress: 0 })
-    const done = entry.status === 'COMPLETE'
-    room.fragments += entry.fragmentCount
-    room.total += 1
-    if (done) room.completed += 1
-    // Sum for now; divided by total below.
-    room.progress += done ? 1 : Math.min(1, entry.fragmentCount / entry.fragmentsRequired)
-  }
-  for (const room of Object.values(byRoom)) room.progress /= room.total
-  return byRoom
+export const placeName = (spaceId: string) => LOCATIONS.find((location) => location.id === spaceId)?.name ?? spaceId
+
+export type EarnedTitle = { key: string; label: string }
+
+/**
+ * Every title the user holds: record titles (욕실 새싹, from real records) and
+ * grade titles (일반 욕실, from completing a 장소 stage with box fragments).
+ */
+export function earnedTitles(state: GameState | null, rooms: RoomStage[]): EarnedTitle[] {
+  const record = [...(state?.titles ?? [])]
+    .sort((a, b) => b.earnedAt.localeCompare(a.earnedAt))
+    .map((title) => ({
+      key: `${title.spaceId}:${title.tierCode}`,
+      label: `${placeName(title.spaceId)} ${tierName(title.tierCode)}`,
+    }))
+  const grade = rooms.flatMap((room) =>
+    room.completedGrades.map((code) => ({
+      key: `grade:${room.spaceId}:${code}`,
+      label: `${gradeLabel(code)} ${placeName(room.spaceId)}`,
+    }))
+  )
+  return [...grade.reverse(), ...record]
 }
 
-/** The 대표 칭호 ("spaceId:tierCode"), kept per device. Null when unset or no longer earned. */
+/** The 대표 칭호, kept per device. Null when unset or no longer held. */
 // ponytail: localStorage, so a recovery-code restore doesn't carry it; move to the server if that matters.
-export function useMainTitle(state: GameState | null) {
+export function useMainTitle(titles: EarnedTitle[]) {
   const [key, setKey] = useLocalStorage<string | null>('remembuy.mainTitle', null)
-  const earned = state?.titles.find((title) => `${title.spaceId}:${title.tierCode}` === key) ?? null
-  return [earned, setKey] as const
+  return [titles.find((title) => title.key === key) ?? null, setKey] as const
 }

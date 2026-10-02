@@ -16,12 +16,15 @@ import {
   type OpenBoxResult,
   type Attendance,
   type Quest,
+  type RoomStage,
 } from '../lib/gameApi'
 
 type GameContextValue = {
   state: GameState | null
   boxes: Box[]
   dex: DexEntry[]
+  /** Each 장소's grade stage; empty until loaded. */
+  rooms: RoomStage[]
   catalogError: boolean
   refresh: () => Promise<void>
   claim: (slotIds: string[]) => Promise<number>
@@ -43,6 +46,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GameState | null>(null)
   const [boxes, setBoxes] = useState<Box[]>([])
   const [dex, setDex] = useState<DexEntry[]>([])
+  const [rooms, setRooms] = useState<RoomStage[]>([])
   const [attendance, setAttendance] = useState<Attendance | null>(null)
   const [quests, setQuests] = useState<Quest[]>([])
   const [catalogError, setCatalogError] = useState(false)
@@ -53,6 +57,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const [boxList, dexList] = await Promise.all([fetchBoxes(), fetchDex()])
       setBoxes(boxList.boxes)
       setDex(dexList.items)
+      setRooms(dexList.rooms ?? [])
       // Attendance is a nice-to-have; its failure must not mark the whole catalog broken.
       fetchAttendance().then(setAttendance, (error) => console.warn('attendance unavailable', error))
       loadQuests()
@@ -92,17 +97,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [refresh, loadCatalogState]
   )
 
+  // A stage can roll over to the next grade: take the server's word rather than guess.
+  const reloadRooms = useCallback(() => {
+    fetchDex().then(
+      (data) => setRooms(data.rooms ?? []),
+      (error) => console.warn('rooms unavailable', error)
+    )
+  }, [])
+
   const openBox = useCallback(async (boxId: string) => {
     try {
       const result = await openBoxApi(boxId)
       setState((prev) => (prev ? { ...prev, points: result.pointsBalance } : prev))
       setDex((prev) => prev.map((entry) => (entry.id === result.dexEntry.id ? result.dexEntry : entry)))
+      reloadRooms()
       return result
     } catch (error) {
       console.warn('open box failed', error)
       return undefined
     }
-  }, [])
+  }, [reloadRooms])
 
   const loadQuests = useCallback(() => {
     fetchQuests().then(
@@ -136,6 +150,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setAttendance((prev) => (prev ? { ...prev, claimedToday: true } : prev))
       loadQuests()
       setDex((prev) => prev.map((entry) => (entry.id === result.dexEntry.id ? result.dexEntry : entry)))
+      reloadRooms()
       return result
     } catch (error) {
       console.warn('attendance claim failed', error)
@@ -143,7 +158,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       fetchAttendance().then(setAttendance, () => {})
       return undefined
     }
-  }, [loadQuests])
+  }, [loadQuests, reloadRooms])
 
   useEffect(() => {
     if (reconciled.current) return
@@ -162,7 +177,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, catalogError, refresh, claim, openBox, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, rooms, catalogError, refresh, claim, openBox, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
   )
 }
 
