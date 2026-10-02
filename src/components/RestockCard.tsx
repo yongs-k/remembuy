@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DdayLabel } from './Badge'
 import { ItemThumb } from './ItemThumb'
@@ -6,6 +7,8 @@ import { useLocker } from '../state/LockerContext'
 import { usePendingPurchases } from '../hooks/usePendingPurchases'
 import { getSoonestRemaining } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
+import { Sheet } from './Sheet'
+import { buyUrl } from './PodiumItemCard'
 
 /** One row of a restock list; the parent <ul> draws the card and dividers. */
 export function RestockCard({
@@ -21,16 +24,12 @@ export function RestockCard({
   const { recordPurchase } = useLocker()
   const pendingPurchases = usePendingPurchases()
   const navigate = useNavigate()
+  const [rebuying, setRebuying] = useState(false)
   const remaining = getSoonestRemaining(item)
-  const dueSoon = remaining !== undefined && remaining <= 7
-  // Items with a purchase link are only recorded after the link was used (구매 완료);
-  // items without one keep the plain 다시 샀어요.
-  const awaitingConfirm = Boolean(item.affiliateUrl) && pendingPurchases.isPending(item.id)
-  const canRestock = dueSoon && !item.affiliateUrl
   const lastPurchase = [item.price !== undefined && `${item.price.toLocaleString()}원`, item.place]
     .filter(Boolean)
     .join(' · ')
-  const hasActions = canRestock || Boolean(item.affiliateUrl)
+  const titleId = `rebuy-${item.id}`
 
   return (
     <li className="flex items-center gap-1.5 py-1 pl-space-md pr-2">
@@ -50,40 +49,60 @@ export function RestockCard({
           )}
         </span>
         {remaining !== undefined && <DdayLabel days={remaining} />}
-        {!hasActions && <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />}
       </button>
-      {canRestock && (
-        <button
-          type="button"
-          onClick={() => recordPurchase(item.id)}
-          className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
-        >
-          다시 샀어요
-        </button>
-      )}
-      {awaitingConfirm && (
-        <button
-          type="button"
-          onClick={() => {
-            recordPurchase(item.id)
-            pendingPurchases.clear(item.id)
-          }}
-          className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
-        >
-          구매 완료
-        </button>
-      )}
-      {item.affiliateUrl && !awaitingConfirm && (
-        <a
-          href={item.affiliateUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => pendingPurchases.markOpened(item.id)}
-          aria-label={`${item.name} 구매하기`}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary active:scale-[0.98]"
-        >
-          <Icon name="shopping_cart" className="text-[20px]" />
-        </a>
+      <button
+        type="button"
+        onClick={() => setRebuying(true)}
+        className="min-h-11 shrink-0 rounded-lg border border-hairline px-2.5 text-label-md text-on-surface transition-colors hover:bg-surface-container-low"
+      >
+        재구매하기
+      </button>
+      {rebuying && (
+        <Sheet labelledBy={titleId} onClose={() => setRebuying(false)}>
+          <div className="space-y-0.5 pb-1 text-center">
+            <h2 id={titleId} className="text-label-lg text-on-surface">
+              {item.name}
+            </h2>
+            {lastPurchase && <p className="text-body-sm text-on-surface-variant">지난 구매 {lastPurchase}</p>}
+          </div>
+          <a
+            href={buyUrl(item)}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-autofocus
+            onClick={() => {
+              // Only a saved link counts toward the item page's 구매 완료 prompt.
+              if (item.affiliateUrl) pendingPurchases.markOpened(item.id)
+              setRebuying(false)
+            }}
+            className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
+          >
+            <Icon name="shopping_cart" className="text-[18px]" />
+            구매하러 가기
+          </a>
+          {!item.affiliateUrl && (
+            <p className="text-center text-body-sm text-on-surface-variant">저장된 링크가 없어 쿠팡 검색으로 열어요.</p>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              recordPurchase(item.id)
+              pendingPurchases.clear(item.id)
+              setRebuying(false)
+            }}
+            className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl border border-hairline text-label-lg text-on-surface transition-colors hover:bg-surface-container-low active:scale-[0.98]"
+          >
+            <Icon name="check" className="text-[18px]" />
+            재구매 완료
+          </button>
+          <button
+            type="button"
+            onClick={() => setRebuying(false)}
+            className="min-h-11 w-full text-center text-body-md text-on-surface-variant"
+          >
+            취소
+          </button>
+        </Sheet>
       )}
     </li>
   )
