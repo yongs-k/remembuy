@@ -28,13 +28,13 @@ function OpeningBox() {
       </g>
       <ellipse cx="60" cy="108" rx="40" ry="5" fill="#000" opacity="0.25" />
       {/* base */}
-      <rect x="22" y="58" width="76" height="48" rx="5" fill="#7a4a26" />
-      <rect x="22" y="58" width="76" height="8" fill="#5f3819" />
+      <rect x="22" y="58" width="76" height="48" rx="5" fill="#2e2118" />
+      <rect x="22" y="58" width="76" height="8" fill="#1c140e" />
       <rect x="54" y="58" width="12" height="48" fill="#ffb95f" />
       <rect x="22" y="100" width="76" height="6" rx="3" fill="#c88a2e" />
       {/* lid */}
       <g className="box-open-lid">
-        <rect x="16" y="42" width="88" height="18" rx="5" fill="#8d5a30" />
+        <rect x="16" y="42" width="88" height="18" rx="5" fill="#3a2a1f" />
         <rect x="16" y="54" width="88" height="6" rx="3" fill="#c88a2e" />
         <rect x="54" y="42" width="12" height="18" fill="#ffb95f" />
         <ellipse cx="50" cy="38" rx="11" ry="6" fill="#ffb95f" transform="rotate(-20 50 38)" />

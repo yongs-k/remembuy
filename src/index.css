@@ -79,6 +79,24 @@ textarea::placeholder {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* Store hero (StorePage): the gift box drifts and its sparkles twinkle. */
+.store-hero-float {
+  animation: store-float 4.5s ease-in-out infinite;
+}
+.store-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: store-twinkle 2.4s ease-in-out infinite both;
+}
+@keyframes store-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes store-twinkle {
+  0%, 100% { transform: scale(0.4); opacity: 0.2; }
+  50% { transform: scale(1); opacity: 1; }
+}
+
 /* Quest reward (QuestCard): +NP rises from the card with a few sparks. */
 .quest-burst {
   position: fixed;
@@ -141,7 +159,9 @@ textarea::placeholder {
   .box-open-item,
   .box-open-text,
   .quest-burst b,
-  .quest-burst i {
+  .quest-burst i,
+  .store-hero-float,
+  .store-sparkle {
     animation-duration: 1ms !important;
     animation-delay: 0s !important;
   }

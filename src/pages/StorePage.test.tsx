@@ -49,7 +49,7 @@ describe('StorePage', () => {
   it('says how many points are missing and points to the collection instead of a dead button', () => {
     mockGame({ state: { ...STATE, points: 100 } })
     render(<StorePage />)
-    expect(screen.queryByRole('button', { name: '1개 열기' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /상자 열기/ })).not.toBeInTheDocument()
     expect(screen.getByText('400P 더 모으면 열 수 있어요')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '퀘스트 보기' }))
     expect(navigateMock).toHaveBeenCalledWith('/quests')
@@ -64,14 +64,14 @@ describe('StorePage', () => {
     }
     mockGame({ openBox: vi.fn().mockResolvedValue(opened) })
     render(<StorePage />)
-    fireEvent.click(screen.getByRole('button', { name: '1개 열기' }))
+    fireEvent.click(screen.getByRole('button', { name: /상자 열기/ }))
     await waitFor(() => expect(screen.getByText('조각을 획득했어요!')).toBeInTheDocument())
   })
 
   it('shows an inline failure message when the open call resolves undefined', async () => {
     mockGame({ openBox: vi.fn().mockResolvedValue(undefined) })
     render(<StorePage />)
-    fireEvent.click(screen.getByRole('button', { name: '1개 열기' }))
+    fireEvent.click(screen.getByRole('button', { name: /상자 열기/ }))
     await waitFor(() =>
       expect(screen.getByText('상자를 열지 못했어요. 다시 시도해 주세요.')).toBeInTheDocument()
     )

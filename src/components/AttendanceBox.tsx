@@ -46,15 +46,15 @@ export function useAttendanceBox() {
   }
 }
 
-/** Store's 출석 card, in the cabinet tone like the paid boxes. */
+/** Store's 출석 card: a gold-edged panel on the store's espresso page. */
 export function AttendanceCard() {
   const box = useAttendanceBox()
   if (box.available === null) return null
 
   return (
-    <div className="space-y-3 rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface shadow-float">
+    <div className="space-y-3 rounded-2xl border border-tertiary-fixed-dim/20 bg-white/[0.03] p-space-md text-inverse-on-surface">
       <div>
-        <h2 className="font-heading text-headline-md">오늘의 출석 상자</h2>
+        <h2 className="text-label-lg font-bold">오늘의 출석 상자</h2>
         <p className="text-body-sm text-inverse-on-surface/70">
           하루 한 번 상자를 무료로 열 수 있어요. 아이템 조각이 나와요.
         </p>
@@ -64,7 +64,7 @@ export function AttendanceCard() {
           type="button"
           disabled={box.opening}
           onClick={() => void box.open()}
-          className="min-h-12 w-full rounded-xl bg-tertiary-fixed-dim text-label-lg text-on-tertiary-fixed active:scale-[0.98] disabled:bg-inverse-on-surface/15 disabled:text-inverse-on-surface/70"
+          className="min-h-12 w-full rounded-full border border-tertiary-fixed-dim/60 text-label-lg text-tertiary-fixed transition-colors hover:bg-white/[0.06] active:scale-[0.98] disabled:opacity-60"
         >
           {box.opening ? '여는 중...' : '무료로 열기'}
         </button>

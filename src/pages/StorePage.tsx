@@ -5,10 +5,111 @@ import { BoxOpenResultModal } from '../components/BoxOpenResultModal'
 import { GameCatalogStatus } from '../components/GameCatalogStatus'
 import { AttendanceCard } from '../components/AttendanceBox'
 import { Icon } from '../data/materialIcons'
+import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
 import type { OpenBoxResult } from '../lib/gameApi'
 
+const STEPS = [
+  { icon: 'task_alt', text: '퀘스트로\n포인트 모으기' },
+  { icon: 'redeem', text: '상자 열고\n장소 조각 받기' },
+  { icon: 'cottage', text: '조각 4개면\n장소 등급 상승' },
+]
+
+// Decorative only: each grade's card shows a symbol, not a specific item.
+const GRADE_ICON: Record<string, string> = {
+  COMMON: 'soap',
+  ADVANCED: 'potted_plant',
+  RARE: 'auto_awesome',
+  LEGENDARY: 'bathtub',
+}
+
+/** The store's hero: a leather gift box with a gold ribbon, floating in its own light. */
+function HeroGiftBox() {
+  return (
+    <svg aria-hidden viewBox="0 0 240 220" className="store-hero-float mx-auto h-auto w-full max-w-[17rem] overflow-visible">
+      <defs>
+        <radialGradient id="hero-glow">
+          <stop offset="0%" stopColor="#ffd38a" stopOpacity="0.55" />
+          <stop offset="55%" stopColor="#ffb95f" stopOpacity="0.14" />
+          <stop offset="100%" stopColor="#ffb95f" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="hero-front" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3a2a1f" />
+          <stop offset="100%" stopColor="#1c140e" />
+        </linearGradient>
+        <linearGradient id="hero-side" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#21170f" />
+          <stop offset="100%" stopColor="#120c08" />
+        </linearGradient>
+        <linearGradient id="hero-lid-top" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stopColor="#4a3627" />
+          <stop offset="100%" stopColor="#2c1f16" />
+        </linearGradient>
+        <linearGradient id="hero-gold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fbe3a6" />
+          <stop offset="45%" stopColor="#d9a24c" />
+          <stop offset="100%" stopColor="#f2c56c" />
+        </linearGradient>
+      </defs>
+
+      <circle cx="120" cy="112" r="118" fill="url(#hero-glow)" />
+      <ellipse cx="124" cy="206" rx="96" ry="9" fill="#000" opacity="0.45" />
+
+      {/* base */}
+      <path d="M40 104 H198 V204 H40 Z" fill="url(#hero-front)" />
+      <path d="M198 104 L220 92 V190 L198 204 Z" fill="url(#hero-side)" />
+      <path d="M198 146 L220 134 V146 L198 158 Z" fill="url(#hero-gold)" opacity="0.85" />
+      <rect x="40" y="198" width="158" height="6" fill="#0d0906" opacity="0.6" />
+      <text
+        x="119"
+        y="160"
+        textAnchor="middle"
+        fill="url(#hero-gold)"
+        fontFamily="Georgia, 'Times New Roman', serif"
+        fontSize="15"
+        letterSpacing="4"
+      >
+        REMEMBUY
+      </text>
+      <rect x="95" y="168" width="48" height="1" fill="url(#hero-gold)" opacity="0.7" />
+
+      {/* lid */}
+      <path d="M32 80 L54 66 H228 L206 80 Z" fill="url(#hero-lid-top)" />
+      <path d="M32 80 H206 V108 H32 Z" fill="#2e2118" />
+      <path d="M206 80 L228 66 V94 L206 108 Z" fill="#170f0a" />
+      <rect x="32" y="104" width="174" height="4" fill="#0d0906" opacity="0.5" />
+      <path d="M111 80 H127 V108 H111 Z" fill="url(#hero-gold)" />
+      <path d="M111 80 L133 66 H149 L127 80 Z" fill="url(#hero-gold)" />
+      <path d="M52 73 L206 73 L203 75 L49 75 Z" fill="url(#hero-gold)" opacity="0.35" />
+
+      {/* bow */}
+      <path d="M130 66 C112 40 86 44 92 60 C96 70 116 70 130 66 Z" fill="url(#hero-gold)" />
+      <path d="M130 66 C150 38 178 44 170 60 C165 70 144 70 130 66 Z" fill="url(#hero-gold)" />
+      <path d="M130 66 C120 76 112 88 104 96 L112 98 C118 88 124 78 130 68 Z" fill="#c8913a" />
+      <path d="M130 66 C142 76 152 86 160 94 L152 97 C146 87 138 78 130 68 Z" fill="#c8913a" />
+      <ellipse cx="130" cy="65" rx="8" ry="6" fill="#e9b85c" />
+
+      {/* sparkles */}
+      {[
+        [36, 40, 1],
+        [206, 30, 0.8],
+        [222, 118, 0.6],
+        [18, 132, 0.7],
+        [168, 18, 0.5],
+      ].map(([x, y, s], i) => (
+        <path
+          key={i}
+          className="store-sparkle"
+          style={{ animationDelay: `${i * 0.45}s` }}
+          d={`M${x} ${y - 8 * s} L${x + 2 * s} ${y - 2 * s} L${x + 8 * s} ${y} L${x + 2 * s} ${y + 2 * s} L${x} ${y + 8 * s} L${x - 2 * s} ${y + 2 * s} L${x - 8 * s} ${y} L${x - 2 * s} ${y - 2 * s} Z`}
+          fill="#ffe3a8"
+        />
+      ))}
+    </svg>
+  )
+}
+
 export default function StorePage() {
-  const { boxes, state, openBox, catalogError } = useGame()
+  const { boxes, state, dex, openBox, catalogError } = useGame()
   const navigate = useNavigate()
   const [opening, setOpening] = useState<string | null>(null)
   const [result, setResult] = useState<OpenBoxResult | null>(null)
@@ -28,47 +129,78 @@ export default function StorePage() {
   }
 
   return (
-    <div className="space-y-space-md p-margin">
-      <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
-        <h1 className="font-heading text-display-sm">상자</h1>
+    // The whole store is a game surface: espresso cabinet from edge to edge (DESIGN.md Cabinet Rule).
+    // -mb-20 runs it under the layout's bottom padding so no paper strip shows above the tabs.
+    <div
+      className="-mb-20 min-h-[calc(100%+5rem)] space-y-space-lg bg-inverse-surface px-4 pb-28 pt-space-lg text-inverse-on-surface"
+      style={{ backgroundImage: 'radial-gradient(ellipse 90% 45% at 50% 30%, rgb(255 185 95 / 0.16), transparent 70%)' }}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-label-sm tracking-[0.3em] text-tertiary-fixed-dim/80">REMEMBUY BOX</span>
         {!catalogError && (
-          <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
-            <Icon name="monetization_on" className="text-[20px]" />
-            <span>{points}P</span>
+          <span className="flex items-center gap-1 rounded-full border border-tertiary-fixed-dim/30 bg-white/[0.04] px-3 py-1 text-label-md tabular-nums">
+            <span className="text-inverse-on-surface/70">내 포인트</span>
+            <span className="font-bold text-tertiary-fixed-dim">{points.toLocaleString()}P</span>
           </span>
         )}
       </div>
-      <p className="text-body-sm text-on-surface-variant">
-        포인트로 상자를 열면 아이템 조각이 나와요. 조각을 다 모으면 아이템 수집함에 완성돼요.
-      </p>
 
-      <AttendanceCard />
+      <div className="space-y-1 text-center">
+        <h1 className="font-heading text-display-sm text-tertiary-fixed">선물상자 열기</h1>
+        <p className="text-body-sm text-inverse-on-surface/70">
+          모은 포인트로 상자를 열면, 장소를 한 단계씩 키우는 조각이 나와요.
+        </p>
+      </div>
+
+      <ol className="flex items-start justify-between gap-1 rounded-2xl border border-tertiary-fixed-dim/20 bg-white/[0.03] px-2 py-space-md">
+        {STEPS.map((step, i) => (
+          <li key={step.icon} className="flex flex-1 items-start justify-center gap-1">
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-tertiary-fixed-dim/40 text-tertiary-fixed-dim">
+                <Icon name={step.icon} className="text-[20px]" />
+              </span>
+              <span className="whitespace-pre-line text-label-sm leading-snug text-inverse-on-surface/85">{step.text}</span>
+            </div>
+            {i < STEPS.length - 1 && (
+              <Icon name="arrow_forward" className="mt-2.5 text-[16px] text-tertiary-fixed-dim/50" />
+            )}
+          </li>
+        ))}
+      </ol>
 
       {boxes.length === 0 ? (
-        <GameCatalogStatus label="상자 정보를" />
+        <div className="rounded-2xl bg-surface p-space-md text-on-surface">
+          <GameCatalogStatus label="상자 정보를" />
+        </div>
       ) : (
         boxes.map((box) => {
           const affordable = points >= box.costPoints
           return (
-            <div
-              key={box.id}
-              className="space-y-3 rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface shadow-float"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-heading text-headline-md">{box.name}</span>
-                <span className="flex items-center gap-1 text-label-lg font-bold tabular-nums text-tertiary-fixed-dim">
-                  <Icon name="monetization_on" className="text-[16px]" />
-                  <span>{box.costPoints}P</span>
-                </span>
+            <section key={box.id} aria-labelledby={`box-${box.id}`} className="space-y-space-md">
+              <HeroGiftBox />
+              <div className="space-y-0.5 text-center">
+                <h2 id={`box-${box.id}`} className="font-heading text-headline-md">
+                  {box.name}
+                </h2>
+                <p className="text-body-sm text-inverse-on-surface/70">
+                  열 때마다 장소 하나의 지금 등급 조각이 나와요.
+                </p>
               </div>
               {affordable ? (
                 <button
                   type="button"
                   disabled={opening === box.id}
                   onClick={() => handleOpen(box.id)}
-                  className="min-h-12 w-full rounded-xl bg-tertiary-fixed-dim text-label-lg text-on-tertiary-fixed active:scale-[0.98] disabled:bg-inverse-on-surface/15 disabled:text-inverse-on-surface/70"
+                  className="relative flex min-h-14 w-full items-center justify-center rounded-full bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] text-label-lg font-bold text-on-tertiary-fixed shadow-[0_10px_30px_-10px_rgba(255,185,95,0.7)] transition-transform active:scale-[0.98] disabled:opacity-70"
                 >
-                  {opening === box.id ? '여는 중...' : '1개 열기'}
+                  {opening === box.id ? (
+                    '여는 중...'
+                  ) : (
+                    <>
+                      상자 열기 · {box.costPoints.toLocaleString()}P
+                      <Icon name="chevron_right" className="absolute right-5 text-[22px]" />
+                    </>
+                  )}
                 </button>
               ) : (
                 <>
@@ -78,7 +210,7 @@ export default function StorePage() {
                   <button
                     type="button"
                     onClick={() => navigate('/quests')}
-                    className="min-h-12 w-full rounded-xl border border-inverse-on-surface/20 text-label-lg text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/10"
+                    className="min-h-14 w-full rounded-full border border-tertiary-fixed-dim/40 text-label-lg text-tertiary-fixed transition-colors hover:bg-white/[0.06]"
                   >
                     퀘스트 보기
                   </button>
@@ -89,9 +221,48 @@ export default function StorePage() {
                   상자를 열지 못했어요. 다시 시도해 주세요.
                 </p>
               )}
-            </div>
+            </section>
           )
         })
+      )}
+
+      <AttendanceCard />
+
+      {dex.length > 0 && (
+        <section aria-labelledby="store-grades" className="space-y-space-sm rounded-2xl border border-tertiary-fixed-dim/20 bg-white/[0.03] p-space-md">
+          <div className="flex items-center justify-between">
+            <h2 id="store-grades" className="text-label-lg font-bold">
+              획득 가능한 아이템
+            </h2>
+            <button
+              type="button"
+              onClick={() => navigate('/dex')}
+              className="-my-2 flex min-h-11 items-center text-label-md text-inverse-on-surface/70"
+            >
+              전체 보기
+              <Icon name="chevron_right" className="text-[18px]" />
+            </button>
+          </div>
+          <ul className="grid grid-cols-4 gap-2">
+            {GRADE_ORDER.map((grade) => {
+              const hex = gradeColor(grade).hex
+              const kinds = dex.filter((entry) => entry.grade === grade).length
+              return (
+                <li
+                  key={grade}
+                  className="flex flex-col items-center gap-1.5 rounded-xl border px-1 pb-2 pt-1.5 text-center"
+                  style={{ borderColor: `${hex}80`, background: `linear-gradient(180deg, ${hex}33, transparent 75%)` }}
+                >
+                  <span className="text-label-sm font-bold" style={{ color: hex }}>
+                    {gradeLabel(grade)}
+                  </span>
+                  <Icon name={GRADE_ICON[grade]} className="text-[30px] text-inverse-on-surface/90" />
+                  <span className="text-label-sm tabular-nums text-inverse-on-surface/70">{kinds}종</span>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
       )}
 
       {result && (
