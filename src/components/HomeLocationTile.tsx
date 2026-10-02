@@ -3,36 +3,32 @@ import { LOCATION_COLOR_HEX } from '../data/locationColors'
 import { Icon, LOCATION_MATERIAL_ICON } from '../data/materialIcons'
 import type { RoomFragments } from '../state/gameProgress'
 
-// Clockwise from top-left: each quarter of the square is 25% of the 장소's items.
-const QUADRANTS = [
-  [0, 0],
-  [9, 0],
-  [9, 9],
-  [0, 9],
-] as const
+// Clockwise from top-left: each quarter of the tile is 25% of the 장소's items.
+const QUARTERS = ['left-0 top-0', 'right-0 top-0', 'bottom-0 right-0', 'bottom-0 left-0']
 
-/** 장소 fragments as a square in four pieces that light up one by one, each filling from the bottom. */
-function FragmentSquare({ progress }: { progress: number }) {
+/** 장소 fragments as the tile itself in four pieces that light up one by one, each filling from the bottom. */
+function FragmentQuarters({ progress }: { progress: number }) {
   return (
-    <svg aria-hidden viewBox="0 0 16 16" className="h-[18px] w-[18px] shrink-0">
-      {QUADRANTS.map(([x, y], i) => {
+    <span aria-hidden className="pointer-events-none absolute inset-0">
+      {QUARTERS.map((corner, i) => {
         const fill = Math.min(1, Math.max(0, progress * 4 - i))
         return (
-          <g key={i}>
-            <rect x={x} y={y} width="7" height="7" rx="1.5" fill="#e7e2db" />
+          <span key={corner} className={`absolute h-1/2 w-1/2 ${corner}`}>
             {fill > 0 && (
-              <rect x={x} y={y + 7 * (1 - fill)} width="7" height={7 * fill} rx="1.5" className="fill-tertiary" />
+              <span className="absolute inset-x-0 bottom-0 bg-tertiary-fixed/60" style={{ height: `${fill * 100}%` }} />
             )}
-          </g>
+          </span>
         )
       })}
-    </svg>
+      <span className="absolute inset-y-0 left-1/2 border-l border-dashed border-outline-variant/50" />
+      <span className="absolute inset-x-0 top-1/2 border-t border-dashed border-outline-variant/50" />
+    </span>
   )
 }
 
 const RING_PATH = 'M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831'
 
-/** Compact room tile: the collection-rate ring wraps the room icon; the 장소's game fragments sit underneath. */
+/** Compact room tile: the collection-rate ring wraps the room icon; the tile's four quarters fill with the 장소's game fragments. */
 export function HomeLocationTile({
   location,
   percent,
@@ -56,8 +52,9 @@ export function HomeLocationTile({
       type="button"
       onClick={onClick}
       aria-label={`${location.name}, ${count}개 등록, 수집률 ${clamped}%${game ? `, 조각 ${game.fragments}개, 아이템 ${game.completed}/${game.total} 완성` : ''}`}
-      className="flex flex-col items-center gap-1.5 rounded-xl border border-hairline bg-surface-container-lowest px-1 py-space-md text-center shadow-card transition-colors hover:border-outline-variant"
+      className="relative flex flex-col items-center gap-1.5 overflow-hidden rounded-xl border border-hairline bg-surface-container-lowest px-1 py-space-md text-center shadow-card transition-colors hover:border-outline-variant"
     >
+      {game && game.total > 0 && <FragmentQuarters progress={game.progress} />}
       <span className="relative flex h-11 w-11 items-center justify-center" style={{ color }}>
         <svg aria-hidden className="absolute inset-0 h-11 w-11 -rotate-90" viewBox="0 0 36 36">
           <path d={RING_PATH} fill="none" stroke="#e7e2db" strokeWidth="2.5" />
@@ -72,13 +69,12 @@ export function HomeLocationTile({
         </svg>
         <Icon name={icon} className="text-[20px]" />
       </span>
-      <span className="w-full truncate text-label-md text-on-surface">{location.name}</span>
-      <span className="text-label-sm font-medium tabular-nums text-on-surface-variant">
+      <span className="relative w-full truncate text-label-md text-on-surface">{location.name}</span>
+      <span className="relative text-label-sm font-medium tabular-nums text-on-surface-variant">
         {count}개 · {clamped}%
       </span>
       {game && game.total > 0 && (
-        <span className="flex items-center gap-1 text-label-sm tabular-nums text-on-surface-variant">
-          <FragmentSquare progress={game.progress} />
+        <span className="relative text-label-sm tabular-nums text-on-surface-variant">
           조각 {game.fragments}
           {game.completed > 0 && <span> · 완성 {game.completed}</span>}
         </span>
