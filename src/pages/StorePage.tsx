@@ -64,7 +64,8 @@ function HeroGiftBox() {
         y="160"
         textAnchor="middle"
         fill="url(#hero-gold)"
-        fontFamily="Georgia, 'Times New Roman', serif"
+        fontFamily="'Plus Jakarta Sans', sans-serif"
+        fontWeight="600"
         fontSize="15"
         letterSpacing="4"
       >
