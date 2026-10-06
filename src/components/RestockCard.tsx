@@ -45,11 +45,14 @@ export function RestockCard({
         <span className="min-w-0 flex-1">
           <span className="flex min-w-0 items-baseline gap-1.5">
             {isNew && <span className="shrink-0 text-label-sm text-primary">새로</span>}
-            <span className="truncate text-label-lg text-on-surface">{item.name}</span>
-            {item.id.startsWith('seed-') && <SampleTag />}
+            {/* Two lines before cutting: the D-day and 재구매하기 leave the name little room. */}
+            <span className="line-clamp-2 text-label-lg text-on-surface">{item.name}</span>
           </span>
-          {showLastPurchase && lastPurchase && (
-            <span className="block truncate text-body-sm text-on-surface-variant">지난 구매 {lastPurchase}</span>
+          {(item.id.startsWith('seed-') || (showLastPurchase && lastPurchase)) && (
+            <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-body-sm text-on-surface-variant">
+              {item.id.startsWith('seed-') && <SampleTag />}
+              {showLastPurchase && lastPurchase && <span className="truncate">지난 구매 {lastPurchase}</span>}
+            </span>
           )}
         </span>
         {remaining !== undefined && <DdayLabel days={remaining} />}
