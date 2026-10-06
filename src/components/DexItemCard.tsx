@@ -1,41 +1,51 @@
 import type { DexEntry } from '../lib/gameApi'
-import { Icon } from '../data/materialIcons'
-import { gradeColor, gradeLabel } from '../data/gradeColors'
+import { gradeColor } from '../data/gradeColors'
+import { placeName } from '../state/gameProgress'
+import { CountBadge, PuzzlePiece } from './Puzzle'
 
+/** One 아이템 수집함 entry, styled like a 조합 pile: a grade piece, its +N, the name and progress. */
 export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => void }) {
   if (entry.status === 'LOCKED') {
     return (
-      <div className="flex flex-col items-center gap-1 rounded-xl border border-dashed border-outline-variant p-space-sm text-center">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant">
-          <Icon name="lock" className="text-[18px]" />
-        </div>
-        <span className="text-label-md text-on-surface-variant">???</span>
+      <div className="flex flex-col items-center gap-0.5 rounded-xl border border-dashed border-white/15 px-1 pb-2 pt-3 text-center">
+        <PuzzlePiece grade={entry.grade} className="h-10 w-10 opacity-20 grayscale" />
+        <span className="text-label-sm font-bold text-inverse-on-surface/50">???</span>
+        <span className="text-[11px] text-inverse-on-surface/40">{entry.roomType ? placeName(entry.roomType).split('/')[0] : '잠김'}</span>
       </div>
     )
   }
 
-  const color = gradeColor(entry.grade)
+  const hex = gradeColor(entry.grade).hex
+  const complete = entry.status === 'COMPLETE'
   const percent = Math.min(100, Math.round((entry.fragmentCount / entry.fragmentsRequired) * 100))
 
   return (
     <button
       type="button"
       onClick={onOpen}
-      className={`flex w-full flex-col items-center gap-1 rounded-xl ${color.bg} p-space-sm text-center transition-transform active:scale-95`}
+      className="relative flex w-full flex-col items-center gap-0.5 rounded-xl bg-white/[0.05] px-1.5 pb-2 pt-3 text-center transition-colors hover:bg-white/[0.09] active:scale-[0.98]"
+      style={complete ? { boxShadow: `inset 0 0 0 1.5px ${hex}` } : undefined}
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest text-on-surface">
-        <Icon name={entry.status === 'COMPLETE' ? 'check_circle' : 'inventory_2'} className="text-[18px]" />
-      </div>
-      <span className={`text-label-md font-bold ${color.text}`}>{entry.name}</span>
-      <span className="text-label-sm text-on-surface-variant">{gradeLabel(entry.grade)}</span>
-      {entry.status === 'COLLECTING' && (
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-low">
-          <div
-            data-testid="dex-progress-fill"
-            className="h-full rounded-full bg-tertiary"
-            style={{ width: `${percent}%` }}
-          />
-        </div>
+      <CountBadge count={entry.fragmentCount} className="absolute right-1 top-1" />
+      <PuzzlePiece grade={entry.grade} slot={entry.id.length % 4} className="h-10 w-10" />
+      <span className="max-w-full truncate text-label-sm font-bold text-inverse-on-surface">{entry.name}</span>
+      {complete ? (
+        <span className="text-[11px] font-bold" style={{ color: hex }}>
+          완성
+        </span>
+      ) : (
+        <>
+          <span className="text-[11px] tabular-nums text-inverse-on-surface/60">
+            {entry.fragmentCount}/{entry.fragmentsRequired}
+          </span>
+          <span className="h-1 w-full overflow-hidden rounded-full bg-white/10">
+            <span
+              data-testid="dex-progress-fill"
+              className="block h-full rounded-full"
+              style={{ width: `${percent}%`, backgroundColor: hex }}
+            />
+          </span>
+        </>
       )}
     </button>
   )
