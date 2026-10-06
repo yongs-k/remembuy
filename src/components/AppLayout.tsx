@@ -8,7 +8,7 @@ import { PurchaseUndoToast } from './PurchaseUndoToast'
 const TABS = [
   { to: '/', label: '홈', icon: 'cottage' },
   { to: '/ranking', label: '랭킹', icon: 'leaderboard' },
-  { to: '/purchase', label: '구매', icon: 'shopping_cart' },
+  { to: '/purchase', label: '구매', icon: 'shopping_cart', also: ['/shopping'] },
   { to: '/store', label: '상자', icon: 'redeem', also: ['/quests'] },
   { to: '/collection', label: '컬렉션', icon: 'menu_book', also: ['/dex'] },
 ]

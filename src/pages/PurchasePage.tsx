@@ -13,6 +13,7 @@ export default function PurchasePage() {
   const { items } = useLocker()
   const navigate = useNavigate()
   const upcoming = useMemo(() => getUpcomingNotifications(items, WINDOW_DAYS), [items])
+  const thisWeek = useMemo(() => getUpcomingNotifications(items, 7).length, [items])
   // Products the user said they'd buy again, minus the ones already listed above.
   const recommended = useMemo(() => {
     const dueIds = new Set(upcoming.map((item) => item.id))
@@ -25,6 +26,25 @@ export default function PurchasePage() {
   return (
     <div className="space-y-space-lg p-margin">
       <h1 className="font-heading text-display-sm text-on-surface">구매</h1>
+
+      {thisWeek > 0 && (
+        <button
+          type="button"
+          onClick={() => navigate('/shopping')}
+          className="flex w-full items-center gap-3 rounded-2xl border border-hairline bg-surface-container-lowest p-space-md text-left shadow-card transition-colors hover:bg-surface-container-low"
+        >
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-on-surface">
+            <Icon name="checklist" className="text-[22px]" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-label-lg text-on-surface">이번 주 장보기</span>
+            <span className="block text-body-sm text-on-surface-variant">
+              {thisWeek}개를 구매처별로 묶어 체크하며 사요
+            </span>
+          </span>
+          <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />
+        </button>
+      )}
 
       <section aria-labelledby="due-title" className="space-y-space-sm">
         <div>

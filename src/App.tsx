@@ -15,6 +15,7 @@ import AdminPage from './pages/AdminPage'
 import SettingsPage from './pages/SettingsPage'
 import QuestsPage from './pages/QuestsPage'
 import CombinePage from './pages/CombinePage'
+import ShoppingListPage from './pages/ShoppingListPage'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/ranking" element={<RankingPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/purchase" element={<PurchasePage />} />
+          <Route path="/shopping" element={<ShoppingListPage />} />
           <Route path="/new" element={<NewItemPage />} />
           <Route path="/collection" element={<CollectionPage />} />
           <Route path="/store" element={<StorePage />} />
