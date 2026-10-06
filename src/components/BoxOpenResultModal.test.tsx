@@ -64,7 +64,7 @@ describe('BoxOpenResultModal', () => {
     expect(screen.getByText(/조합 재료로 보관했어요/)).toBeInTheDocument()
   })
 
-  it('확인 closes, 도감 보기 goes to the collection and 다시 열기 opens another', () => {
+  it('확인 closes, 컬렉션 보기 goes to the collection and 다시 열기 opens another', () => {
     const onClose = vi.fn()
     const onViewCollection = vi.fn()
     const onReopen = vi.fn()
@@ -73,7 +73,7 @@ describe('BoxOpenResultModal', () => {
     )
     screen.getByText('확인').click()
     expect(onClose).toHaveBeenCalledTimes(1)
-    screen.getByText('도감 보기').click()
+    screen.getByText('컬렉션 보기').click()
     expect(onViewCollection).toHaveBeenCalledTimes(1)
     screen.getByText('다시 열기').click()
     expect(onReopen).toHaveBeenCalledTimes(1)

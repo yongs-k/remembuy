@@ -49,6 +49,10 @@ type GameContextValue = {
   claimAttendance: () => Promise<OpenBoxResult | undefined>
   /** 퀘스트 from the server; empty until loaded or when the server is unreachable. */
   quests: Quest[]
+  /** The last quest fetch failed (as opposed to still loading). */
+  questsError?: boolean
+  /** Fetch the quests again. */
+  reloadQuests?: () => void
   /** Claims a completed quest's points; returns the points awarded, or 0 if it failed. */
   claimQuest: (questId: string) => Promise<number>
 }
@@ -64,6 +68,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [stacks, setStacks] = useState<PieceStack[]>([])
   const [attendance, setAttendance] = useState<Attendance | null>(null)
   const [quests, setQuests] = useState<Quest[]>([])
+  const [questsError, setQuestsError] = useState(false)
   const [catalogError, setCatalogError] = useState(false)
   const reconciled = useRef(false)
 
@@ -181,8 +186,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const loadQuests = useCallback(() => {
     fetchQuests().then(
-      (data) => setQuests(data.quests),
-      (error) => console.warn('quests unavailable', error)
+      (data) => {
+        setQuests(data.quests)
+        setQuestsError(false)
+      },
+      (error) => {
+        console.warn('quests unavailable', error)
+        setQuestsError(true)
+      }
     )
   }, [])
 
@@ -238,7 +249,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, rooms, stacks, combine, achieve, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, claimQuest }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, rooms, stacks, combine, achieve, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, questsError, reloadQuests: loadQuests, claimQuest }}>{children}</GameContext.Provider>
   )
 }
 

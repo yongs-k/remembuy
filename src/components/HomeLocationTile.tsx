@@ -93,7 +93,7 @@ export function HomeLocationTile({
           disabled={achieving}
           onClick={onAchieve}
           aria-label={`${location.name} ${gradeLabel(room!.stage!)} 달성`}
-          className="absolute right-1 top-1 min-h-8 rounded-full bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] px-2.5 text-label-sm font-bold text-on-tertiary-fixed shadow-float active:scale-[0.97] disabled:opacity-70"
+          className="absolute right-1 top-1 min-h-8 rounded-full before:absolute before:-inset-1.5 before:content-[''] bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] px-2.5 text-label-sm font-bold text-on-tertiary-fixed shadow-float active:scale-[0.97] disabled:opacity-70"
         >
           {achieving ? '…' : '달성'}
         </button>

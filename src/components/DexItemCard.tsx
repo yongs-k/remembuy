@@ -7,7 +7,11 @@ import { CountBadge, PuzzlePiece } from './Puzzle'
 export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => void }) {
   if (entry.status === 'LOCKED') {
     return (
-      <div className="flex flex-col items-center gap-0.5 rounded-xl border border-dashed border-white/15 px-1 pb-2 pt-3 text-center">
+      <div
+        role="img"
+        aria-label={`잠긴 ${entry.roomType ? placeName(entry.roomType) + ' ' : ''}아이템`}
+        className="flex flex-col items-center gap-0.5 rounded-xl border border-dashed border-white/15 px-1 pb-2 pt-3 text-center"
+      >
         <PuzzlePiece grade={entry.grade} className="h-10 w-10 opacity-20 grayscale" />
         <span className="text-label-sm font-bold text-inverse-on-surface/50">???</span>
         <span className="text-[11px] text-inverse-on-surface/40">{entry.roomType ? placeName(entry.roomType).split('/')[0] : '잠김'}</span>

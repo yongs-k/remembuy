@@ -48,7 +48,7 @@ describe('HomeGameCard', () => {
   it('shows the points balance and the completed/total dex count', () => {
     mockGame(STATE, DEX)
     render(<HomeGameCard />)
-    expect(screen.getByText('1250P')).toBeInTheDocument()
+    expect(screen.getByText('1,250P')).toBeInTheDocument()
     expect(screen.getByText('1/2 완성')).toBeInTheDocument()
   })
 

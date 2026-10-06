@@ -192,8 +192,7 @@ export default function StorePage() {
       className="-mb-20 min-h-[calc(100%+5rem)] space-y-space-lg bg-inverse-surface px-4 pb-28 pt-space-lg text-inverse-on-surface"
       style={{ backgroundImage: 'radial-gradient(ellipse 90% 45% at 50% 30%, rgb(255 185 95 / 0.16), transparent 70%)' }}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-label-sm tracking-[0.3em] text-tertiary-fixed-dim/80">REMEMBUY BOX</span>
+      <div className="flex justify-end">
         {!catalogError && (
           <span className="flex items-center gap-1 rounded-full border border-tertiary-fixed-dim/30 bg-white/[0.04] px-3 py-1 text-label-md tabular-nums">
             <span className="text-inverse-on-surface/70">내 포인트</span>
@@ -224,6 +223,9 @@ export default function StorePage() {
           </li>
         ))}
       </ol>
+
+      {/* Today's free box first: the gift before the paid boxes. */}
+      <AttendanceCard />
 
       {boxes.length === 0 ? (
         <div className="rounded-2xl bg-surface p-space-md text-on-surface">
@@ -293,7 +295,6 @@ export default function StorePage() {
         })
       )}
 
-      <AttendanceCard />
 
       {dex.length > 0 && (
         <section aria-labelledby="store-grades" className="space-y-space-sm rounded-2xl border border-tertiary-fixed-dim/20 bg-white/[0.03] p-space-md">

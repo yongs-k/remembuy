@@ -53,7 +53,7 @@ export function HomeGameCard() {
         {!catalogError && (
           <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
             <Icon name="monetization_on" className="text-[20px]" />
-            <span>{points}P</span>
+            <span>{points.toLocaleString()}P</span>
           </span>
         )}
       </div>

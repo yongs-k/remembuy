@@ -13,7 +13,7 @@ function ordered(quests: Quest[]) {
 }
 
 export default function QuestsPage() {
-  const { quests, state } = useGame()
+  const { quests, questsError, reloadQuests, state } = useGame()
   const navigate = useNavigate()
   const goBack = useBack()
   const daily = ordered(quests.filter((quest) => quest.kind === 'daily'))
@@ -35,7 +35,7 @@ export default function QuestsPage() {
         {state && (
           <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
             <Icon name="monetization_on" className="text-[20px]" />
-            <span>{state.points}P</span>
+            <span>{state.points.toLocaleString()}P</span>
           </span>
         )}
       </div>
@@ -44,9 +44,20 @@ export default function QuestsPage() {
       </p>
 
       {quests.length === 0 ? (
-        <p className="rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg text-body-sm text-on-surface-variant">
-          퀘스트를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.
-        </p>
+        questsError ? (
+          <div role="alert" className="space-y-space-sm rounded-2xl border border-hairline bg-surface-container-lowest px-space-md py-space-lg">
+            <p className="text-body-sm text-on-surface-variant">퀘스트를 불러오지 못했어요.</p>
+            <button
+              type="button"
+              onClick={() => reloadQuests?.()}
+              className="min-h-11 rounded-xl border border-hairline px-space-md text-label-lg text-on-surface transition-colors hover:bg-surface-container-low"
+            >
+              다시 시도
+            </button>
+          </div>
+        ) : (
+          <p className="px-1 text-body-sm text-on-surface-variant">퀘스트를 불러오는 중...</p>
+        )
       ) : (
         <>
           <section aria-labelledby="daily-quests" className="space-y-space-sm">

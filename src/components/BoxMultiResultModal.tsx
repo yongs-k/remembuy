@@ -16,7 +16,7 @@ export function BoxMultiResultModal({
   results: OpenBoxResult[]
   /** 확인: close. */
   onClose: () => void
-  /** 도감 보기: the 컬렉션. */
+  /** 컬렉션 보기. */
   onViewCollection: () => void
   /** 다시 열기: the same number again. */
   onReopen: () => void
@@ -80,7 +80,7 @@ export function BoxMultiResultModal({
               onClick={onViewCollection}
               className="min-h-12 flex-1 rounded-xl border border-tertiary-fixed-dim/50 text-label-lg text-tertiary-fixed transition-colors hover:bg-white/[0.06]"
             >
-              도감 보기
+              컬렉션 보기
             </button>
             <button
               type="button"

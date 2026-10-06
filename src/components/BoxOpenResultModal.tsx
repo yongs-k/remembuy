@@ -60,7 +60,7 @@ export function BoxOpenResultModal({
   intro?: boolean
   /** 확인: close. */
   onClose: () => void
-  /** 도감 보기: the 컬렉션, where each 장소's grade stage shows. */
+  /** 컬렉션 보기: where each 장소's grade stage shows. */
   onViewCollection: () => void
   /** 다시 열기: open the same box again; omitted where a box can't be reopened (출석). */
   onReopen?: () => void
@@ -144,7 +144,7 @@ export function BoxOpenResultModal({
               onClick={onViewCollection}
               className="min-h-12 flex-1 rounded-xl border border-tertiary-fixed-dim/50 text-label-lg text-tertiary-fixed transition-colors hover:bg-white/[0.06]"
             >
-              도감 보기
+              컬렉션 보기
             </button>
             {onReopen && (
               <button
