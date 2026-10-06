@@ -15,6 +15,7 @@ import { useGame } from '../state/GameContext'
 import { pickEasiestQuests } from '../state/quests'
 import { QuestCard } from '../components/QuestCard'
 import { useAchieveStage } from '../components/AchieveStage'
+import { HowToButton } from '../components/HowTo'
 
 type HomeFilter = 'all' | 'urgent' | 'recommended'
 
@@ -235,7 +236,7 @@ export default function HomePage() {
               <h2 id="locations-title" className="font-heading text-headline-md text-on-surface">
                 장소별 도감
               </h2>
-              <span className="text-body-sm text-on-surface-variant">기록 상품 {items.length}개</span>
+              <HowToButton topic="tiles" />
             </div>
             <div className="grid grid-cols-3 gap-space-sm sm:grid-cols-5">
               {locations.map((location) => (

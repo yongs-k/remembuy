@@ -7,6 +7,7 @@ import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
 import { placeName } from '../state/gameProgress'
 import { CountBadge, PuzzlePiece } from '../components/Puzzle'
 import { Sheet } from '../components/Sheet'
+import { HowToButton } from '../components/HowTo'
 import type { CombinePick, PieceResult, PieceStack } from '../lib/gameApi'
 
 /** Pieces of one grade that make one piece of the next (server COMBINE_COST). */
@@ -102,6 +103,7 @@ export default function CombinePage() {
         <p className="text-body-sm text-inverse-on-surface/70">
           같은 등급 장소 조각 {COMBINE_COST}개를 넣으면 다음 등급 장소 조각 1개가 무작위로 나와요.
         </p>
+        <HowToButton topic="combine" tone="cabinet" />
       </div>
 
       <div role="tablist" aria-label="넣을 등급" className="grid grid-cols-3 gap-1.5">
@@ -188,7 +190,7 @@ export default function CombinePage() {
         </div>
         {!auto && (
           <p className="text-center text-label-sm text-inverse-on-surface/60">
-            자동 넣기는 {AUTO_MIN_STACK}개 이상 쌓인 조각만 쓰고, 달성할 단계 조각 4개는 남겨요. 나머지는 아래에서 직접 넣어 주세요.
+            자동 넣기로 채울 조각이 부족해요. 아래에서 직접 넣어 주세요.
           </p>
         )}
         {failed && (

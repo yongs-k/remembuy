@@ -9,6 +9,7 @@ import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
 import type { OpenBoxResult } from '../lib/gameApi'
 import { PuzzlePiece } from '../components/Puzzle'
+import { HowToButton } from '../components/HowTo'
 
 const STEPS = [
   { icon: 'task_alt', text: '퀘스트로\n포인트 모으기' },
@@ -206,6 +207,7 @@ export default function StorePage() {
         <p className="text-body-sm text-inverse-on-surface/70">
           모은 포인트로 상자를 열면, 장소를 한 단계씩 키우는 조각이 나와요.
         </p>
+        <HowToButton topic="box" tone="cabinet" />
       </div>
 
       <ol className="flex items-start justify-between gap-1 rounded-2xl border border-tertiary-fixed-dim/20 bg-white/[0.03] px-2 py-space-md">

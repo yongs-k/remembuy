@@ -4,6 +4,7 @@ import { getLocationCompletion, getMasterItemCounts } from '../state/selectors'
 import { useGame } from '../state/GameContext'
 import { HomeLocationTile } from './HomeLocationTile'
 import { TitleManager } from './TitleManager'
+import { HowToButton } from './HowTo'
 import { useAchieveStage } from './AchieveStage'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '../data/materialIcons'
@@ -97,9 +98,10 @@ export function CollectionOverview({
             <Icon name="chevron_right" className="text-[18px]" />
           </button>
         </div>
-        <p className="-mt-1 text-body-sm text-on-surface-variant">
-          상자에서 장소 조각을 +4 모으면 달성으로 등급이 올라가요 (일반 → 고급 → 레어 → 전설).
-        </p>
+        <div className="-mt-1 flex items-center justify-between gap-space-sm">
+          <p className="text-body-sm text-on-surface-variant">장소 조각 +4를 모아 달성하면 등급이 올라가요.</p>
+          <HowToButton topic="tiles" />
+        </div>
         {showFilters && (
         <div className="flex gap-1.5 overflow-x-auto pb-space-xs [scrollbar-width:none]">
           {chips.map((chip) => {
