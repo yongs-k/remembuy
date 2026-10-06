@@ -9,8 +9,8 @@ const TABS = [
   { to: '/', label: '홈', icon: 'cottage' },
   { to: '/ranking', label: '랭킹', icon: 'leaderboard' },
   { to: '/purchase', label: '구매', icon: 'shopping_cart' },
-  { to: '/store', label: '상자', icon: 'redeem' },
-  { to: '/collection', label: '컬렉션', icon: 'menu_book' },
+  { to: '/store', label: '상자', icon: 'redeem', also: ['/quests'] },
+  { to: '/collection', label: '컬렉션', icon: 'menu_book', also: ['/dex'] },
 ]
 
 export function AppLayout() {
@@ -68,11 +68,12 @@ export function AppLayout() {
               key={tab.to}
               to={tab.to}
               end={tab.to === '/'}
-              className={({ isActive }) =>
-                `flex flex-col items-center gap-0.5 py-2 text-xs ${
-                  isActive ? 'text-primary font-bold' : 'text-on-surface-variant'
+              className={({ isActive }) => {
+                const active = isActive || Boolean(tab.also?.some((path) => pathname.startsWith(path)))
+                return `flex flex-col items-center gap-0.5 py-2 text-xs ${
+                  active ? 'text-primary font-bold' : 'text-on-surface-variant'
                 }`
-              }
+              }}
             >
               <Icon name={tab.icon} className="text-[22px]" />
               {tab.label}

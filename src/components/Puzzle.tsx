@@ -121,6 +121,23 @@ export function PuzzleBoard({
   )
 }
 
+/** One 아이템 조각: a cut gem in the grade's colour (장소 조각 are puzzle pieces). */
+export function GemPiece({ grade, className = '', dim = false }: { grade: string; className?: string; dim?: boolean }) {
+  const id = useId()
+  const hex = gradeColor(grade).hex
+  return (
+    <svg aria-hidden viewBox="0 0 100 100" className={className} style={dim ? { opacity: 0.2, filter: 'grayscale(1)' } : undefined}>
+      <defs>
+        <Gradient id={id} hex={hex} />
+      </defs>
+      {/* table, crown facets, pavilion */}
+      <path d="M50 92 L8 38 L26 14 H74 L92 38 Z" fill={shade(hex, -0.35)} transform="translate(3 4)" />
+      <path d="M50 92 L8 38 L26 14 H74 L92 38 Z" fill={`url(#${id})`} />
+      <path d="M8 38 H92 M26 14 L38 38 L50 14 L62 38 L74 14 M38 38 L50 92 L62 38" fill="none" stroke="#fff" strokeOpacity="0.45" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 /** "+2", "+3"… the pieces gathered, over a piece or a 장소. */
 export function CountBadge({ count, className = '' }: { count: number; className?: string }) {
   if (count < 1) return null

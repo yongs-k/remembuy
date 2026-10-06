@@ -1,4 +1,4 @@
-import { DdayLabel } from './Badge'
+import { DdayLabel, SampleTag } from './Badge'
 import { ItemThumb } from './ItemThumb'
 import type { Item } from '../types'
 import { Icon } from '../data/materialIcons'
@@ -15,7 +15,10 @@ export function ItemCard({ item, onClick }: { item: Item; onClick: () => void })
     >
       <ItemThumb item={item} />
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <p className="truncate text-label-lg text-on-surface">{item.name}</p>
+        <p className="flex min-w-0 items-center gap-1.5 text-label-lg text-on-surface">
+          <span className="truncate">{item.name}</span>
+          {item.id.startsWith('seed-') && <SampleTag />}
+        </p>
         {(item.recommendation !== undefined || remaining !== undefined) && (
           <span className="flex flex-wrap items-center gap-2">
             {item.recommendation !== undefined && <RecommendationBadge recommendation={item.recommendation} />}

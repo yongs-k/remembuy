@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useGame } from '../state/GameContext'
 import { DexItemCard } from '../components/DexItemCard'
 import { GameCatalogStatus } from '../components/GameCatalogStatus'
-import { PuzzlePiece } from '../components/Puzzle'
+import { GemPiece } from '../components/Puzzle'
 import { Sheet } from '../components/Sheet'
 import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
@@ -88,11 +88,7 @@ export default function DexPage() {
       {selected && (
         <Sheet labelledBy="dex-sheet-title" onClose={() => setSelected(null)} tone="cabinet" placement="center">
           <div className="space-y-3 text-center">
-            <PuzzlePiece
-              grade={selected.grade}
-              slot={selected.id.length % 4}
-              className="mx-auto h-20 w-20 drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]"
-            />
+            <GemPiece grade={selected.grade} className="mx-auto h-20 w-20 drop-shadow-[0_8px_16px_rgba(0,0,0,0.45)]" />
             <div className="space-y-0.5">
               <h2 id="dex-sheet-title" className="font-heading text-headline-md">
                 {selected.name}

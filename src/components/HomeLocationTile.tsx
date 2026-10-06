@@ -44,7 +44,7 @@ export function HomeLocationTile({
       <button
         type="button"
         onClick={onClick}
-        aria-label={`${location.name}, ${count}개 등록, 수집률 ${clamped}%${room ? (room.stage ? `, ${gradeLabel(room.stage)} 조각 +${room.count}` : ', 전설까지 달성') : ''}`}
+        aria-label={`${location.name}, 기록 ${count}개, 도감 수집률 ${clamped}%${room ? (room.stage ? `, ${gradeLabel(room.stage)} 단계 장소 조각 +${room.count}` : ', 전설까지 달성') : ''}`}
         className={`relative flex w-full flex-col items-center gap-1.5 overflow-hidden rounded-xl border-2 bg-surface-container-lowest px-1 py-space-md text-center shadow-card transition-colors duration-500 ${grade ? '' : 'border-hairline'}`}
         style={grade ? { borderColor: gradeColor(grade).hex } : undefined}
       >
@@ -77,7 +77,7 @@ export function HomeLocationTile({
         <span className="relative flex max-w-full flex-col items-center rounded-lg bg-surface-container-lowest/90 px-2 py-0.5 shadow-[0_0_0_1px_rgb(0_0_0/0.04)]">
           <span className="max-w-full truncate text-label-md font-bold text-on-surface">{location.name}</span>
           <span className="text-label-sm font-medium tabular-nums text-on-surface-variant">
-            {count}개 · {clamped}%
+            기록 {count}개 · {clamped}%
           </span>
           {room && grade && (
             <span className={`text-label-sm font-bold ${gradeColor(grade).text}`}>

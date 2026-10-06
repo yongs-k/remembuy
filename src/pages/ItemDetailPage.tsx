@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DdayLabel } from '../components/Badge'
+import { DdayLabel, SampleTag } from '../components/Badge'
 import { Sheet } from '../components/Sheet'
 import { useBack } from '../hooks/useBack'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -48,7 +48,7 @@ export default function ItemDetailPage() {
     .slice(0, 4)
   const remaining = getSoonestRemaining(item)
   const tracksSupply = parseRestockCycleDays(item.restockCycle) !== undefined || item.daysUntilEmpty !== undefined
-  // Link items are recorded via 구매 완료 after the link was opened; others via 다시 샀어요.
+  // Link items are recorded via 구매 완료 after the link was opened; others via 재구매 완료.
   const canRestock = tracksSupply && !item.affiliateUrl
   const awaitingConfirm = Boolean(item.affiliateUrl) && pendingPurchases.isPending(item.id)
   const repurchases = getPurchaseDates(item).length - 1
@@ -72,7 +72,10 @@ export default function ItemDetailPage() {
         <ItemThumb item={item} className="h-24 w-20" />
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           {meta && <span className="text-body-sm text-on-surface-variant">{meta}</span>}
-          <h1 className="font-heading text-headline-lg text-on-surface">{item.name}</h1>
+          <h1 className="flex items-center gap-1.5 font-heading text-headline-lg text-on-surface">
+            {item.name}
+            {item.id.startsWith('seed-') && <SampleTag />}
+          </h1>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {item.price !== undefined && (
               <span className="font-heading text-headline-md tabular-nums text-on-surface">
@@ -135,11 +138,22 @@ export default function ItemDetailPage() {
             구매하기
           </a>
         )}
+        {/* Due within a week and no store link: recording the repurchase is the page's one action. */}
+        {canRestock && remaining !== undefined && remaining <= 7 && (
+          <button
+            type="button"
+            onClick={() => recordPurchase(item.id)}
+            className="flex min-h-12 items-center justify-center gap-1.5 rounded-xl bg-primary text-label-lg text-on-primary active:scale-[0.98]"
+          >
+            <Icon name="check" className="text-[18px]" />
+            재구매 완료
+          </button>
+        )}
         <div className="flex gap-2">
-          {canRestock && (
+          {canRestock && (remaining === undefined || remaining > 7) && (
             <button type="button" onClick={() => recordPurchase(item.id)} className={quietBtn}>
               <Icon name="restart_alt" className="text-[18px]" />
-              다시 샀어요
+              재구매 완료
             </button>
           )}
           {awaitingConfirm && (

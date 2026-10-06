@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import type { Quest } from '../lib/gameApi'
+import { Icon } from '../data/materialIcons'
 import { useGame } from '../state/GameContext'
 
 /**
@@ -19,7 +21,31 @@ function celebrateClaim(anchor: DOMRect, points: number) {
 }
 
 /** One quest in the game cabinet tone: progress toward the target and a 받기 button when done. */
-export function QuestCard({ quest, className = '' }: { quest: Quest; className?: string }) {
+// Where each quest is done (by id prefix), for its 하러 가기 link.
+const QUEST_ROUTE: Array<[string, string]> = [
+  ['daily-attend', '/store'],
+  ['attend', '/store'],
+  ['daily-restock', '/purchase'],
+  ['restock', '/purchase'],
+  ['price', '/purchase'],
+  ['link', '/collection'],
+  ['rate', '/purchase'],
+  ['daily-record', '/new'],
+  ['record', '/new'],
+]
+
+export function QuestCard({
+  quest,
+  className = '',
+  showKind = true,
+}: {
+  quest: Quest
+  className?: string
+  /** False where a heading already says 오늘의 퀘스트. */
+  showKind?: boolean
+}) {
+  const navigate = useNavigate()
+  const route = QUEST_ROUTE.find(([prefix]) => quest.id.startsWith(prefix))?.[1]
   const { claimQuest } = useGame()
   const [claiming, setClaiming] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -37,7 +63,7 @@ export function QuestCard({ quest, className = '' }: { quest: Quest; className?:
             +{quest.reward}P
           </span>
         </div>
-        {quest.kind === 'daily' && <p className="text-label-sm text-inverse-on-surface/70">오늘의 퀘스트</p>}
+        {showKind && quest.kind === 'daily' && <p className="text-label-sm text-inverse-on-surface/70">오늘의 퀘스트</p>}
       </div>
       <div className="space-y-1.5">
         <div
@@ -70,6 +96,15 @@ export function QuestCard({ quest, className = '' }: { quest: Quest; className?:
               className="min-h-11 rounded-lg bg-tertiary-fixed-dim px-4 text-label-md text-on-tertiary-fixed active:scale-[0.98] disabled:opacity-70"
             >
               {claiming ? '받는 중...' : '받기'}
+            </button>
+          ) : route ? (
+            <button
+              type="button"
+              onClick={() => navigate(route)}
+              className="-my-2 inline-flex min-h-11 items-center text-label-md text-inverse-on-surface/80"
+            >
+              하러 가기
+              <Icon name="chevron_right" className="text-[18px]" />
             </button>
           ) : null}
         </div>

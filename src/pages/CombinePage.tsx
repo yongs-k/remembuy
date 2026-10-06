@@ -190,7 +190,7 @@ export default function CombinePage() {
         </div>
         {!auto && (
           <p className="text-center text-label-sm text-inverse-on-surface/60">
-            자동 넣기로 채울 조각이 부족해요. 아래에서 직접 넣어 주세요.
+            {AUTO_MIN_STACK}개 이상 쌓인 조각을 다 모아도 10개가 안 돼요(달성용 4개는 빼고). 아래에서 직접 넣어 주세요.
           </p>
         )}
         {failed && (

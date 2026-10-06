@@ -90,7 +90,7 @@ export function getRemainingDays(item: Item, today: string = new Date().toISOStr
 }
 
 export function formatDday(days: number): string {
-  return days >= 0 ? `D-${days}` : `D+${Math.abs(days)}`
+  return days > 0 ? `D-${days}` : days === 0 ? '오늘' : `${Math.abs(days)}일 지남`
 }
 
 const CYCLE_UNIT_DAYS: Record<string, number> = { 일: 1, 주: 7, 개월: 30, 달: 30, 년: 365 }

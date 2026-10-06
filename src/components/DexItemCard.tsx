@@ -1,7 +1,7 @@
 import type { DexEntry } from '../lib/gameApi'
 import { gradeColor } from '../data/gradeColors'
 import { placeName } from '../state/gameProgress'
-import { PuzzlePiece } from './Puzzle'
+import { GemPiece } from './Puzzle'
 
 /** One 아이템 수집함 entry, styled like a 조합 pile: a grade piece, the name and its 아이템 조각 n/10 (+N is for 장소 조각 only). */
 export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => void }) {
@@ -12,7 +12,7 @@ export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => 
         aria-label={`잠긴 ${entry.roomType ? placeName(entry.roomType) + ' ' : ''}아이템`}
         className="flex flex-col items-center gap-0.5 rounded-xl border border-dashed border-white/15 px-1 pb-2 pt-3 text-center"
       >
-        <PuzzlePiece grade={entry.grade} className="h-10 w-10 opacity-20 grayscale" />
+        <GemPiece grade={entry.grade} dim className="h-10 w-10" />
         <span className="text-label-sm font-bold text-inverse-on-surface/50">???</span>
         <span className="text-[11px] text-inverse-on-surface/40">{entry.roomType ? placeName(entry.roomType).split('/')[0] : '잠김'}</span>
       </div>
@@ -30,7 +30,7 @@ export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => 
       className="relative flex w-full flex-col items-center gap-0.5 rounded-xl bg-white/[0.05] px-1.5 pb-2 pt-3 text-center transition-colors hover:bg-white/[0.09] active:scale-[0.98]"
       style={complete ? { boxShadow: `inset 0 0 0 1.5px ${hex}` } : undefined}
     >
-      <PuzzlePiece grade={entry.grade} slot={entry.id.length % 4} className="h-10 w-10" />
+      <GemPiece grade={entry.grade} className="h-10 w-10" />
       <span className="max-w-full truncate text-label-sm font-bold text-inverse-on-surface">{entry.name}</span>
       {complete ? (
         <span className="text-[11px] font-bold" style={{ color: hex }}>

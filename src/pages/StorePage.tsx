@@ -8,7 +8,7 @@ import { AttendanceCard } from '../components/AttendanceBox'
 import { Icon } from '../data/materialIcons'
 import { GRADE_ORDER, gradeColor, gradeLabel } from '../data/gradeColors'
 import type { OpenBoxResult } from '../lib/gameApi'
-import { PuzzlePiece } from '../components/Puzzle'
+import { GemPiece, PuzzlePiece } from '../components/Puzzle'
 import { HowToButton } from '../components/HowTo'
 
 const STEPS = [
@@ -205,7 +205,7 @@ export default function StorePage() {
       <div className="space-y-1 text-center">
         <h1 className="font-heading text-display-sm text-tertiary-fixed">상자 열기</h1>
         <p className="text-body-sm text-inverse-on-surface/70">
-          모은 포인트로 상자를 열면, 장소를 한 단계씩 키우는 조각이 나와요.
+          모은 포인트로 상자를 열어 장소를 키워요.
         </p>
         <HowToButton topic="box" tone="cabinet" />
       </div>
@@ -302,17 +302,20 @@ export default function StorePage() {
         <section aria-labelledby="store-grades" className="space-y-space-sm rounded-2xl border border-tertiary-fixed-dim/20 bg-white/[0.03] p-space-md">
           <div className="flex items-center justify-between">
             <h2 id="store-grades" className="text-label-lg font-bold">
-              획득 가능한 아이템
+              상자에서 나오는 것
             </h2>
             <button
               type="button"
               onClick={() => navigate('/dex')}
               className="-my-2 flex min-h-11 items-center text-label-md text-inverse-on-surface/70"
             >
-              전체 보기
+              아이템 수집함
               <Icon name="chevron_right" className="text-[18px]" />
             </button>
           </div>
+          <p className="-mt-1 text-body-sm text-inverse-on-surface/70">
+            상자 하나에 장소 조각(퍼즐) 1개와 그 아이템의 아이템 조각(보석) 1개가 나와요.
+          </p>
           <ul className="grid grid-cols-4 gap-2">
             {GRADE_ORDER.map((grade) => {
               const hex = gradeColor(grade).hex
@@ -326,8 +329,11 @@ export default function StorePage() {
                   <span className="text-label-sm font-bold" style={{ color: hex }}>
                     {gradeLabel(grade)}
                   </span>
-                  <PuzzlePiece grade={grade} slot={GRADE_ORDER.indexOf(grade)} className="h-10 w-10" />
-                  <span className="text-label-sm tabular-nums text-inverse-on-surface/70">{kinds}종</span>
+                  <span className="flex items-end">
+                    <PuzzlePiece grade={grade} slot={GRADE_ORDER.indexOf(grade)} className="h-9 w-9" />
+                    <GemPiece grade={grade} className="-ml-2 h-5 w-5" />
+                  </span>
+                  <span className="text-[11px] tabular-nums text-inverse-on-surface/70">아이템 {kinds}종</span>
                 </li>
               )
             })}

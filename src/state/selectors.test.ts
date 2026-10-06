@@ -166,12 +166,12 @@ describe('getRemainingDays', () => {
 
 describe('formatDday', () => {
   it('formats zero and positive numbers as D-N', () => {
-    expect(formatDday(0)).toBe('D-0')
+    expect(formatDday(0)).toBe('오늘')
     expect(formatDday(7)).toBe('D-7')
   })
 
-  it('formats negative numbers as D+N (absolute value)', () => {
-    expect(formatDday(-3)).toBe('D+3')
+  it('formats overdue days as words', () => {
+    expect(formatDday(-3)).toBe('3일 지남')
   })
 })
 

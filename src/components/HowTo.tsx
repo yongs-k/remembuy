@@ -57,7 +57,7 @@ const TOPICS: Record<Topic, { title: string; steps: Step[] }> = {
       {
         visual: <PuzzleBoard grade="ADVANCED" pieces={[1, 1, 1, 1]} className="h-7 w-7 text-inverse-on-surface" />,
         title: '+4면 달성',
-        text: '홈이나 컬렉션의 장소 타일에서 달성을 누르면 등급이 올라가요. 아이템 조각도 함께 쌓여 아이템 수집함이 채워져요.',
+        text: '홈이나 컬렉션의 장소 타일에서 달성을 누르면 등급이 올라가요. 함께 나온 아이템 조각(보석)은 아이템 수집함에 따로 쌓여요.',
       },
     ],
   },

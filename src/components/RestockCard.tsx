@@ -8,6 +8,7 @@ import { usePendingPurchases } from '../hooks/usePendingPurchases'
 import { getSoonestRemaining } from '../state/selectors'
 import { Icon } from '../data/materialIcons'
 import { Sheet } from './Sheet'
+import { SampleTag } from './Badge'
 import { buyUrl } from './PodiumItemCard'
 
 /** One row of a restock list; the parent <ul> draws the card and dividers. */
@@ -30,6 +31,8 @@ export function RestockCard({
     .filter(Boolean)
     .join(' · ')
   const titleId = `rebuy-${item.id}`
+  // The action appears only when it's time; further-off rows just open the item.
+  const due = remaining !== undefined && remaining <= 7
 
   return (
     <li className="flex items-center gap-1.5 py-1 pl-space-md pr-2">
@@ -43,13 +46,16 @@ export function RestockCard({
           <span className="flex min-w-0 items-baseline gap-1.5">
             {isNew && <span className="shrink-0 text-label-sm text-primary">새로</span>}
             <span className="truncate text-label-lg text-on-surface">{item.name}</span>
+            {item.id.startsWith('seed-') && <SampleTag />}
           </span>
           {showLastPurchase && lastPurchase && (
             <span className="block truncate text-body-sm text-on-surface-variant">지난 구매 {lastPurchase}</span>
           )}
         </span>
         {remaining !== undefined && <DdayLabel days={remaining} />}
+        {!due && <Icon name="chevron_right" className="text-[20px] text-on-surface-variant" />}
       </button>
+      {due && (
       <button
         type="button"
         onClick={() => setRebuying(true)}
@@ -57,6 +63,7 @@ export function RestockCard({
       >
         재구매하기
       </button>
+      )}
       {rebuying && (
         <Sheet labelledBy={titleId} onClose={() => setRebuying(false)}>
           <div className="space-y-0.5 pb-1 text-center">

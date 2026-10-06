@@ -4,11 +4,13 @@ import { formatDday } from '../state/selectors'
 /** Days until empty. Plain text; only urgent ones get the accent color and a dot. */
 export function DdayLabel({ days, urgentAt = 7 }: { days: number; urgentAt?: number }) {
   const urgent = days <= urgentAt
+  // Overdue and today weigh more than "soon".
+  const pressing = days <= 0
   return (
     <span
       className={`inline-flex shrink-0 items-center gap-1 text-label-md tabular-nums ${
         urgent ? 'text-primary' : 'font-medium text-on-surface-variant'
-      }`}
+      } ${pressing ? 'font-bold' : ''}`}
     >
       {urgent && <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-primary" />}
       {formatDday(days)}

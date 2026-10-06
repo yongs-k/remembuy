@@ -7,7 +7,7 @@ import type { Item } from '../types'
 
 vi.mock('../state/LockerContext')
 
-const item = { id: 'i1', name: '치약', categoryId: 'c1', createdAt: '2026-09-01' } as Item
+const item = { id: 'i1', name: '치약', categoryId: 'c1', createdAt: '2026-09-01', daysUntilEmpty: 2 } as Item
 
 describe('RestockCard', () => {
   it('재구매하기 offers a store link and records the purchase on 재구매 완료', () => {

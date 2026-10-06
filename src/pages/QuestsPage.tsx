@@ -16,8 +16,10 @@ export default function QuestsPage() {
   const { quests, questsError, reloadQuests, state } = useGame()
   const navigate = useNavigate()
   const goBack = useBack()
-  const daily = ordered(quests.filter((quest) => quest.kind === 'daily'))
-  const once = ordered(quests.filter((quest) => quest.kind === 'once'))
+  // Rewards waiting go first, in their own section; the rest by kind.
+  const ready = quests.filter((quest) => quest.claimable && !quest.claimed)
+  const daily = ordered(quests.filter((quest) => quest.kind === 'daily' && !ready.includes(quest)))
+  const once = ordered(quests.filter((quest) => quest.kind === 'once' && !ready.includes(quest)))
 
   return (
     <div className="space-y-space-lg p-margin">
@@ -30,12 +32,11 @@ export default function QuestsPage() {
         뒤로
       </button>
 
-      <div className="flex items-end justify-between gap-space-sm rounded-2xl bg-inverse-surface p-space-lg text-inverse-on-surface">
-        <h1 className="font-heading text-display-sm">퀘스트</h1>
+      <div className="flex items-end justify-between gap-space-sm">
+        <h1 className="font-heading text-display-sm text-on-surface">퀘스트</h1>
         {state && (
-          <span className="flex shrink-0 items-center gap-1 font-heading text-stat-counter tabular-nums text-tertiary-fixed-dim">
-            <Icon name="monetization_on" className="text-[20px]" />
-            <span>{state.points.toLocaleString()}P</span>
+          <span className="shrink-0 text-label-lg tabular-nums text-on-surface-variant">
+            내 포인트 <strong className="text-on-surface">{state.points.toLocaleString()}P</strong>
           </span>
         )}
       </div>
@@ -60,6 +61,19 @@ export default function QuestsPage() {
         )
       ) : (
         <>
+          {ready.length > 0 && (
+            <section aria-labelledby="ready-quests" className="space-y-space-sm">
+              <h2 id="ready-quests" className="font-heading text-headline-md text-on-surface">
+                지금 받을 수 있어요
+              </h2>
+              <div className="grid gap-space-sm sm:grid-cols-2">
+                {ready.map((quest) => (
+                  <QuestCard key={quest.id} quest={quest} />
+                ))}
+              </div>
+            </section>
+          )}
+
           <section aria-labelledby="daily-quests" className="space-y-space-sm">
             <h2 id="daily-quests" className="font-heading text-headline-md text-on-surface">
               오늘의 퀘스트
@@ -67,7 +81,7 @@ export default function QuestsPage() {
             <p className="-mt-1 text-body-sm text-on-surface-variant">매일 자정(한국 시간)에 새로 시작돼요.</p>
             <div className="grid gap-space-sm sm:grid-cols-2">
               {daily.map((quest) => (
-                <QuestCard key={quest.id} quest={quest} />
+                <QuestCard key={quest.id} quest={quest} showKind={false} />
               ))}
             </div>
           </section>

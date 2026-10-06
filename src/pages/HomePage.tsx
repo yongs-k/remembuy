@@ -234,7 +234,7 @@ export default function HomePage() {
           <section aria-labelledby="locations-title" className="space-y-space-sm">
             <div className="flex items-baseline justify-between gap-space-sm">
               <h2 id="locations-title" className="font-heading text-headline-md text-on-surface">
-                장소별 도감
+                장소
               </h2>
               <HowToButton topic="tiles" />
             </div>
