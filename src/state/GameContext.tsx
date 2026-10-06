@@ -9,6 +9,8 @@ import {
   claimAttendance as claimAttendanceApi,
   fetchQuests,
   claimQuest as claimQuestApi,
+  claimSavings as claimSavingsApi,
+  type Saving,
   openBox as openBoxApi,
   openBoxes as openBoxesApi,
   combinePieces as combinePiecesApi,
@@ -47,6 +49,9 @@ type GameContextValue = {
   attendance: Attendance | null
   /** Opens today's free box; undefined if already claimed or the call failed. */
   claimAttendance: () => Promise<OpenBoxResult | undefined>
+  /** The last 재구매 할인 payout, shown once; dismissSavings clears it. */
+  savings?: { paid: Saving[]; points: number } | null
+  dismissSavings?: () => void
   /** 퀘스트 from the server; empty until loaded or when the server is unreachable. */
   quests: Quest[]
   /** The last quest fetch failed (as opposed to still loading). */
@@ -69,6 +74,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [attendance, setAttendance] = useState<Attendance | null>(null)
   const [quests, setQuests] = useState<Quest[]>([])
   const [questsError, setQuestsError] = useState(false)
+  const [savings, setSavings] = useState<{ paid: Saving[]; points: number } | null>(null)
   const [catalogError, setCatalogError] = useState(false)
   const reconciled = useRef(false)
 
@@ -200,7 +206,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
   // Quest progress is computed from the server's copy of the records: refetch
   // once each record save lands there.
   useEffect(() => {
-    if (syncedAt !== null) loadQuests()
+    if (syncedAt === null) return
+    loadQuests()
+    // Prices land with the same save: pay any cheaper repurchase now.
+    claimSavingsApi().then(
+      (result) => {
+        if (result.pointsAwarded <= 0) return
+        setSavings({ paid: result.paid, points: result.pointsAwarded })
+        fetchGameState().then(setState, () => {})
+      },
+      (error) => console.warn('savings claim failed', error)
+    )
   }, [syncedAt, loadQuests])
 
   const claimQuest = useCallback(async (questId: string) => {
@@ -249,7 +265,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <GameContext.Provider value={{ state, boxes, dex, rooms, stacks, combine, achieve, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, questsError, reloadQuests: loadQuests, claimQuest }}>{children}</GameContext.Provider>
+    <GameContext.Provider value={{ state, boxes, dex, rooms, stacks, combine, achieve, catalogError, refresh, claim, openBox, openBoxes, attendance, claimAttendance, quests, questsError, reloadQuests: loadQuests, claimQuest, savings, dismissSavings: () => setSavings(null) }}>{children}</GameContext.Provider>
   )
 }
 

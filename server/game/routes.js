@@ -13,6 +13,7 @@ import {
   claimAttendance,
 } from './itemService.js'
 import { getQuests, claimQuest } from './quests.js'
+import { claimSavings } from './savings.js'
 
 const DEVICE_ID = /^[A-Za-z0-9-]{8,64}$/
 const MAX_BODY_BYTES = 64 * 1024
@@ -105,6 +106,11 @@ export async function handleGameRequest(req, res, db) {
         else if (error.message === 'not complete' || error.message === 'already claimed') sendJson(res, 409, { error: error.message })
         else throw error
       }
+      return
+    }
+
+    if (route === 'POST /api/game/savings/claim') {
+      sendJson(res, 200, claimSavings(db, deviceId))
       return
     }
 

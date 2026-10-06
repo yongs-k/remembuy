@@ -242,13 +242,20 @@ export function LockerProvider({ children }: { children: ReactNode }) {
     recordPurchaseDetails: (id, date, details) => {
       const item = state.items.find((i) => i.id === id)
       if (!item) return
+      // The price the item was first recorded with is the baseline 재구매 할인 compares
+      // against; keep it as a purchase entry before item.price is overwritten.
+      const hasEarlierPrice = Object.entries(item.purchaseDetails ?? {}).some(([d, v]) => d < date && v?.price !== undefined)
+      const baseline =
+        !hasEarlierPrice && item.price !== undefined && item.createdAt < date
+          ? { [item.createdAt]: { price: item.price, ...(item.place && { place: item.place }) } }
+          : {}
       dispatch({
         type: 'UPDATE_ITEM',
         id,
         patch: {
           ...(details.price !== undefined && { price: details.price }),
           ...(details.place && { place: details.place }),
-          purchaseDetails: { ...item.purchaseDetails, [date]: details },
+          purchaseDetails: { ...baseline, ...item.purchaseDetails, [date]: details },
         },
       })
     },

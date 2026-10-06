@@ -4,6 +4,7 @@ import { getUpcomingNotifications } from '../state/selectors'
 import { useSeenNotifications } from '../hooks/useSeenNotifications'
 import { Icon } from '../data/materialIcons'
 import { PurchaseUndoToast } from './PurchaseUndoToast'
+import { SavingsToast } from './SavingsToast'
 
 const TABS = [
   { to: '/', label: '홈', icon: 'cottage' },
@@ -81,6 +82,7 @@ export function AppLayout() {
           ))}
         </nav>
         <PurchaseUndoToast />
+        <SavingsToast />
       </div>
     </div>
   )

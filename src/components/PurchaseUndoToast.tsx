@@ -5,7 +5,7 @@ import { Sheet } from './Sheet'
 // Long enough to read and reach; paused while hovered or focused (WCAG 2.2.1).
 const VISIBLE_MS = 10000
 
-type Editing = { id: string; name: string; date: string; price: string; place: string }
+type Editing = { id: string; name: string; date: string; price: string; place: string; lastPrice?: number }
 
 /**
  * After each recorded purchase: "다시 산 걸로 기록했어요 · 가격 입력 · 되돌리기".
@@ -38,6 +38,7 @@ export function PurchaseUndoToast() {
       name: lastPurchase.name,
       date: lastPurchase.date,
       price: item?.price !== undefined ? String(item.price) : '',
+      lastPrice: item?.price,
       place: item?.place ?? '',
     })
     dismissLastPurchase()
@@ -113,6 +114,20 @@ export function PurchaseUndoToast() {
                 className={inputCls}
               />
             </label>
+            {editing.lastPrice !== undefined && (
+              <p className="rounded-xl bg-surface-container-low px-3 py-2 text-body-sm text-on-surface-variant">
+                지난 가격 {editing.lastPrice.toLocaleString()}원
+                {(() => {
+                  const now = Number(editing.price)
+                  const saved = editing.price.trim() !== '' && Number.isFinite(now) ? editing.lastPrice - now : 0
+                  return saved > 0 ? (
+                    <strong className="ml-1 text-on-surface">· {saved.toLocaleString()}원 아껴서 +{saved.toLocaleString()}P</strong>
+                  ) : (
+                    ' · 더 싸게 샀다면 차액만큼 포인트를 받아요'
+                  )
+                })()}
+              </p>
+            )}
             <label className="block text-label-md text-on-surface-variant">
               구매처
               <input

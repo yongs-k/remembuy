@@ -162,6 +162,15 @@ CREATE TABLE IF NOT EXISTS user_piece_stock (
   count INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (user_id, space_id, grade)
 );
+-- 재구매 할인 보상 paid: one row per cheaper repurchase (item, purchase date).
+CREATE TABLE IF NOT EXISTS savings_claims (
+  user_id TEXT NOT NULL REFERENCES users(id),
+  item_id TEXT NOT NULL,
+  purchase_date TEXT NOT NULL,
+  amount INTEGER NOT NULL,
+  claimed_at TEXT NOT NULL,
+  PRIMARY KEY (user_id, item_id, purchase_date)
+);
 -- Quest rewards claimed; period is 'once' or the KST day for daily quests.
 CREATE TABLE IF NOT EXISTS quest_claims (
   user_id TEXT NOT NULL REFERENCES users(id),

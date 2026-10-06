@@ -170,6 +170,12 @@ export const fetchAttendance = () => request<Attendance>('/api/game/attendance')
 
 export const claimAttendance = () => request<OpenBoxResult>('/api/game/attendance', { method: 'POST' })
 
+/** 재구매 할인 보상: cheaper repurchases paid as points (1원 = 1P). */
+export type Saving = { itemId: string; name: string; date: string; from: number; to: number; saved: number }
+
+export const claimSavings = () =>
+  request<{ paid: Saving[]; pointsAwarded: number }>('/api/game/savings/claim', { method: 'POST' })
+
 /** 퀘스트 progress, computed by the server from the synced records and attendance. */
 export type Quest = {
   id: string
