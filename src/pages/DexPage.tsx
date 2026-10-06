@@ -34,7 +34,7 @@ export default function DexPage() {
       <div className="space-y-1 text-center">
         <h1 className="font-heading text-display-sm text-tertiary-fixed">아이템 수집함</h1>
         <p className="text-body-sm text-inverse-on-surface/70">
-          상자에서 나온 조각이 아이템마다 쌓여요.
+          상자를 열 때마다 그 아이템의 아이템 조각이 쌓이고, 다 모으면 완성돼요.
           {dex.length > 0 && (
             <>
               {' '}
@@ -53,7 +53,7 @@ export default function DexPage() {
         className="flex min-h-12 w-full items-center justify-center gap-1.5 rounded-xl bg-gradient-to-b from-[#f8dc9a] to-[#d9a24c] text-label-lg font-bold text-on-tertiary-fixed active:scale-[0.98]"
       >
         <Icon name="extension" className="text-[20px]" />
-        조각 조합
+        장소 조각 조합
       </button>
 
       {dex.length === 0 ? (
@@ -102,7 +102,7 @@ export default function DexPage() {
                 {selected.roomType && <span className="text-inverse-on-surface/70"> · {placeName(selected.roomType)}</span>}
               </p>
               <p className="text-body-sm tabular-nums text-inverse-on-surface/70">
-                {selected.fragmentCount} / {selected.fragmentsRequired} 조각
+                아이템 조각 {selected.fragmentCount} / {selected.fragmentsRequired}
               </p>
             </div>
             <button

@@ -66,15 +66,15 @@ describe('DexPage', () => {
     mockGame(ENTRIES)
     render(<DexPage />)
     fireEvent.click(screen.getByText('레어템'))
-    expect(screen.getByText('20 / 20 조각')).toBeInTheDocument()
+    expect(screen.getByText('아이템 조각 20 / 20')).toBeInTheDocument()
     fireEvent.click(screen.getByText('닫기'))
-    expect(screen.queryByText('20 / 20 조각')).not.toBeInTheDocument()
+    expect(screen.queryByText('아이템 조각 20 / 20')).not.toBeInTheDocument()
   })
 
   it('a locked entry has no detail sheet to open', () => {
     mockGame(ENTRIES)
     render(<DexPage />)
     fireEvent.click(screen.getByText('???'))
-    expect(screen.queryByText('0 / 30 조각')).not.toBeInTheDocument()
+    expect(screen.queryByText('아이템 조각 0 / 30')).not.toBeInTheDocument()
   })
 })

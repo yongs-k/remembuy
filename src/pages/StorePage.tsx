@@ -202,7 +202,7 @@ export default function StorePage() {
       </div>
 
       <div className="space-y-1 text-center">
-        <h1 className="font-heading text-display-sm text-tertiary-fixed">선물상자 열기</h1>
+        <h1 className="font-heading text-display-sm text-tertiary-fixed">상자 열기</h1>
         <p className="text-body-sm text-inverse-on-surface/70">
           모은 포인트로 상자를 열면, 장소를 한 단계씩 키우는 조각이 나와요.
         </p>

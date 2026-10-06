@@ -5,6 +5,8 @@ import { useGame } from '../state/GameContext'
 import { HomeLocationTile } from './HomeLocationTile'
 import { TitleManager } from './TitleManager'
 import { useAchieveStage } from './AchieveStage'
+import { useNavigate } from 'react-router-dom'
+import { Icon } from '../data/materialIcons'
 
 type Filter = 'all' | 'progress' | 'almost' | 'none'
 
@@ -22,6 +24,7 @@ export function CollectionOverview({
   const [filter, setFilter] = useState<Filter>('all')
   const { dex, rooms } = useGame()
   const achieveStage = useAchieveStage()
+  const navigate = useNavigate()
   const totalFragments = dex.reduce((sum, entry) => sum + entry.fragmentCount, 0)
 
   const overall = getMasterItemCounts(items, categories)
@@ -55,14 +58,11 @@ export function CollectionOverview({
 
   return (
     <div className="space-y-space-lg p-margin">
-      <TitleManager />
       {achieveStage.sheet}
       <section className="space-y-space-sm">
         <h1 className="font-heading text-display-sm text-on-surface">컬렉션</h1>
         <p className="text-body-md text-on-surface-variant">
-          장소마다 집에 필요한 소모품을 모아둔 도감이에요. 기록하면 체크돼요. 상자에서 그 장소 등급 조각을 +4 모아 달성하면 등급이 올라가요 (일반 → 고급 → 레어 → 전설).
-          <br />
-          {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을 모았어요.
+          장소별 소모품 도감이에요. {overall.total}종 중 <strong className="text-on-surface">{overall.owned}종</strong>을 기록했어요.
         </p>
         <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
           <div className="h-full rounded-full bg-secondary" style={{ width: `${overallPercent}%` }} />
@@ -71,8 +71,8 @@ export function CollectionOverview({
           {(
             [
               ['수집률', `${overallPercent}%`],
-              dex.length > 0 ? ['모은 조각', `${totalFragments}개`] : ['등록 상품', `${items.length}개`],
-              ['완성한 장소', `${completedCount}/${locations.length}`],
+              dex.length > 0 ? ['아이템 조각', `${totalFragments}개`] : ['등록 상품', `${items.length}개`],
+              ['도감 완성 장소', `${completedCount}/${locations.length}`],
             ] as const
           ).map(([label, value]) => (
             <div key={label} className="flex flex-col-reverse gap-0.5">
@@ -83,8 +83,23 @@ export function CollectionOverview({
         </dl>
       </section>
 
+      <TitleManager />
+
       <section className="space-y-space-sm">
-        <h2 className="font-heading text-headline-md text-on-surface">장소별 도감</h2>
+        <div className="flex items-baseline justify-between gap-space-sm">
+          <h2 className="font-heading text-headline-md text-on-surface">장소별 도감</h2>
+          <button
+            type="button"
+            onClick={() => navigate('/dex/combine')}
+            className="-my-2 flex min-h-11 shrink-0 items-center gap-0.5 text-label-md text-on-surface-variant"
+          >
+            장소 조각 조합
+            <Icon name="chevron_right" className="text-[18px]" />
+          </button>
+        </div>
+        <p className="-mt-1 text-body-sm text-on-surface-variant">
+          상자에서 장소 조각을 +4 모으면 달성으로 등급이 올라가요 (일반 → 고급 → 레어 → 전설).
+        </p>
         {showFilters && (
         <div className="flex gap-1.5 overflow-x-auto pb-space-xs [scrollbar-width:none]">
           {chips.map((chip) => {

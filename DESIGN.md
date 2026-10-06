@@ -150,7 +150,7 @@ The palette is warm neutrals with three accents: terracotta for action, sage for
 
 ### Tertiary
 - **Cabinet Gold** (tertiary-fixed-dim): points and the box-opening button on the dark game surface. Used only on espresso.
-- **Grade colours** (`src/data/gradeColors.ts`): 일반 silver #aab6c2, 고급 lime #8bc34a, 레어 purple #9c6ade, 전설 red #e53935. They colour puzzle pieces, grade labels and a 장소 tile's border; nothing else.
+- **Grade colours** (`src/data/gradeColors.ts`): 일반 silver #aab6c2, 고급 lime #8bc34a, 레어 purple #9c6ade, 전설 ruby #e0245e (never the terracotta of urgency). They colour puzzle pieces, grade labels and a 장소 tile's border; nothing else.
 - **Honey** (tertiary-fixed): the assigned rank on podium buttons and the Badge chip.
 
 ### Neutral

@@ -100,7 +100,7 @@ export default function CombinePage() {
       <div className="space-y-1 text-center">
         <h1 className="font-heading text-display-sm text-tertiary-fixed">조각 조합</h1>
         <p className="text-body-sm text-inverse-on-surface/70">
-          같은 등급 조각 {COMBINE_COST}개를 넣으면 다음 등급 조각 1개가 무작위로 나와요.
+          같은 등급 장소 조각 {COMBINE_COST}개를 넣으면 다음 등급 장소 조각 1개가 무작위로 나와요.
         </p>
       </div>
 
@@ -200,7 +200,7 @@ export default function CombinePage() {
 
       <section aria-labelledby="piles-title" className="space-y-2">
         <h2 id="piles-title" className="text-label-lg font-bold">
-          가진 {gradeLabel(grade)} 조각 · 눌러서 넣기
+          가진 {gradeLabel(grade)} 장소 조각 · 눌러서 넣기
         </h2>
         {piles.length === 0 ? (
           <p className="rounded-xl bg-white/[0.04] px-space-md py-space-md text-center text-body-sm text-inverse-on-surface/60">

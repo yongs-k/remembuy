@@ -1,9 +1,9 @@
 import type { DexEntry } from '../lib/gameApi'
 import { gradeColor } from '../data/gradeColors'
 import { placeName } from '../state/gameProgress'
-import { CountBadge, PuzzlePiece } from './Puzzle'
+import { PuzzlePiece } from './Puzzle'
 
-/** One 아이템 수집함 entry, styled like a 조합 pile: a grade piece, its +N, the name and progress. */
+/** One 아이템 수집함 entry, styled like a 조합 pile: a grade piece, the name and its 아이템 조각 n/10 (+N is for 장소 조각 only). */
 export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => void }) {
   if (entry.status === 'LOCKED') {
     return (
@@ -30,7 +30,6 @@ export function DexItemCard({ entry, onOpen }: { entry: DexEntry; onOpen: () => 
       className="relative flex w-full flex-col items-center gap-0.5 rounded-xl bg-white/[0.05] px-1.5 pb-2 pt-3 text-center transition-colors hover:bg-white/[0.09] active:scale-[0.98]"
       style={complete ? { boxShadow: `inset 0 0 0 1.5px ${hex}` } : undefined}
     >
-      <CountBadge count={entry.fragmentCount} className="absolute right-1 top-1" />
       <PuzzlePiece grade={entry.grade} slot={entry.id.length % 4} className="h-10 w-10" />
       <span className="max-w-full truncate text-label-sm font-bold text-inverse-on-surface">{entry.name}</span>
       {complete ? (

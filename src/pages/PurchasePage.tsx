@@ -24,7 +24,7 @@ export default function PurchasePage() {
 
   return (
     <div className="space-y-space-lg p-margin">
-      <h1 className="font-heading text-display-sm text-on-surface">다시 살 상품</h1>
+      <h1 className="font-heading text-display-sm text-on-surface">구매</h1>
 
       <section aria-labelledby="due-title" className="space-y-space-sm">
         <div>
