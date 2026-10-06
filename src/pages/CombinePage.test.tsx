@@ -20,6 +20,13 @@ describe('autoFill', () => {
     expect(picked?.map((p) => p.spaceId)).toEqual([...Array(6).fill('kitchen'), ...Array(4).fill('car')])
     expect(autoFill([stack('car', 5), stack('laundry', 3), stack('entrance', 3)])).toBeNull()
   })
+
+  it('uses kept pieces first and leaves a stage pile its four for 달성', () => {
+    const picked = autoFill([stack('bathroom', 9, 'stage'), stack('car', 4), stack('kitchen', 4)])
+    expect(picked?.map((p) => p.spaceId)).toEqual([...Array(4).fill('car'), ...Array(4).fill('kitchen'), 'bathroom', 'bathroom'])
+    // A stage pile of exactly four gives nothing.
+    expect(autoFill([stack('bathroom', 4, 'stage'), stack('car', 6)])).toBeNull()
+  })
 })
 
 describe('CombinePage', () => {

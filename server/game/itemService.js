@@ -138,9 +138,18 @@ function dropEntries(db, boxId) {
   )
 }
 
+/** What 자동 넣기 may take from a pile: none under four; a stage pile keeps four for 달성. */
+const autoSpare = (stack) =>
+  stack.count < AUTO_MIN_STACK ? 0 : stack.source === 'stage' ? stack.count - STAGE_SIZE : stack.count
+
+/** 자동 넣기 order: kept pieces before stage pieces, tallest first within each. */
+const autoOrder = (stacks) =>
+  [...stacks].sort((a, b) => (a.source === b.source ? b.count - a.count : a.source === 'stock' ? -1 : 1))
+
 /**
  * 조합: ten pieces of one grade become one random piece of the next grade.
- * Without `picks` (자동 넣기) the ten come from stacks of at least four, tallest first;
+ * Without `picks` (자동 넣기) the ten come from stacks of at least four: kept pieces
+ * first, tallest first, and a 장소's stage pieces only past the four 달성 needs.
  * `picks` ([{ spaceId, source, count }]) choose them by hand.
  */
 export function combinePieces(db, userId, grade, picks, randomFn = Math.random, nowIso = new Date().toISOString()) {
@@ -154,9 +163,10 @@ export function combinePieces(db, userId, grade, picks, randomFn = Math.random, 
     if (picks === undefined) {
       take = []
       let left = COMBINE_COST
-      for (const stack of [...stacks].filter((s) => s.count >= AUTO_MIN_STACK).sort((a, b) => b.count - a.count)) {
+      for (const stack of autoOrder(stacks)) {
         if (left === 0) break
-        const n = Math.min(left, stack.count)
+        const n = Math.min(left, autoSpare(stack))
+        if (n === 0) continue
         take.push({ spaceId: stack.spaceId, source: stack.source, count: n })
         left -= n
       }

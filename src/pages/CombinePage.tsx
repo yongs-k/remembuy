@@ -17,11 +17,19 @@ export const AUTO_MIN_STACK = 4
 type Piece = { spaceId: string; source: PieceStack['source'] }
 const key = (p: Piece) => `${p.spaceId}|${p.source}`
 
-/** 자동 넣기: ten from piles of four or more, tallest first; null when they hold fewer than ten. */
+/** Stage pieces 달성 needs (server STAGE_SIZE); 자동 넣기 leaves them in place. */
+const STAGE_KEEP = 4
+
+/**
+ * 자동 넣기 (mirrors the server): ten from piles of four or more, kept pieces before
+ * stage pieces, tallest first, and a stage pile only past its four. Null when short of ten.
+ */
 export function autoFill(stacks: PieceStack[]): Piece[] | null {
+  const spare = (s: PieceStack) => (s.count < AUTO_MIN_STACK ? 0 : s.source === 'stage' ? s.count - STAGE_KEEP : s.count)
+  const ordered = [...stacks].sort((a, b) => (a.source === b.source ? b.count - a.count : a.source === 'stock' ? -1 : 1))
   const pieces: Piece[] = []
-  for (const stack of stacks.filter((s) => s.count >= AUTO_MIN_STACK).sort((a, b) => b.count - a.count)) {
-    for (let i = 0; i < stack.count && pieces.length < COMBINE_COST; i++) pieces.push({ spaceId: stack.spaceId, source: stack.source })
+  for (const stack of ordered) {
+    for (let i = 0; i < spare(stack) && pieces.length < COMBINE_COST; i++) pieces.push({ spaceId: stack.spaceId, source: stack.source })
   }
   return pieces.length === COMBINE_COST ? pieces : null
 }
@@ -180,7 +188,7 @@ export default function CombinePage() {
         </div>
         {!auto && (
           <p className="text-center text-label-sm text-inverse-on-surface/60">
-            자동 넣기는 {AUTO_MIN_STACK}개 이상 쌓인 조각만 써요. 3개 이하는 아래에서 직접 넣어 주세요.
+            자동 넣기는 {AUTO_MIN_STACK}개 이상 쌓인 조각만 쓰고, 달성할 단계 조각 4개는 남겨요. 나머지는 아래에서 직접 넣어 주세요.
           </p>
         )}
         {failed && (

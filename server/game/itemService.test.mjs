@@ -129,6 +129,21 @@ test('자동 넣기 takes ten from stacks of four or more, tallest first', () =>
   assert.throws(() => combinePieces(db, DEVICE, 'LEGENDARY'), /invalid grade/)
 })
 
+test('자동 넣기 spends kept pieces first and leaves a ready 장소 its four', () => {
+  const db = freshDbWithPoints(5000)
+  // 욕실 stage: 9 일반 pieces (randomFn 0 always lands on 욕실's first 일반 item).
+  for (let i = 0; i < 9; i++) openBox(db, DEVICE, 'box-starter', NOW, () => 0)
+  stockRow(db, 'car', 'COMMON', 4)
+  stockRow(db, 'kitchen', 'COMMON', 4)
+  combinePieces(db, DEVICE, 'COMMON', undefined, () => 0)
+  const bathroom = room(db, 'bathroom')
+  assert.equal(bathroom.stage, 'COMMON')
+  assert.equal(bathroom.count, 7)
+  assert.deepEqual(getStacks(db, DEVICE).filter((s) => s.source === 'stock' && s.grade === 'COMMON'), [])
+  // 욕실's spare is 3 now: with no kept pieces left, ten can't be found.
+  assert.throws(() => combinePieces(db, DEVICE, 'COMMON'), /not enough pieces/)
+})
+
 test('pieces picked by hand must add up to ten and exist', () => {
   const db = freshDbWithPoints(0)
   stockRow(db, 'laundry', 'COMMON', 3)
